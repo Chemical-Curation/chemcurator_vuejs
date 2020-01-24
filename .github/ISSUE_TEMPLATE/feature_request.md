@@ -7,10 +7,10 @@ assignees: ''
 
 ---
 
-As a *role*
-I want *functionality*
-So that *justification*
+**As a** *role*
+**I want** *functionality*
+**So that** *justification*
 
-Acceptance Criteria:
+**Acceptance Criteria:**
 
-Test(s):
+**Test(s):**
