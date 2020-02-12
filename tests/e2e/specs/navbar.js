@@ -3,7 +3,7 @@
 describe("Home should have navbar", () => {
   it("Visits the app root url", () => {
     cy.visit("localhost:8080");
-    cy.contains("navbar", "ChemReg");
+    cy.contains("nav", "ChemReg");
   });
 });
 
