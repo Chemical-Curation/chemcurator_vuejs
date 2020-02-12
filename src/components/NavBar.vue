@@ -19,7 +19,7 @@
 
 <script>
 export default {
-  name: `navbar`
+  name: "navbar"
 };
 </script>
 
@@ -32,5 +32,4 @@ export default {
   nav a {
     color: white;
   }
-
 </style>
