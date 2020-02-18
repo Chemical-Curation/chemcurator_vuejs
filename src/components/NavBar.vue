@@ -24,12 +24,12 @@ export default {
 </script>
 
 <style scoped>
-  .navbar {
-    height: 30px;
-    background-color: #0071bc;
-  }
+.navbar {
+  height: 30px;
+  background-color: #0071bc;
+}
 
-  nav a {
-    color: white;
-  }
+nav a {
+  color: white;
+}
 </style>
