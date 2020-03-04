@@ -8,7 +8,7 @@
 </template>
 
 <script>
-  export default {
-    name: "KetcherWindow.vue"
-  };
+export default {
+  name: "KetcherWindow.vue"
+};
 </script>
