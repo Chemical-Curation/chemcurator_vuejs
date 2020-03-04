@@ -1,17 +1,19 @@
 <template>
   <div id="app">
     <NavBar />
+    <KetcherWindow/>
     <router-view />
   </div>
 </template>
 
 <script>
-import NavBar from "./components/NavBar";
+  import NavBar from "./components/NavBar";
+  import KetcherWindow from "./components/KetcherWindow";
 
 export default {
   name: "app",
   components: {
-    NavBar
+    NavBar, KetcherWindow
   }
 };
 </script>
