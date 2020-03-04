@@ -1,7 +1,14 @@
 <template>
   <div>
     <h2>Ketcher</h2>
-    <iframe id="ketcher" class="ketcher" data-cy="ketcher" v-bind:src="ketcherURL" width="800" height="600">
+    <iframe
+      id="ketcher"
+      class="ketcher"
+      data-cy="ketcher"
+      v-bind:src="ketcherURL"
+      width="800"
+      height="600"
+    >
       ketcher
     </iframe>
   </div>
