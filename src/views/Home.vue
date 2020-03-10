@@ -1,7 +1,7 @@
 <template>
   <div class="home">
     <HelloWorld msg="Welcome to ChemReg" />
-    <KetcherWindow/>
+    <KetcherWindow />
   </div>
 </template>
 
