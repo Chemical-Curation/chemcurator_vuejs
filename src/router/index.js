@@ -38,6 +38,11 @@ const router = new VueRouter({
 
 router.beforeEach((to, from, next) => {
   if (to.matched.some(record => record.meta.requiresAuth)) {
+    // set the user to state for cypress tests loggedIn state
+    if (window.Cypress && localStorage.user) {
+      store.commit("CYPRESS_SET_USER", localStorage.user);
+      next();
+    }
     if (!store.state.user) {
       next({ name: "login" });
     } else {

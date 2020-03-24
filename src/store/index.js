@@ -3,7 +3,7 @@ import Vuex from "vuex";
 
 Vue.use(Vuex);
 
-export default new Vuex.Store({
+const store = new Vuex.Store({
   state: {
     user: ""
   },
@@ -13,6 +13,9 @@ export default new Vuex.Store({
     },
     LOGOUT(state) {
       state.user = "";
+    },
+    CYPRESS_SET_USER(state, user) {
+      state.user = user;
     }
   },
   actions: {
@@ -25,3 +28,12 @@ export default new Vuex.Store({
   },
   modules: {}
 });
+
+store.subscribe((mutation, state) => {
+  // Store user for cypress tests
+  if (window.Cypress) {
+    localStorage.setItem("user", state.user);
+  }
+});
+
+export default store;

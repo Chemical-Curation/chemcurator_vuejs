@@ -50,7 +50,7 @@
           id="password-live-feedback"
         >This is a required field and must be at least 8 characters.</b-form-invalid-feedback>
       </b-input-group>
-      <b-button variant="primary" class="my-3" @click="login">Submit</b-button>
+      <b-button variant="primary" class="my-3" name="submit" @click="login">Submit</b-button>
     </b-form>
   </b-card>
 </template>
