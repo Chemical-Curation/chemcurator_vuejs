@@ -27,22 +27,13 @@ const api = axios.create(axiosConfig);
 Vue.prototype.$http = api;
 
 api.interceptors.response.use(
-  // this is currently our guard for loggedIn state, status codes may need to change
-  response => {
-    if (response.status === 200 || response.status === 201) {
-      return Promise.resolve(response);
-    } else {
-      return Promise.reject(response);
-    }
-  },
-  () => {
-    // cookie no longer good
-    if (store.state.user) {
-      store.dispatch("logout").then(() => {
-        router.push("/login");
-      });
-    }
-    throw new Error("Go back to start, do not pass go, do not collect $200!");
+  // this is currently our guard for loggedIn state
+  response => response,
+  error => {
+    store.dispatch("logout").then(() => {
+      router.push("/login");
+    });
+    return Promise.reject(error);
   }
 );
 
