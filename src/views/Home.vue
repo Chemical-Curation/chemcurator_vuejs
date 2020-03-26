@@ -7,7 +7,7 @@
 
 <script>
 // @ is an alias to /src
-import { doIt } from "@/backend";
+// import { doIt } from "@/backend";
 import HelloWorld from "@/components/HelloWorld.vue";
 import KetcherWindow from "../components/KetcherWindow";
 
@@ -16,8 +16,8 @@ export default {
   components: {
     HelloWorld,
     KetcherWindow
-  },
-  created: doIt
+  }
+  // created: doIt
 };
 </script>
 

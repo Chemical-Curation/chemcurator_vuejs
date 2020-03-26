@@ -6,16 +6,13 @@
 </template>
 
 <script>
-import { doIt } from "@/backend";
-
 export default {
   name: "About",
   data() {
     return {
       uname: "this should never appear"
     };
-  },
-  created: doIt
+  }
 };
 </script>
 
