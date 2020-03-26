@@ -17,7 +17,6 @@ export default {
     HelloWorld,
     KetcherWindow
   }
-  // created: doIt
 };
 </script>
 

@@ -46,12 +46,13 @@ router.beforeEach((to, from, next) => {
     };
     HTTP(options)
       .then(response => response)
-      .catch(() => {
+      .catch(error => {
+        console.log(error.response.status);
         next({ name: "login" });
       });
     // set the user to state for cypress tests loggedIn state
     if (window.Cypress && localStorage.user) {
-      store.commit("CYPRESS_SET_USER", localStorage.user);
+      store.commit("SET_USER", localStorage.user);
       next();
     }
     if (!store.state.auth.user) {

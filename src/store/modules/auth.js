@@ -24,9 +24,6 @@ const mutations = {
   },
   LOGOUT(state) {
     state.user = "";
-  },
-  CYPRESS_SET_USER(state, user) {
-    state.user = user;
   }
 };
 

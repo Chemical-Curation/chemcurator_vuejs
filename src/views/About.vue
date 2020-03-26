@@ -8,10 +8,10 @@
 <script>
 export default {
   name: "About",
-  data() {
-    return {
-      uname: "this should never appear"
-    };
+  computed: {
+    uname() {
+      return this.$store.state.auth.user;
+    }
   }
 };
 </script>
