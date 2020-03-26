@@ -1,15 +1,16 @@
+import { HTTP } from "@/store/http-common";
+
 export function doIt() {
   const options = {
     method: "get",
     url: "login/",
     withCredentials: true
   };
-  this.$http(options)
+  HTTP(options)
     .then(() => {
-      this.uname = this.$store.state.user;
+      this.uname = this.$store.state.auth.user;
     })
-    .catch(error => {
+    .catch(() => {
       // alert("you're credentials are no longer good!");
-      console.log(error);
     });
 }

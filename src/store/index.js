@@ -1,32 +1,13 @@
 import Vue from "vue";
 import Vuex from "vuex";
+import auth from "./modules/auth";
 
 Vue.use(Vuex);
 
 const store = new Vuex.Store({
-  state: {
-    user: ""
-  },
-  mutations: {
-    SET_USER(state, user) {
-      state.user = user;
-    },
-    LOGOUT(state) {
-      state.user = "";
-    },
-    CYPRESS_SET_USER(state, user) {
-      state.user = user;
-    }
-  },
-  actions: {
-    logout({ commit }) {
-      commit("LOGOUT");
-    }
-  },
-  getters: {
-    isLoggedIn: state => !!state.user
-  },
-  modules: {}
+  modules: {
+    auth
+  }
 });
 
 store.subscribe((mutation, state) => {

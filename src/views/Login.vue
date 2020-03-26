@@ -9,8 +9,7 @@
       :variant="variant"
       ref="message"
       v-bind:class="{ 'm-0 p-0 ': true, shake: variant === 'danger' }"
-      >{{ message }}</b-alert
-    >
+    >{{ message }}</b-alert>
     <b-form>
       <b-input-group class="my-2">
         <template v-slot:prepend>
@@ -26,9 +25,7 @@
           id="text-username"
           class="rounded-right"
         />
-        <b-form-invalid-feedback id="username-live-feedback"
-          >This is a required field.</b-form-invalid-feedback
-        >
+        <b-form-invalid-feedback id="username-live-feedback">This is a required field.</b-form-invalid-feedback>
       </b-input-group>
       <b-input-group aria-describedby="password-live-feedback">
         <template v-slot:prepend>
@@ -47,23 +44,20 @@
           <span class="input-group-text rounded-right">
             <b-icon icon="eye-fill" />
           </span>
-          <b-tooltip target="eye" triggers="hover" placement="right"
-            >Show Password</b-tooltip
-          >
+          <b-tooltip target="eye" triggers="hover" placement="right">Show Password</b-tooltip>
         </div>
-        <b-form-invalid-feedback id="password-live-feedback"
-          >This is a required field and must be at least 8
-          characters.</b-form-invalid-feedback
-        >
+        <b-form-invalid-feedback id="password-live-feedback">
+          This is a required field and must be at least 8
+          characters.
+        </b-form-invalid-feedback>
       </b-input-group>
-      <b-button variant="primary" class="my-3" name="submit" @click="login"
-        >Submit</b-button
-      >
+      <b-button variant="primary" class="my-3" name="submit" @click="login">Submit</b-button>
     </b-form>
   </b-card>
 </template>
 
 <script>
+import { HTTP } from "@/store/http-common";
 import { validationMixin } from "vuelidate";
 import { required, minLength } from "vuelidate/lib/validators";
 
@@ -124,9 +118,9 @@ export default {
         auth: { username, password },
         withCredentials: true
       };
-      this.$http(options)
+      HTTP(options)
         .then(() => {
-          this.$store.commit("SET_USER", username);
+          this.$store.dispatch("auth/login", username);
           this.$router.push("/");
         })
         .catch(error => {

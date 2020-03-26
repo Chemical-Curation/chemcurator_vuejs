@@ -3,7 +3,6 @@ import App from "./App.vue";
 import "./registerServiceWorker";
 import router from "./router";
 import store from "./store";
-import axios from "axios";
 import Vuelidate from "vuelidate";
 import {
   BootstrapVue,
@@ -16,26 +15,6 @@ Vue.config.productionTip = false;
 Vue.use(BootstrapVue);
 Vue.use(IconsPlugin);
 Vue.use(Vuelidate);
-
-const axiosConfig = {
-  baseURL: process.env.VUE_APP_API_URL
-  // timeout: 30000 // not sure what to set here, default is 0.
-  // https://github.com/axios/axios/blob/master/README.md#request-config
-};
-const api = axios.create(axiosConfig);
-
-Vue.prototype.$http = api;
-
-api.interceptors.response.use(
-  // this is currently our guard for loggedIn state
-  response => response,
-  error => {
-    store.dispatch("logout").then(() => {
-      router.push("/login");
-    });
-    return Promise.reject(error);
-  }
-);
 
 const app = new Vue({
   router,
