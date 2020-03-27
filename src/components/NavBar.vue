@@ -2,7 +2,11 @@
   <b-navbar toggleable="lg" type="light" variant="primary">
     <router-link :to="{ name: 'home' }">
       <b-navbar-brand>
-        <img :src="require(`@/assets/logo_32px.png`)" class="d-inline-block" alt />
+        <img
+          :src="require(`@/assets/logo_32px.png`)"
+          class="d-inline-block"
+          alt
+        />
         ChemReg
       </b-navbar-brand>
     </router-link>
@@ -12,7 +16,9 @@
         <b-nav-item :to="{ name: 'about' }">About</b-nav-item>
       </b-navbar-nav>
       <b-navbar-nav class="ml-auto">
-        <b-nav-item :to="{ name: 'login' }" data-test="login" v-if="!isLoggedIn">Login</b-nav-item>
+        <b-nav-item :to="{ name: 'login' }" data-test="login" v-if="!isLoggedIn"
+          >Login</b-nav-item
+        >
         <b-nav-item-dropdown name="user-profile" right v-if="isLoggedIn">
           <template v-slot:button-content>
             <span class="h4">
@@ -20,7 +26,9 @@
               {{ user }}
             </span>
           </template>
-          <b-dropdown-item name="logout" @click="logout">Log Out</b-dropdown-item>
+          <b-dropdown-item name="logout" @click="logout"
+            >Log Out</b-dropdown-item
+          >
         </b-nav-item-dropdown>
       </b-navbar-nav>
     </b-collapse>

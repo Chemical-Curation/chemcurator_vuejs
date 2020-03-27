@@ -46,8 +46,8 @@ router.beforeEach((to, from, next) => {
     };
     HTTP(options)
       .then(response => response)
-      .catch(error => {
-        console.log(error.response.status);
+      .catch(() => {
+        // console.log(error.response.status);
         next({ name: "login" });
       });
     // set the user to state for cypress tests loggedIn state

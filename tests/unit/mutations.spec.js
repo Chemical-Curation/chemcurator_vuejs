@@ -5,14 +5,14 @@ import store from "@/store";
 // cause it's already checked in the e2e tests.
 
 test("logout mutation logs out user from state", () => {
-  store.state.user = "annabelle";
-  expect(store.state.user).toBe("annabelle");
-  store.commit("LOGOUT");
-  expect(store.state.user).toBe("");
+  store.state.auth.user = "annabelle";
+  expect(store.state.auth.user).toBe("annabelle");
+  store.commit("auth/LOGOUT");
+  expect(store.state.auth.user).toBe("");
 });
 
 test("getter returns proper isLoggedIn state", () => {
-  expect(store.getters.isLoggedIn).toBe(false);
-  store.state.user = "annabelle";
-  expect(store.getters.isLoggedIn).toBe(true);
+  expect(store.getters["auth/isLoggedIn"]).toBe(false);
+  store.state.auth.user = "annabelle";
+  expect(store.getters["auth/isLoggedIn"]).toBe(true);
 });
