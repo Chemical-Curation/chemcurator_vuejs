@@ -1,29 +1,53 @@
+import router from "@/router";
+import { HTTP } from "../http-common";
+
 const state = {
-  user: ""
+  email: "",
+  firstName: "",
+  lastName: "",
+  username: ""
 };
 
 // getters
 const getters = {
-  isLoggedIn: state => !!state.user
+  isAuthenticated: state => !(state.username === "")
 };
 
 // actions
 const actions = {
-  logout({ commit }) {
-    commit("LOGOUT");
+  fetchUser: async ({ commit }) => {
+    try {
+      const response = await HTTP.get("/login/");
+      commit("setUser", response.data);
+    } catch {
+      commit("setUser", {});
+    }
   },
-  login({ commit }, user) {
-    commit("SET_USER", user);
+  login: async ({ commit }, { username, password }) => {
+    const response = await HTTP.post(
+      "/login/",
+      {},
+      {
+        auth: { username: username, password: password }
+      }
+    );
+    commit("setUser", response.data);
+    router.push("/");
+  },
+  logout: async ({ commit }) => {
+    await HTTP.delete("/login/");
+    commit("setUser", {});
+    router.push("login");
   }
 };
 
 // mutations
 const mutations = {
-  SET_USER(state, user) {
-    state.user = user;
-  },
-  LOGOUT(state) {
-    state.user = "";
+  setUser(state, user) {
+    state.email = user.email || "";
+    state.firstName = user.first_name || "";
+    state.lastName = user.last_name || "";
+    state.username = user.username || "";
   }
 };
 
