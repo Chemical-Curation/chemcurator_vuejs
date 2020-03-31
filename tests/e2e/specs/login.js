@@ -1,69 +1,35 @@
-describe("login", () => {
-  beforeEach(() => {
+describe("The Login page", () => {
+  it("sets and deletes sessionid cookie on login/logout", function() {
+    const user = Cypress.env("VUE_APP_TEST_ADMIN_USER");
+    const pass = Cypress.env("VUE_APP_TEST_ADMIN_PASS");
+
     cy.visit("/login");
+    cy.get("input[name=username]").type(user);
+    cy.get("input[name=password]").type(`${pass}{enter}`);
+    // we should be redirected to /
+    cy.url().should("eq", Cypress.config().baseUrl);
+    // our auth cookie should be present
+    cy.getCookie("sessionid").should("exist");
+    // UI should reflect this user being logged in
+    cy.get("[name='user-profile']").should("contain", "karyn");
+    // cookie should be deleted on logout
+    cy.get("[name='user-profile']").click();
+    cy.get("[name='logout']").click();
+    cy.getCookie("sessionid").should("not.exist");
   });
-
-  const getStore = () => cy.window().its("app.$store");
-
-  it("state has user property empty", () => {
-    getStore()
-      .its("state")
-      .should("have.keys", ["user"]);
-    getStore()
-      .its("state.user")
-      .should("equal", "");
+  it("refuses bad logins", function() {
+    cy.visit("/login");
+    cy.get("input[name=username]").type("foo");
+    cy.get("input[name=password]").type("bar{enter}");
+    cy.get(".alert").contains("Invalid username/password");
   });
-
-  it("A User logs in and sees their username in the nav bar", () => {
-    login("annabelle", "specialP@55word");
-    getStore()
-      .its("state.user")
-      .should("equal", "annabelle");
-    expect(cy.contains("annabelle")).toBeTruthy;
-  });
-
-  it("A User logs off and sees login page", () => {
-    login("annabelle", "specialP@55word");
-    logout();
-    getStore()
-      .its("state.user")
-      .should("equal", "");
-    expect(cy.contains("Please log in..."));
-  });
-
-  it("Username displays error", () => {
-    cy.login("", "password");
-    cy.contains("#username-live-feedback", "This is a required field.");
-  });
-
-  it("Password displays error", () => {
-    cy.login("garbage", "");
-    cy.contains(
-      "#password-live-feedback",
-      "This is a required field and must be at least 8 characters."
-    );
-  });
-
-  it("A User logs in with bad credentials and gets error", () => {
-    login("garbage", "password");
-    getStore()
-      .its("state.user")
-      .should("equal", "");
-    cy.contains("Invalid username/password.");
+  it("username/password required", function() {
+    cy.visit("/login");
+    cy.get("input[name=username]")
+      .invoke("attr", "required")
+      .should("exist");
+    cy.get("input[name=password]")
+      .invoke("attr", "required")
+      .should("exist");
   });
 });
-
-const logout = () => {
-  cy.get("[name='user-profile']").click();
-  cy.get("[name='logout']").click();
-};
-
-const login = (username, password) => {
-  if (username) {
-    cy.get("#text-username").type(username);
-  }
-  if (password) {
-    cy.get("#text-password").type(password);
-  }
-  cy.get("[name='submit']").click();
-};

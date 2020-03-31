@@ -10,8 +10,13 @@
 //
 //
 // -- This is a parent command --
-Cypress.Commands.add("login", () => {
-  window.localStorage.setItem("user", "annabelle");
+Cypress.Commands.add("adminLogin", () => {
+  cy.request("POST", "/login/", {
+    auth: {
+      user: process.env.VUE_APP_TEST_ADMIN_USER,
+      pass: process.env.VUE_APP_TEST_ADMIN_PASS
+    }
+  });
 });
 //
 //

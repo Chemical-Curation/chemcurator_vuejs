@@ -1,14 +1,13 @@
-// https://docs.cypress.io/api/introduction/api.html
-
-describe("Visits the app root url", () => {
+describe("The navbar", () => {
   before(() => {
-    cy.login();
-    cy.visit("/");
+    cy.adminLogin();
   });
   it("Home should have navbar", () => {
+    cy.visit("/");
     cy.contains("nav", "ChemReg");
   });
-  it("Home should have welcome msg", () => {
-    cy.contains("h1", "Welcome to ChemReg");
+  it("About should have navbar", () => {
+    cy.visit("/about");
+    cy.contains("nav", "ChemReg");
   });
 });
