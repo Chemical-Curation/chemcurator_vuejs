@@ -6,10 +6,8 @@
 </template>
 
 <script>
-// @ is an alias to /src
-// import { doIt } from "@/backend";
-import HelloWorld from "@/components/HelloWorld.vue";
-import KetcherWindow from "../components/KetcherWindow";
+import HelloWorld from "@/components/HelloWorld";
+import KetcherWindow from "@/components/KetcherWindow";
 
 export default {
   name: "home",
