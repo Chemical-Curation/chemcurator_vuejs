@@ -32,4 +32,10 @@ describe("The login page", () => {
       .invoke("attr", "required")
       .should("exist");
   });
+  it("redirects to login page when anonymous", function() {
+    cy.visit("/");
+    cy.url().should("eq", Cypress.config().baseUrl + "login");
+    cy.visit("/about");
+    cy.url().should("eq", Cypress.config().baseUrl + "login");
+  });
 });
