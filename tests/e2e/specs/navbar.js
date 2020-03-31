@@ -2,12 +2,12 @@ describe("The navbar", () => {
   before(() => {
     cy.adminLogin();
   });
-  it("Home should have navbar", () => {
+  it("home should have navbar", () => {
     cy.visit("/");
-    cy.contains("nav", "ChemReg");
+    cy.contains("nav", "chemreg");
   });
-  it("About should have navbar", () => {
+  it("about should have navbar", () => {
     cy.visit("/about");
-    cy.contains("nav", "ChemReg");
+    cy.contains("nav", "chemreg");
   });
 });

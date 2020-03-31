@@ -11,10 +11,13 @@
 //
 // -- This is a parent command --
 Cypress.Commands.add("adminLogin", () => {
-  cy.request("POST", "/login/", {
+  cy.request({
+    method: "POST",
+    url: Cypress.env("VUE_APP_API_URL") + "/login/",
     auth: {
-      user: process.env.VUE_APP_TEST_ADMIN_USER,
-      pass: process.env.VUE_APP_TEST_ADMIN_PASS
+      user: Cypress.env("VUE_APP_TEST_ADMIN_USER"),
+      pass: Cypress.env("VUE_APP_TEST_ADMIN_PASS"),
+      sendImmediately: true
     }
   });
 });

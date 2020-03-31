@@ -1,4 +1,4 @@
-describe("The Login page", () => {
+describe("The login page", () => {
   it("sets and deletes sessionid cookie on login/logout", function() {
     const user = Cypress.env("VUE_APP_TEST_ADMIN_USER");
     const pass = Cypress.env("VUE_APP_TEST_ADMIN_PASS");

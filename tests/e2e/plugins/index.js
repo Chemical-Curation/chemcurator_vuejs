@@ -14,6 +14,7 @@ module.exports = (on, config) => {
   //  watchOptions: {}
   // }))
 
+  config.env.VUE_APP_API_URL = process.env.VUE_APP_API_URL;
   config.env.VUE_APP_TEST_ADMIN_USER = process.env.VUE_APP_TEST_ADMIN_USER;
   config.env.VUE_APP_TEST_ADMIN_PASS = process.env.VUE_APP_TEST_ADMIN_PASS;
 

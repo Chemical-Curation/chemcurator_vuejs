@@ -3,10 +3,10 @@ describe("The home page", () => {
     cy.adminLogin();
     cy.visit("/");
   });
-  it("Home should have welcome msg", () => {
+  it("should have welcome msg", () => {
     cy.contains("h1", "Welcome to ChemReg");
   });
-  it("Home should have Ketcher", () => {
+  it("should have Ketcher", () => {
     cy.get("[data-cy=ketcher]").contains("ketcher");
   });
 });
