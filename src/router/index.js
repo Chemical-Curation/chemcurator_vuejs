@@ -2,7 +2,6 @@ import Vue from "vue";
 import VueRouter from "vue-router";
 import store from "@/store";
 import Home from "@/views/Home.vue";
-import { HTTP } from "@/store/http-common";
 
 Vue.use(VueRouter);
 
@@ -37,32 +36,15 @@ const router = new VueRouter({
   routes
 });
 
-router.beforeEach((to, from, next) => {
-  if (to.matched.some(record => record.meta.requiresAuth)) {
-    const options = {
-      method: "get",
-      url: "login/",
-      withCredentials: true
-    };
-    HTTP(options)
-      .then(response => response)
-      .catch(error => {
-        console.log(error.response.status);
-        next({ name: "login" });
-      });
-    // set the user to state for cypress tests loggedIn state
-    if (window.Cypress && localStorage.user) {
-      store.commit("SET_USER", localStorage.user);
-      next();
-    }
-    if (!store.state.auth.user) {
+router.beforeEach(async (to, from, next) => {
+  if (to.meta.requiresAuth) {
+    await store.dispatch("auth/fetchUser");
+    if (!store.getters["auth/isAuthenticated"]) {
       next({ name: "login" });
-    } else {
-      next();
+      return;
     }
-  } else {
-    next();
   }
+  next();
 });
 
 export default router;
