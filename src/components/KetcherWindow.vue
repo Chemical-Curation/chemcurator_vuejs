@@ -16,7 +16,7 @@
 
 <script>
 export default {
-  name: "KetcherWindow.vue",
+  name: "KetcherWindow",
   data() {
     return {
       ketcherURL: process.env.VUE_APP_KETCHER_URL
