@@ -1,11 +1,10 @@
 <template>
-  <b-tabs class="editor" content-class="mt-3" 
-      active-nav-item-class="font-weight-bold" fill>
+  <b-tabs class="editor" content-class="mt-3" active-nav-item-class="font-weight-bold" fill>
     <b-tab title="Ketcher" active>
-        <KetcherWindow />
+      <KetcherWindow />
     </b-tab>
     <b-tab title="Marvin">
-        <MarvinWindow />
+      <MarvinWindow />
     </b-tab>
   </b-tabs>
 </template>
