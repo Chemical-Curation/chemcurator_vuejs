@@ -9,4 +9,7 @@ describe("The home page", () => {
   it("should have Ketcher", () => {
     cy.get("[data-cy=ketcher]").contains("ketcher");
   });
+  it("should have Marvin", () => {
+    cy.get("[data-cy=marvin]").contains("marvin");
+  });
 });
