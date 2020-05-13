@@ -23,6 +23,3 @@ yarn-error.log*
 *.njsproj
 *.sln
 *.sw?
-
-# MarvinJS license files
-*.cxl
