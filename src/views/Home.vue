@@ -13,7 +13,7 @@ export default {
   name: "home",
   components: {
     HelloWorld,
-    ChemicalEditors,
+    ChemicalEditors
   }
 };
 </script>

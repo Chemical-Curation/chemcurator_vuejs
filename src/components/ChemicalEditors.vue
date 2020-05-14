@@ -1,5 +1,10 @@
 <template>
-  <b-tabs class="editor" content-class="mt-3" active-nav-item-class="font-weight-bold" fill>
+  <b-tabs
+    class="editor"
+    content-class="mt-3"
+    active-nav-item-class="font-weight-bold"
+    fill
+  >
     <b-tab title="Ketcher" active>
       <KetcherWindow />
     </b-tab>

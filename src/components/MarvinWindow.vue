@@ -1,6 +1,8 @@
 <template>
   <div>
-    <iframe id="marvin" class="marvin" data-cy="marvin" v-bind:src="marvinURL">marvin</iframe>
+    <iframe id="marvin" class="marvin" data-cy="marvin" v-bind:src="marvinURL"
+      >marvin</iframe
+    >
   </div>
 </template>
 
