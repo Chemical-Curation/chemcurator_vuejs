@@ -1,17 +1,14 @@
 <template>
-  <b-tabs
-    class="editor"
-    content-class="mt-3"
-    active-nav-item-class="font-weight-bold"
-    fill
-  >
-    <b-tab title="Ketcher" active>
-      <KetcherWindow />
-    </b-tab>
-    <b-tab title="Marvin">
-      <MarvinWindow />
-    </b-tab>
-  </b-tabs>
+  <div>
+    <b-form-select
+      id="compound-type-dropdown"
+      v-model="selected"
+      :options="options"
+      class="m-5 w-25"
+    ></b-form-select>
+    <KetcherWindow v-if="selected == 'defined'" />
+    <MarvinWindow v-if="selected == 'ill-defined'" />
+  </div>
 </template>
 
 <script>
@@ -23,6 +20,15 @@ export default {
   components: {
     KetcherWindow,
     MarvinWindow
+  },
+  data() {
+    return {
+      selected: "defined",
+      options: [
+        { value: "defined", text: "defined" },
+        { value: "ill-defined", text: "ill-defined" }
+      ]
+    };
   }
 };
 </script>
