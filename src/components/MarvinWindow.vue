@@ -3,6 +3,31 @@
     <iframe id="marvin" class="marvin" data-cy="marvin" v-bind:src="marvinURL"
       >marvin</iframe
     >
+    <br />
+    <b-button
+      variant="secondary"
+      v-on:click="exportMrvfile"
+      style="width:800px"
+      id="marvin-export-button"
+      ><b-icon-file-arrow-down></b-icon-file-arrow-down> Export</b-button
+    >
+    <b-form-textarea
+      id="marvin-import-textarea"
+      v-model="mrvfile"
+      rows="3"
+      max-rows="6"
+      placeholder="Paste mrvfile to import..."
+      class="mx-auto mt-5"
+      style="width:800px"
+    ></b-form-textarea>
+    <b-button
+      variant="primary"
+      v-on:click="importMrvfile"
+      class="mt-2"
+      style="width:800px"
+      id="marvin-import-button"
+      ><b-icon-file-arrow-up></b-icon-file-arrow-up> Import</b-button
+    >
   </div>
 </template>
 
@@ -11,23 +36,43 @@ export default {
   name: "MarvinWindow",
   data() {
     return {
-      marvinURL: process.env.VUE_APP_MARVIN_URL + "/editorws.html"
+      marvinURL: process.env.VUE_APP_MARVIN_URL + "/editorws.html",
+      mrvfile: ""
     };
   },
-  computed: {
-    mrvfile: {
-      set: function(newValue) {
-        document
-          .getElementById("marvin")
-          .contentWindow.postMessage(
-            `{"method": "importStructure", "args": ["mrv", "${newValue.replace(
-              /"/g,
-              "'"
-            )}"]}`,
-            "*"
-          );
-      }
+  methods: {
+    importMrvfile: function() {
+      document
+        .getElementById("marvin")
+        .contentWindow.postMessage(
+          { type: "importMrvfile", mrvfile: this.mrvfile },
+          "*"
+        );
+    },
+    exportMrvfile: function() {
+      document
+        .getElementById("marvin")
+        .contentWindow.postMessage({ type: "exportMrvfile" }, "*");
     }
+  },
+  mounted() {
+    window.addEventListener(
+      "message",
+      function(event) {
+        if (event.data.type == "returnMrvfile") {
+          // https://stackoverflow.com/a/34156339
+          var a = document.createElement("a");
+          var file = new Blob([event.data.mrvfile], {
+            type: "application/xml"
+          });
+          a.href = URL.createObjectURL(file);
+          a.download = "structure.mrv";
+          a.click();
+          URL.revokeObjectURL(a.href);
+        }
+      },
+      false
+    );
   }
 };
 </script>
