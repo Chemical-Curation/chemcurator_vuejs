@@ -56,19 +56,12 @@ export default {
     }
   },
   mounted() {
+    let self = this;
     window.addEventListener(
       "message",
       function(event) {
         if (event.data.type == "returnMrvfile") {
-          // https://stackoverflow.com/a/34156339
-          var a = document.createElement("a");
-          var file = new Blob([event.data.mrvfile], {
-            type: "application/xml"
-          });
-          a.href = URL.createObjectURL(file);
-          a.download = "structure.mrv";
-          a.click();
-          URL.revokeObjectURL(a.href);
+          self.mrvfile = event.data.mrvfile;
         }
       },
       false
