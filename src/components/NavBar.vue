@@ -10,10 +10,14 @@
       <b-navbar-nav>
         <b-nav-item :to="{ name: 'about' }">About</b-nav-item>
       </b-navbar-nav>
+      <b-form-input
+        class="search ml-auto"
+        v-model="text"
+        v-if="username"
+        placeholder="Search Compounds"
+      />
       <b-navbar-nav class="ml-auto">
-        <b-nav-item :to="{ name: 'login' }" v-if="!isAuthenticated"
-          >Login</b-nav-item
-        >
+        <b-nav-item :to="{ name: 'login' }" v-if="!isAuthenticated">Login</b-nav-item>
         <b-nav-item-dropdown name="user-profile" right v-if="username">
           <template v-slot:button-content>
             <span>
@@ -21,9 +25,7 @@
               {{ username }}
             </span>
           </template>
-          <b-dropdown-item name="logout" @click="logout"
-            >Log Out</b-dropdown-item
-          >
+          <b-dropdown-item name="logout" @click="logout">Log Out</b-dropdown-item>
         </b-nav-item-dropdown>
       </b-navbar-nav>
     </b-collapse>
@@ -36,6 +38,9 @@ import ChemregLogo from "@/components/ChemregLogo";
 
 export default {
   name: "NavBar",
+  props: {
+    text: String
+  },
   computed: {
     ...mapState("auth", ["username"]),
     ...mapGetters("auth", ["isAuthenticated"])
@@ -54,5 +59,8 @@ export default {
 <style scoped>
 img {
   margin-right: 5px;
+}
+.search {
+  width: 30%;
 }
 </style>
