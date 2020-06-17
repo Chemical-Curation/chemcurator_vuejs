@@ -12,10 +12,19 @@
       </b-navbar-nav>
       <b-form-input
         class="search ml-auto"
-        v-model="text"
+        v-model="searchString"
         v-if="username"
-        placeholder="Search Compounds"
+        placeholder="Search Compounds (cid or inchikey)"
       />
+      <b-button
+        class="ml-2"
+        variant="dark"
+        @click="searchCompound"
+        v-if="username"
+        :disabled="searchString.length == 0"
+      >
+        <b-icon icon="search" />
+      </b-button>
       <b-navbar-nav class="ml-auto">
         <b-nav-item :to="{ name: 'login' }" v-if="!isAuthenticated">Login</b-nav-item>
         <b-nav-item-dropdown name="user-profile" right v-if="username">
@@ -38,8 +47,10 @@ import ChemregLogo from "@/components/ChemregLogo";
 
 export default {
   name: "NavBar",
-  props: {
-    text: String
+  data: function() {
+    return {
+      searchString: ""
+    };
   },
   computed: {
     ...mapState("auth", ["username"]),
@@ -48,6 +59,9 @@ export default {
   methods: {
     logout: function() {
       this.$store.dispatch("auth/logout");
+    },
+    searchCompound: function() {
+      this.$store.dispatch("compound/fetchCompound", this.searchString);
     }
   },
   components: {

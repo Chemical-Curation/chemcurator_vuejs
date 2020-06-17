@@ -1,34 +1,43 @@
 <template>
   <div>
-    <b-form-select
-      id="compound-type-dropdown"
-      v-model="selected"
-      :options="options"
-      class="m-5 w-25"
-    ></b-form-select>
-    <KetcherWindow v-if="selected == 'defined'" />
-    <MarvinWindow v-if="selected == 'ill-defined'" />
+    <Alert />
+    <b-form-select id="compound-type-dropdown" v-model="type" :options="options" class="m-5 w-25" />
+    <KetcherWindow v-if="type == 'definedCompound'" />
+    <MarvinWindow v-if="type == 'illDefinedCompound'" />
   </div>
 </template>
 
 <script>
+import { mapState } from "vuex";
 import KetcherWindow from "@/components/KetcherWindow";
 import MarvinWindow from "@/components/MarvinWindow";
+import Alert from "@/components/Alert";
 
 export default {
   name: "ChemicalEditors",
   components: {
     KetcherWindow,
-    MarvinWindow
+    MarvinWindow,
+    Alert
   },
   data() {
     return {
-      selected: "defined",
       options: [
-        { value: "defined", text: "defined" },
-        { value: "ill-defined", text: "ill-defined" }
+        { value: "definedCompound", text: "defined" },
+        { value: "illDefinedCompound", text: "ill-defined" }
       ]
     };
+  },
+  computed: {
+    type: {
+      get() {
+        return this.$store.state.compound.type;
+      },
+      set(value) {
+        this.$store.commit("compound/setType", value);
+      }
+    },
+    ...mapState("compound", ["cid"])
   }
 };
 </script>
