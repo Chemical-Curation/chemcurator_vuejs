@@ -33,8 +33,6 @@
 </template>
 
 <script>
-// import onElementReady from "../utils/onElementReady";
-
 export default {
   name: "MarvinWindow",
   data() {
