@@ -65,6 +65,16 @@ export default {
         .contentWindow.postMessage({ type: "exportMrvfile" }, "*");
     }
   },
+  computed: {
+    filio: function() {
+      return this.$store.state.compound.mrvfile;
+    }
+  },
+  watch: {
+    filio: function() {
+      this.loadMrvfile();
+    }
+  },
   mounted() {
     let self = this;
     window.addEventListener(
@@ -72,6 +82,7 @@ export default {
       function(event) {
         if (event.data.type == "returnMrvfile") {
           self.mrvfile = event.data.mrvfile;
+          this.mrvfile = this.$store.state.compound.mrvfile;
         }
       },
       false
