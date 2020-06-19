@@ -7,12 +7,6 @@ const state = {
   molfileV3000: "",
   type: "definedCompound"
 };
-
-// getters
-// const getters = {
-//   isAuthenticated: state => !(state.username === "")
-// };
-
 // actions
 const actions = {
   fetchCompound: async (context, searchString) => {
@@ -55,7 +49,6 @@ const mutations = {
 export default {
   namespaced: true,
   state,
-  //   getters,
   actions,
   mutations
 };

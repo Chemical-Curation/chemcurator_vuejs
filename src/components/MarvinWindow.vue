@@ -1,16 +1,16 @@
 <template>
   <div>
-    <iframe id="marvin" class="marvin" data-cy="marvin" v-bind:src="marvinURL"
-      >marvin</iframe
-    >
+    <br />
+    <iframe id="marvin" class="marvin compound" data-cy="marvin" v-bind:src="marvinURL">marvin</iframe>
     <br />
     <b-button
       variant="secondary"
       v-on:click="exportMrvfile"
       style="width:800px"
       id="marvin-export-button"
-      ><b-icon-file-arrow-down></b-icon-file-arrow-down> Export</b-button
     >
+      <b-icon-file-arrow-down></b-icon-file-arrow-down>Export
+    </b-button>
     <b-form-textarea
       id="marvin-import-textarea"
       v-model="mrvfile"
@@ -26,12 +26,15 @@
       class="mt-2"
       style="width:800px"
       id="marvin-import-button"
-      ><b-icon-file-arrow-up></b-icon-file-arrow-up> Import</b-button
     >
+      <b-icon-file-arrow-up></b-icon-file-arrow-up>Import
+    </b-button>
   </div>
 </template>
 
 <script>
+// import onElementReady from "../utils/onElementReady";
+
 export default {
   name: "MarvinWindow",
   data() {
@@ -48,6 +51,15 @@ export default {
           { type: "importMrvfile", mrvfile: this.mrvfile },
           "*"
         );
+    },
+    loadMrvfile: function() {
+      document.getElementById("marvin").contentWindow.postMessage(
+        {
+          type: "importMrvfile",
+          mrvfile: this.$store.state.compound.mrvfile
+        },
+        "*"
+      );
     },
     exportMrvfile: function() {
       document
@@ -66,6 +78,13 @@ export default {
       },
       false
     );
+    if (this.$store.state.compound.mrvfile !== "") {
+      const load = this.loadMrvfile; // lexical this, goes away in setTimeout!
+      setTimeout(function() {
+        load();
+      }, 300); // there is a bit of lag to get the .marvin element to load, thus, the timeout.
+      this.mrvfile = this.$store.state.compound.mrvfile;
+    }
   }
 };
 </script>
