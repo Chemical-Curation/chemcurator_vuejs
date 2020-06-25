@@ -6,7 +6,8 @@
     :variant="color"
     v-on:dismissed="clearState"
     @dismiss-count-down="countDownChanged"
-  >{{ message }}</b-alert>
+    >{{ message }}</b-alert
+  >
 </template>
 
 <script>

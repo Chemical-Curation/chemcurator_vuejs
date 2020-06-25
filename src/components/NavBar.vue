@@ -26,7 +26,9 @@
         <b-icon icon="search" />
       </b-button>
       <b-navbar-nav class="ml-auto">
-        <b-nav-item :to="{ name: 'login' }" v-if="!isAuthenticated">Login</b-nav-item>
+        <b-nav-item :to="{ name: 'login' }" v-if="!isAuthenticated"
+          >Login</b-nav-item
+        >
         <b-nav-item-dropdown name="user-profile" right v-if="username">
           <template v-slot:button-content>
             <span>
@@ -34,7 +36,9 @@
               {{ username }}
             </span>
           </template>
-          <b-dropdown-item name="logout" @click="logout">Log Out</b-dropdown-item>
+          <b-dropdown-item name="logout" @click="logout"
+            >Log Out</b-dropdown-item
+          >
         </b-nav-item-dropdown>
       </b-navbar-nav>
     </b-collapse>
