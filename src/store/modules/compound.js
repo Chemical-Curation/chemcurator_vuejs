@@ -4,7 +4,7 @@ const state = {
   cid: "",
   inchikey: "",
   mrvfile: "",
-  molfileV3000: "",
+  molfile: "",
   type: "definedCompound"
 };
 // actions
@@ -39,7 +39,7 @@ const mutations = {
     state.cid = cid;
     state.inchikey = inchikey;
     state.mrvfile = mrvfile;
-    state.molfileV3000 = molfileV3000;
+    state.molfile = molfileV3000;
   },
   setType(state, type) {
     state.type = type;
