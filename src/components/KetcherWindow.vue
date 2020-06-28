@@ -1,6 +1,5 @@
 <template>
   <div>
-    <h2>Ketcher</h2>
     <iframe
       id="ketcher"
       class="ketcher"

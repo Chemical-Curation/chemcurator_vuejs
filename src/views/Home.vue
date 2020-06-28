@@ -1,19 +1,19 @@
 <template>
   <div class="home">
     <HelloWorld msg="Welcome to ChemReg" />
-    <KetcherWindow />
+    <ChemicalEditors />
   </div>
 </template>
 
 <script>
 import HelloWorld from "@/components/HelloWorld";
-import KetcherWindow from "@/components/KetcherWindow";
+import ChemicalEditors from "@/components/ChemicalEditors";
 
 export default {
   name: "home",
   components: {
     HelloWorld,
-    KetcherWindow
+    ChemicalEditors
   }
 };
 </script>
