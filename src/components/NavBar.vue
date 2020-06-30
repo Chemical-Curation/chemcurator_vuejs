@@ -10,25 +10,26 @@
       <b-navbar-nav>
         <b-nav-item :to="{ name: 'about' }">About</b-nav-item>
       </b-navbar-nav>
-      <b-form-input
-        class="search ml-auto"
-        v-model="searchString"
-        v-if="username"
-        placeholder="Search Compounds (cid or inchikey)"
-      />
-      <b-button
-        class="ml-2"
-        variant="dark"
-        @click="searchCompound"
-        v-if="username"
-        :disabled="searchString.length == 0"
-      >
-        <b-icon icon="search" />
-      </b-button>
       <b-navbar-nav class="ml-auto">
-        <b-nav-item :to="{ name: 'login' }" v-if="!isAuthenticated"
-          >Login</b-nav-item
+        <b-form-input
+          class="mr-2 search"
+          v-model="searchString"
+          v-if="username"
+          placeholder="Search Compounds (cid or inchikey)"
+        />
+
+        <b-button
+          class="mr-2"
+          variant="dark"
+          @click="searchCompound"
+          v-if="username"
+          :disabled="searchString.length == 0"
         >
+          <b-icon icon="search" />
+        </b-button>
+      </b-navbar-nav>
+      <b-navbar-nav class="ml-auto">
+        <b-nav-item :to="{ name: 'login' }" v-if="!isAuthenticated">Login</b-nav-item>
         <b-nav-item-dropdown name="user-profile" right v-if="username">
           <template v-slot:button-content>
             <span>
@@ -36,9 +37,7 @@
               {{ username }}
             </span>
           </template>
-          <b-dropdown-item name="logout" @click="logout"
-            >Log Out</b-dropdown-item
-          >
+          <b-dropdown-item name="logout" @click="logout">Log Out</b-dropdown-item>
         </b-nav-item-dropdown>
       </b-navbar-nav>
     </b-collapse>
@@ -79,6 +78,6 @@ img {
   margin-right: 5px;
 }
 .search {
-  width: 30%;
+  width: 311px;
 }
 </style>
