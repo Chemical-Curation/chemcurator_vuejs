@@ -8,9 +8,7 @@
       v-bind:src="ketcherURL"
       width="800"
       height="600"
-    >
-      ketcher
-    </iframe>
+    >ketcher</iframe>
     <br />
     <b-button
       variant="secondary"
@@ -75,12 +73,12 @@ export default {
     }
   },
   computed: {
-    filio: function() {
+    compound: function() {
       return this.$store.state.compound.molfile;
     }
   },
   watch: {
-    filio: function() {
+    compound: function() {
       this.loadMolfile();
     }
   },
@@ -97,10 +95,11 @@ export default {
       false
     );
     if (this.$store.state.compound.molfile !== "") {
-      const load = this.loadMolfile; // lexical this, goes away in setTimeout!
-      setTimeout(function() {
+      const load = this.loadMolfile;
+      var iFrame = document.getElementById("ketcher");
+      iFrame.addEventListener("load", function() {
         load();
-      }, 300); // there is a bit of lag to get the .ketcher element to load, thus, the timeout.
+      });
       this.molfile = this.$store.state.compound.molfile;
     }
   }

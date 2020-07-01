@@ -17,7 +17,6 @@
           v-if="username"
           placeholder="Search Compounds (cid or inchikey)"
         />
-
         <b-button
           class="mr-2"
           variant="dark"

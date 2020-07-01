@@ -1,13 +1,7 @@
 <template>
   <div>
     <br />
-    <iframe
-      id="marvin"
-      class="marvin compound"
-      data-cy="marvin"
-      v-bind:src="marvinURL"
-      >marvin</iframe
-    >
+    <iframe id="marvin" class="marvin" data-cy="marvin" v-bind:src="marvinURL">marvin</iframe>
     <br />
     <b-button
       variant="secondary"
@@ -72,12 +66,12 @@ export default {
     }
   },
   computed: {
-    filio: function() {
+    compound: function() {
       return this.$store.state.compound.mrvfile;
     }
   },
   watch: {
-    filio: function() {
+    compound: function() {
       this.loadMrvfile();
     }
   },
@@ -94,10 +88,11 @@ export default {
       false
     );
     if (this.$store.state.compound.mrvfile !== "") {
-      const load = this.loadMrvfile; // lexical this, goes away in setTimeout!
-      setTimeout(function() {
+      const load = this.loadMrvfile;
+      var iFrame = document.getElementById("marvin");
+      iFrame.addEventListener("load", function() {
         load();
-      }, 300); // there is a bit of lag to get the .marvin element to load, thus, the timeout.
+      });
       this.mrvfile = this.$store.state.compound.mrvfile;
     }
   }
