@@ -65,6 +65,7 @@ export default {
         },
         "*"
       );
+      this.molfile = this.$store.state.compound.molfile;
     },
     exportMolfile: function() {
       document
@@ -100,7 +101,6 @@ export default {
       iFrame.addEventListener("load", function() {
         load();
       });
-      this.molfile = this.$store.state.compound.molfile;
     }
   }
 };

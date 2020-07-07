@@ -58,6 +58,7 @@ export default {
         },
         "*"
       );
+      this.mrvfile = this.$store.state.compound.mrvfile;
     },
     exportMrvfile: function() {
       document
@@ -89,11 +90,9 @@ export default {
     );
     if (this.$store.state.compound.mrvfile !== "") {
       const load = this.loadMrvfile;
-      var iFrame = document.getElementById("marvin");
-      iFrame.addEventListener("load", function() {
+      setTimeout(function(){
         load();
-      });
-      this.mrvfile = this.$store.state.compound.mrvfile;
+      }, 300)
     }
   }
 };
