@@ -1,5 +1,5 @@
 <template>
-  <b-navbar toggleable="lg" type="dark" variant="primary" class="shadow mb-5">
+  <b-navbar toggleable="lg" type="dark" variant="primary" class="shadow mb-2">
     <router-link :to="{ name: 'home' }">
       <b-navbar-brand>
         <ChemregLogo color="white" size="35px" />

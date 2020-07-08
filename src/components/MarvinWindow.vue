@@ -81,19 +81,19 @@ export default {
     window.addEventListener(
       "message",
       function(event) {
+        if (
+          event.data === "marvinLoaded" &&
+          self.$store.state.compound.mrvfile
+        ) {
+          self.loadMrvfile();
+        }
         if (event.data.type == "returnMrvfile") {
           self.mrvfile = event.data.mrvfile;
-          this.mrvfile = this.$store.state.compound.mrvfile;
+          this.mrvfile = self.$store.state.compound.mrvfile;
         }
       },
       false
     );
-    if (this.$store.state.compound.mrvfile !== "") {
-      const load = this.loadMrvfile;
-      setTimeout(function(){
-        load();
-      }, 300)
-    }
   }
 };
 </script>

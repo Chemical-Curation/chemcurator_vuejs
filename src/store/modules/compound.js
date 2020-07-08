@@ -14,21 +14,25 @@ const actions = {
       searchString.indexOf("-") > 0
         ? "/definedCompounds?filter[inchikey]="
         : "/compounds?filter[cid]=";
-    const response = await HTTP.get(endpoint + searchString);
-    const data = response.data.data;
-    if (data.length > 0) {
-      const obj = data.shift();
-      context.commit("setType", obj.type);
-      context.commit("setCompound", obj.attributes);
-    } else {
-      const alert = {
-        message: `${searchString} not valid`,
-        color: "warning",
-        dismissCountDown: 4
-      };
-      context.commit("setType", "definedCompound");
-      context.dispatch("alert/alert", alert, { root: true });
-    }
+    await HTTP.get(endpoint + searchString)
+      .then(response => {
+        const data = response.data.data;
+        if (data.length > 0) {
+          const obj = data.shift();
+          context.commit("setType", obj.type);
+          context.commit("setCompound", obj.attributes);
+        } else {
+          const alert = {
+            message: `${searchString} not valid`,
+            color: "warning",
+            dismissCountDown: 4
+          };
+          context.commit("setType", "definedCompound");
+          context.dispatch("alert/alert", alert, { root: true });
+        }
+      })
+      // this catch won't likely be used without any permissions set on GET
+      .catch(() => context.dispatch("auth/logout", { root: true }));
   }
 };
 

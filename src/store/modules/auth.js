@@ -15,13 +15,19 @@ const getters = {
 
 // actions
 const actions = {
-  fetchUser: async ({ commit }) => {
-    try {
-      const response = await HTTP.get("/login/");
-      commit("setUser", response.data);
-    } catch {
-      commit("setUser", {});
-    }
+  fetchUser: async ({ commit, dispatch }) => {
+    await HTTP.get("/login/")
+      .then(response => commit("setUser", response.data))
+      .catch(() => {
+        const alert = {
+          message: `${state.username}, you are no longer logged in!`,
+          color: "danger",
+          dismissCountDown: 4
+        };
+        commit("setUser", {});
+        router.push("login");
+        dispatch("alert/alert", alert, { root: true });
+      });
   },
   login: async ({ commit }, { username, password }) => {
     const response = await HTTP.post(

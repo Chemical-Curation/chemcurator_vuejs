@@ -1,6 +1,5 @@
 <template>
   <div>
-    <Alert />
     <b-form-select id="compound-type-dropdown" v-model="type" :options="options" class="m-1 w-25" />
     <KetcherWindow v-if="type == 'definedCompound'" />
     <MarvinWindow v-if="type == 'illDefinedCompound'" />
@@ -11,14 +10,12 @@
 import { mapState } from "vuex";
 import KetcherWindow from "@/components/KetcherWindow";
 import MarvinWindow from "@/components/MarvinWindow";
-import Alert from "@/components/Alert";
 
 export default {
   name: "ChemicalEditors",
   components: {
     KetcherWindow,
-    MarvinWindow,
-    Alert
+    MarvinWindow
   },
   data() {
     return {
