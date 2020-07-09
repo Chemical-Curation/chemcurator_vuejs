@@ -58,7 +58,7 @@ export default {
         },
         "*"
       );
-      this.mrvfile = this.$store.state.compound.mrvfile;
+      this.exportMrvfile();
     },
     exportMrvfile: function() {
       document
