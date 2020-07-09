@@ -65,7 +65,7 @@ export default {
         },
         "*"
       );
-      this.molfile = this.$store.state.compound.molfile;
+      this.exportMolfile();
     },
     exportMolfile: function() {
       document
@@ -90,7 +90,7 @@ export default {
       function(event) {
         if (event.data.type == "returnMolfile") {
           self.molfile = event.data.molfile;
-          this.molfile = this.$store.state.compound.molfile;
+          this.molfile = self.$store.state.compound.molfile;
         }
       },
       false
