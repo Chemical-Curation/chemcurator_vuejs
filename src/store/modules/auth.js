@@ -19,9 +19,12 @@ const actions = {
     await HTTP.get("/login/")
       .then(response => commit("setUser", response.data))
       .catch(() => {
+        const b = state.username.length === 0;
         const alert = {
-          message: `${state.username}, you are no longer logged in!`,
-          color: "danger",
+          message: b
+            ? "Please log in..."
+            : `${state.username}, you are no longer logged in!`,
+          color: b ? "success" : "danger",
           dismissCountDown: 4
         };
         commit("setUser", {});
@@ -41,9 +44,15 @@ const actions = {
     router.push("/");
   },
   logout: async ({ commit }) => {
-    await HTTP.delete("/login/");
-    commit("setUser", {});
-    router.push("login");
+    await HTTP.delete("/login/")
+      .then(() => {
+        commit("setUser", {});
+        router.push("login");
+      })
+      .catch(() => {
+        commit("setUser", {});
+        router.push("login");
+      });
   }
 };
 
