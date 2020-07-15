@@ -1,31 +1,17 @@
 import {
   shallowMount,
-  createLocalVue
 } from "@vue/test-utils";
-import Vuex from "vuex";
 import NavBar from "@/components/NavBar.vue";
-import auth from '@/store/modules/auth'
-
-const localVue = createLocalVue()
-localVue.use(Vuex);
-
-const store = new Vuex.Store({
-  computed: {
-    username: "alice",
-    isAuthenticated: "true",
-  },
-  modules: {
-    auth: {
-      state: auth.state,
-      actions: auth.actions,
-      getters: auth.getters
-    },
-  }
-})
 
 const wrapper = shallowMount(NavBar, {
-  store,
-  localVue
+  mocks: {
+    $store: {
+      state: {
+        username: "alice",
+        isAuthenticated: "true"
+      }
+    }
+  },
 })
 
 describe('NavBar', () => {
