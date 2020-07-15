@@ -43,15 +43,22 @@ const actions = {
     commit("setUser", response.data);
     router.push("/");
   },
-  logout: async ({ commit }) => {
+  logout: async ({ commit, dispatch }) => {
+    const alert = {
+      message: `${state.username}, you are no longer logged in!`,
+      color: "warning",
+      dismissCountDown: 4
+    };
     await HTTP.delete("/login/")
       .then(() => {
         commit("setUser", {});
         router.push("login");
+        dispatch("alert/alert", alert, { root: true });
       })
       .catch(() => {
         commit("setUser", {});
         router.push("login");
+        dispatch("alert/alert", alert, { root: true });
       });
   }
 };
