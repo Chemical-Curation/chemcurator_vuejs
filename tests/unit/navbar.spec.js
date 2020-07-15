@@ -1,14 +1,37 @@
 import {
-  shallowMount
+  shallowMount,
+  createLocalVue
 } from "@vue/test-utils";
+import Vuex from "vuex";
 import NavBar from "@/components/NavBar.vue";
+import auth from '@/store/modules/auth'
 
-const wrapper = shallowMount(NavBar)
+const localVue = createLocalVue()
+localVue.use(Vuex);
+
+const store = new Vuex.Store({
+  computed: {
+    username: "alice",
+    isAuthenticated: "true",
+  },
+  modules: {
+    auth: {
+      state: auth.state,
+      actions: auth.actions,
+      getters: auth.getters
+    },
+  }
+})
+
+const wrapper = shallowMount(NavBar, {
+  store,
+  localVue
+})
 
 describe('NavBar', () => {
 
-  it('has no search class by default', () => {
-    expect(wrapper.hasClass('search')).to.be.false;
+  it('displays a search box to an authenticated user', () => {
+    expect(wrapper.find("search").exists()).toBe(true)
   });
 
   it("provides ability to logout", () => {
