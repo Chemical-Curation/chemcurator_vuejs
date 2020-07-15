@@ -6,8 +6,8 @@
     :variant="color"
     v-on:dismissed="clearState"
     @dismiss-count-down="countDownChanged"
-    >{{ message }}</b-alert
-  >
+    data-cy="alert-box"
+  >{{ message }}</b-alert>
 </template>
 
 <script>

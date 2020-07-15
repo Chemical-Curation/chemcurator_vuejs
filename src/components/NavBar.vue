@@ -16,6 +16,7 @@
           v-model="searchString"
           v-if="username"
           placeholder="Search Compounds (cid or inchikey)"
+          data-cy="search-box"
         />
         <b-button
           class="mr-2"
@@ -23,19 +24,20 @@
           @click="searchCompound"
           v-if="username"
           :disabled="searchString.length == 0"
+          data-cy="search-button"
         >
           <b-icon icon="search" />
         </b-button>
       </b-navbar-nav>
       <b-navbar-nav class="ml-auto">
-        <b-nav-item-dropdown name="user-profile" right v-if="username">
+        <b-nav-item-dropdown name="user-profile" right v-if="username" data-cy="user-dropdown">
           <template v-slot:button-content>
             <span>
               <b-icon icon="person-fill" />
               {{ username }}
             </span>
           </template>
-          <b-dropdown-item name="logout" @click="logout">Log Out</b-dropdown-item>
+          <b-dropdown-item name="logout" @click="logout" data-cy="logout-button">Log Out</b-dropdown-item>
         </b-nav-item-dropdown>
       </b-navbar-nav>
     </b-collapse>
