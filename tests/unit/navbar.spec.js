@@ -19,26 +19,20 @@ const wrapper = shallowMount(NavBar, {
       return true
     },
     username: "karyn",
-    // username: {
-    //   get: function () {
-    //     return "karyn"
-    //   },
-    //   set: function (newName) {
-    //     return yourNewName
-    //   }
-    // }
   }
 })
 
-console.log(wrapper.html({
-  pretty: true
-}))
+// To inspect the mounted wrapper:
+// console.log(wrapper.html({
+//   pretty: true
+// }))
 
 describe('NavBar', () => {
-
+  // reference for selectors in .find()
+  // https://vue-test-utils.vuejs.org/api/selectors.html
 
   it('displays a brand logo', () => {
-    expect(wrapper.find(".navbar-brand").exists()).toBe(true)
+    expect(wrapper.find("chemreglogo-stub").exists()).toBe(true) // the logo is being stubbed in
   });
 
   it('displays a search box to an authenticated user', () => {
