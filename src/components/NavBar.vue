@@ -17,6 +17,7 @@
           v-if="username"
           placeholder="Search Compounds (cid or inchikey)"
           data-cy="search-box"
+          @keyup.enter="searchCompound"
         />
         <b-button
           class="mr-2"
