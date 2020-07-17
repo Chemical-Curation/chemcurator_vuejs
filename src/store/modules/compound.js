@@ -9,7 +9,7 @@ const state = {
 };
 // actions
 const actions = {
-  fetchCompound: async ({commit, dispatch}, searchString) => {
+  fetchCompound: async ({ commit, dispatch }, searchString) => {
     dispatch("auth/fetchUser", null, { root: true });
     const endpoint =
       searchString.indexOf("-") > 0

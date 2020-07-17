@@ -1,6 +1,4 @@
-import {
-  shallowMount,
-} from "@vue/test-utils";
+import { shallowMount } from "@vue/test-utils";
 import NavBar from "@/components/NavBar.vue";
 
 const wrapper = shallowMount(NavBar, {
@@ -16,27 +14,27 @@ const wrapper = shallowMount(NavBar, {
   ],
   computed: {
     isAuthenticated() {
-      return true
+      return true;
     },
-    username: "karyn",
+    username: "karyn"
   }
-})
+});
 
 // To inspect the mounted wrapper:
 // console.log(wrapper.html({
 //   pretty: true
 // }))
 
-describe('NavBar', () => {
+describe("NavBar", () => {
   // reference for selectors in .find()
   // https://vue-test-utils.vuejs.org/api/selectors.html
 
-  it('displays a brand logo', () => {
-    expect(wrapper.find("chemreglogo-stub").exists()).toBe(true) // the logo is being stubbed in
+  it("displays a brand logo", () => {
+    expect(wrapper.find("chemreglogo-stub").exists()).toBe(true); // the logo is being stubbed in
   });
 
-  it('displays a search box to an authenticated user', () => {
-    expect(wrapper.find(".search").exists()).toBe(true)
+  it("displays a search box to an authenticated user", () => {
+    expect(wrapper.find(".search").exists()).toBe(true);
   });
 
   it("provides ability to logout", () => {

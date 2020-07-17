@@ -1,6 +1,9 @@
 <template>
   <b-navbar toggleable="lg" type="dark" variant="primary" class="shadow mb-2">
-    <component :is="isAuthenticated ? 'router-link' : 'span'" :to="{ name: 'home' }">
+    <component
+      :is="isAuthenticated ? 'router-link' : 'span'"
+      :to="{ name: 'home' }"
+    >
       <b-navbar-brand>
         <ChemregLogo color="white" size="35px" />
       </b-navbar-brand>
@@ -8,7 +11,9 @@
     <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
     <b-collapse id="nav-collapse" is-nav>
       <b-navbar-nav>
-        <b-nav-item :to="{ name: 'about' }" v-if="isAuthenticated">About</b-nav-item>
+        <b-nav-item :to="{ name: 'about' }" v-if="isAuthenticated"
+          >About</b-nav-item
+        >
       </b-navbar-nav>
       <b-navbar-nav class="ml-auto">
         <b-form-input
@@ -31,14 +36,21 @@
         </b-button>
       </b-navbar-nav>
       <b-navbar-nav class="ml-auto">
-        <b-nav-item-dropdown name="user-profile" right v-if="username" data-cy="user-dropdown">
+        <b-nav-item-dropdown
+          name="user-profile"
+          right
+          v-if="username"
+          data-cy="user-dropdown"
+        >
           <template v-slot:button-content>
             <span>
               <b-icon icon="person-fill" />
               {{ username }}
             </span>
           </template>
-          <b-dropdown-item name="logout" @click="logout" data-cy="logout-button">Log Out</b-dropdown-item>
+          <b-dropdown-item name="logout" @click="logout" data-cy="logout-button"
+            >Log Out</b-dropdown-item
+          >
         </b-nav-item-dropdown>
       </b-navbar-nav>
     </b-collapse>

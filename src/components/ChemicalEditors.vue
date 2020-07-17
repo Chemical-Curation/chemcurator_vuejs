@@ -1,6 +1,11 @@
 <template>
   <div>
-    <b-form-select id="compound-type-dropdown" v-model="type" :options="options" class="m-1 w-25" />
+    <b-form-select
+      id="compound-type-dropdown"
+      v-model="type"
+      :options="options"
+      class="m-1 w-25"
+    />
     <KetcherWindow v-if="type == 'definedCompound'" />
     <MarvinWindow v-if="type == 'illDefinedCompound'" />
   </div>

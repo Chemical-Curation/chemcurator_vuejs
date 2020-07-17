@@ -7,7 +7,8 @@
     v-on:dismissed="clearState"
     @dismiss-count-down="countDownChanged"
     data-cy="alert-box"
-  >{{ message }}</b-alert>
+    >{{ message }}</b-alert
+  >
 </template>
 
 <script>

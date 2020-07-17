@@ -8,7 +8,8 @@
       v-bind:src="ketcherURL"
       width="800"
       height="600"
-    >ketcher</iframe>
+      >ketcher</iframe
+    >
     <br />
     <b-button
       variant="secondary"

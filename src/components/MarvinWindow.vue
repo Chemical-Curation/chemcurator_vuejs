@@ -1,7 +1,9 @@
 <template>
   <div>
     <br />
-    <iframe id="marvin" class="marvin" data-cy="marvin" v-bind:src="marvinURL">marvin</iframe>
+    <iframe id="marvin" class="marvin" data-cy="marvin" v-bind:src="marvinURL"
+      >marvin</iframe
+    >
     <br />
     <b-button
       variant="secondary"
