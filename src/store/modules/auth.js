@@ -15,13 +15,22 @@ const getters = {
 
 // actions
 const actions = {
-  fetchUser: async ({ commit }) => {
-    try {
-      const response = await HTTP.get("/login/");
-      commit("setUser", response.data);
-    } catch {
-      commit("setUser", {});
-    }
+  fetchUser: async ({ commit, dispatch }) => {
+    await HTTP.get("/login/")
+      .then(response => commit("setUser", response.data))
+      .catch(() => {
+        const b = state.username.length === 0;
+        const alert = {
+          message: b
+            ? "Please log in..."
+            : `${state.username}, you are no longer logged in!`,
+          color: b ? "success" : "danger",
+          dismissCountDown: 4
+        };
+        commit("setUser", {});
+        router.push("login");
+        dispatch("alert/alert", alert, { root: true });
+      });
   },
   login: async ({ commit }, { username, password }) => {
     const response = await HTTP.post(
@@ -34,10 +43,23 @@ const actions = {
     commit("setUser", response.data);
     router.push("/");
   },
-  logout: async ({ commit }) => {
-    await HTTP.delete("/login/");
-    commit("setUser", {});
-    router.push("login");
+  logout: async ({ commit, dispatch }) => {
+    const alert = {
+      message: `${state.username}, you are no longer logged in!`,
+      color: "warning",
+      dismissCountDown: 4
+    };
+    await HTTP.delete("/login/")
+      .then(() => {
+        commit("setUser", {});
+        router.push("login");
+        dispatch("alert/alert", alert, { root: true });
+      })
+      .catch(() => {
+        commit("setUser", {});
+        router.push("login");
+        dispatch("alert/alert", alert, { root: true });
+      });
   }
 };
 
