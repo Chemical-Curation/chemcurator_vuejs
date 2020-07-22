@@ -10,7 +10,12 @@ const wrapper = shallowMount(NavBar, {
     "b-navbar-toggle",
     "b-navbar-brand",
     "router-link",
-    "router-link"
+    "router-link",
+    "b-form-input",
+    "b-button",
+    "b-nav-item-dropdown",
+    "b-icon",
+    "b-dropdown-item"
   ],
   computed: {
     isAuthenticated() {
