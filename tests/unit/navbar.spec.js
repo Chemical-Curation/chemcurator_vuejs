@@ -16,19 +16,13 @@ const wrapper = shallowMount(NavBar, {
     isAuthenticated() {
       return true;
     },
-    username: "karyn"
+    username() {
+      return "karyn";
+    }
   }
 });
 
-// To inspect the mounted wrapper:
-// console.log(wrapper.html({
-//   pretty: true
-// }))
-
 describe("NavBar", () => {
-  // reference for selectors in .find()
-  // https://vue-test-utils.vuejs.org/api/selectors.html
-
   it("displays a brand logo", () => {
     expect(wrapper.find("chemreglogo-stub").exists()).toBe(true); // the logo is being stubbed in
   });
