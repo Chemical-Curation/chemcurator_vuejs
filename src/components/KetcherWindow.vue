@@ -6,19 +6,12 @@
       class="ketcher"
       data-cy="ketcher"
       v-bind:src="ketcherURL"
+      @load="startInterval"
       width="800"
       height="600"
-      >ketcher</iframe
     >
-    <br />
-    <b-button
-      variant="secondary"
-      v-on:click="exportMolfile"
-      style="width:800px"
-      id="ketcher-export-button"
-    >
-      <b-icon-file-arrow-down></b-icon-file-arrow-down>Export
-    </b-button>
+      ketcher
+    </iframe>
     <b-form-textarea
       id="ketcher-import-textarea"
       v-model="molfile"
@@ -27,16 +20,8 @@
       placeholder="Paste molfile to import..."
       class="mx-auto mt-5"
       style="width:800px"
+      disabled
     ></b-form-textarea>
-    <b-button
-      variant="primary"
-      v-on:click="importMolfile"
-      class="mt-2"
-      style="width:800px"
-      id="ketcher-import-button"
-    >
-      <b-icon-file-arrow-up></b-icon-file-arrow-up>Import
-    </b-button>
   </div>
 </template>
 
@@ -72,7 +57,12 @@ export default {
       document
         .getElementById("ketcher")
         .contentWindow.postMessage({ type: "exportMolfile" }, "*");
-    }
+    },
+    startInterval: function() {
+      setInterval(() => {
+        this.exportMolfile()
+      }, 1000);
+    },
   },
   computed: {
     compound: function() {
@@ -82,6 +72,9 @@ export default {
   watch: {
     compound: function() {
       this.loadMolfile();
+    },
+    molfile: () => {
+      console.log("molfile changed")
     }
   },
   mounted() {
