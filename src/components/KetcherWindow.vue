@@ -31,6 +31,7 @@ export default {
   data() {
     return {
       ketcherURL: process.env.VUE_APP_KETCHER_URL,
+      ketcherWatch: null,
       molfile: ""
     };
   },
@@ -58,11 +59,11 @@ export default {
         .getElementById("ketcher")
         .contentWindow.postMessage({ type: "exportMolfile" }, "*");
     },
-    startInterval: function() {
-      setInterval(() => {
-        this.exportMolfile()
+    startInterval: () => {
+      this.ketcherWatch = setInterval(() => {
+        this.exportMolfile();
       }, 1000);
-    },
+    }
   },
   computed: {
     compound: function() {
@@ -74,7 +75,7 @@ export default {
       this.loadMolfile();
     },
     molfile: () => {
-      console.log("molfile changed")
+      console.log("molfile changed");
     }
   },
   mounted() {
@@ -96,6 +97,9 @@ export default {
         load();
       });
     }
+  },
+  beforeDestroy() {
+    clearInterval(this.ketcherWatch);
   }
 };
 </script>
