@@ -6,7 +6,7 @@
       class="ketcher"
       data-cy="ketcher"
       v-bind:src="ketcherURL"
-      @load="startInterval"
+      @load="ketcherLoaded"
       width="800"
       height="600"
     >
@@ -31,7 +31,7 @@ export default {
   data() {
     return {
       ketcherURL: process.env.VUE_APP_KETCHER_URL,
-      ketcherWatch: null,
+      ketcherInterval: null,
       molfile: ""
     };
   },
@@ -59,8 +59,8 @@ export default {
         .getElementById("ketcher")
         .contentWindow.postMessage({ type: "exportMolfile" }, "*");
     },
-    startInterval: () => {
-      this.ketcherWatch = setInterval(() => {
+    ketcherLoaded: function() {
+      this.ketcherInterval = setInterval(() => {
         this.exportMolfile();
       }, 1000);
     }
@@ -75,7 +75,7 @@ export default {
       this.loadMolfile();
     },
     molfile: () => {
-      console.log("molfile changed");
+      // console.log("molfile changed");
     }
   },
   mounted() {
@@ -99,7 +99,7 @@ export default {
     }
   },
   beforeDestroy() {
-    clearInterval(this.ketcherWatch);
+    clearInterval(this.ketcherInterval);
   }
 };
 </script>
