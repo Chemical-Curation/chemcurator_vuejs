@@ -1,11 +1,21 @@
 <template>
-  <div class="container">
-    <div>
-      <h1 class="m-3">Controlled Vocabularies</h1>
-    </div>
-    <b-select v-model="type" :options="types" />
-    <div class="mt-3">
-      <VocabularyListTable :type="type" />
+  <div>
+    <h1 class="m-3">Controlled Vocabularies</h1>
+    <div class="row">
+      <div class="col-2 offset-1">
+        <b-form-radio-group
+          id="radio-type-select"
+          class="d-flex flex-fill"
+          v-model="type"
+          :options="types"
+          button-variant="outline-primary btn-light-hover"
+          buttons
+          stacked
+        />
+      </div>
+      <div class="col-8">
+        <VocabularyListTable :type="type" />
+      </div>
     </div>
   </div>
 </template>
