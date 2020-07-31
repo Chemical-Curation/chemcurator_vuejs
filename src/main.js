@@ -7,6 +7,8 @@ import {
   BootstrapVue,
   IconsPlugin
 } from "bootstrap-vue/dist/bootstrap-vue.esm";
+import $ from "jquery";  // eslint-disable-line
+import "bootstrap/dist/js/bootstrap.min";
 import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap-vue/dist/bootstrap-vue.css";
 

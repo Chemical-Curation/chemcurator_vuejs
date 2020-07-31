@@ -11,6 +11,11 @@
     <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
     <b-collapse id="nav-collapse" is-nav>
       <b-navbar-nav>
+        <b-nav-item :to="{ name: 'controlled-vocabularies' }" v-if="isAuthenticated"
+          >Vocabularies</b-nav-item
+        >
+      </b-navbar-nav>
+      <b-navbar-nav>
         <b-nav-item :to="{ name: 'about' }" v-if="isAuthenticated"
           >About</b-nav-item
         >
