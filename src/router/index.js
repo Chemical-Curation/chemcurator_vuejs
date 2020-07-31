@@ -25,7 +25,10 @@ const routes = [
   {
     path: "/vocabularies",
     name: "controlled-vocabularies",
-    component: () => import(/* webpackChunkName: "ControlledVocabularies" */ "../views/Vocabularies"),
+    component: () =>
+      import(
+        /* webpackChunkName: "ControlledVocabularies" */ "../views/Vocabularies"
+      ),
     meta: {
       requiresAuth: true
     }

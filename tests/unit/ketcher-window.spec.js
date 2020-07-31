@@ -1,28 +1,26 @@
 import KetcherWindow from "@/components/KetcherWindow.vue";
-import Vuex from 'vuex'
-import {createLocalVue, shallowMount} from "@vue/test-utils";
+import Vuex from "vuex";
+import { createLocalVue, shallowMount } from "@vue/test-utils";
 
-const localVue = createLocalVue()
+const localVue = createLocalVue();
 
-localVue.use(Vuex)
+localVue.use(Vuex);
 
-
-
-describe ('KetcherWindow.vue', () =>{
+describe("KetcherWindow.vue", () => {
   let wrapper;
   let state;
   let store;
 
   beforeEach(() => {
     state = {
-      "compound": {
-        "molfile": "",
-      },
-    }
+      compound: {
+        molfile: ""
+      }
+    };
 
     store = new Vuex.Store({
       state
-    })
+    });
 
     wrapper = shallowMount(KetcherWindow, {
       stubs: [
@@ -42,14 +40,14 @@ describe ('KetcherWindow.vue', () =>{
         "b-dropdown-item"
       ],
       store,
-      localVue,
-    })
-  })
+      localVue
+    });
+  });
 
   it("starts and stops interval on iframe load and destroy", () => {
-    jest.useFakeTimers()
-    const spy = jest.spyOn(wrapper.vm,"ketcherLoaded");
-    wrapper.setMethods({"ketcherLoaded": spy})
+    jest.useFakeTimers();
+    const spy = jest.spyOn(wrapper.vm, "ketcherLoaded");
+    wrapper.setMethods({ ketcherLoaded: spy });
 
     wrapper.find("#ketcher").trigger("load");
     expect(spy).toBeCalled();
@@ -57,5 +55,5 @@ describe ('KetcherWindow.vue', () =>{
 
     wrapper.destroy();
     expect(clearInterval).toHaveBeenCalled();
-  })
-})
+  });
+});
