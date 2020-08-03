@@ -1,5 +1,5 @@
 import VocabularyListTable from "@/components/vocabulary/VocabularyListTable.vue";
-import {createLocalVue, shallowMount} from "@vue/test-utils";
+import {createLocalVue, mount, shallowMount} from "@vue/test-utils";
 import Vuex from "vuex";
 import BootstrapVue from "bootstrap-vue";
 
@@ -48,7 +48,7 @@ describe("Lifecycle Tests", () => {
 
 describe("Test Component Functionality",() => {
   beforeEach(() => {
-    wrapper = shallowMount(VocabularyListTable, {
+    wrapper = mount(VocabularyListTable, {
       store,
       localVue,
       propsData: {
@@ -61,5 +61,10 @@ describe("Test Component Functionality",() => {
     const spy = jest.spyOn(wrapper.vm, 'getList')
     wrapper.setProps({type: 'qcLevels'})
     expect(spy).toBeCalled()
+  });
+
+  it("has Name and Description table headers", () => {
+    expect(wrapper.findAll('th').at(0).text()).toBe("Name")
+    expect(wrapper.findAll('th').at(1).text()).toBe("Description")
   });
 });
