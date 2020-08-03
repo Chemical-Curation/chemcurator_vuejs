@@ -72,32 +72,30 @@ describe("The home page", () => {
   });
   it("should update the import textarea when ketcher changes", () => {
     cy.get("iframe[id=ketcher]")
-      .its("0.contentDocument.body")
-      .should("not.be.empty");
+      .its('0.contentDocument.body')
+      .should('not.be.empty')
     cy.get("#ketcher-import-textarea")
       .invoke("val")
-      .should("contain", "Ketcher")
-      .as("text")
-      .then(function() {
+      .should('contain', 'Ketcher')
+      .as('text').then(function () {
         cy.get("iframe[id=ketcher]")
-          .its("0.contentDocument.body")
-          .should("not.be.empty")
+          .its('0.contentDocument.body')
+          .should('not.be.empty')
           .then(cy.wrap)
           .find("#atom")
-          .find("button", "Hydrogen (H)")
-          .first()
-          .click();
+          .find("button", "Hydrogen (H)").first()
+          .click()
         cy.get("iframe[id=ketcher]")
-          .its("0.contentDocument.body")
-          .should("not.be.empty")
+          .its('0.contentDocument.body')
+          .should('not.be.empty')
           .then(cy.wrap)
           .find("#canvas")
-          .click();
-        cy.wait(2000);
+          .click()
+        cy.wait(2000)
         cy.get("#ketcher-import-textarea")
           .invoke("val")
-          .should("not.contain", this.text);
-      });
+          .should("not.contain", this.text)
+    })
   });
   it("bad search should alert invalidity", () => {
     cy.get("[data-cy=search-box]").type("compound 47");
