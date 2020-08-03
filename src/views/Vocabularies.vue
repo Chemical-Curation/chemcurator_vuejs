@@ -2,7 +2,7 @@
   <div>
     <Title msg="Controlled Vocabularies" />
     <div class="row">
-      <div class="col-2 offset-1">
+      <div class="col-2 offset-2">
         <b-form-radio-group
           id="radio-type-select"
           class="d-flex flex-fill"
@@ -13,7 +13,7 @@
           stacked
         />
       </div>
-      <div class="col-8">
+      <div class="col-6">
         <VocabularyListTable :type="type" />
       </div>
     </div>
