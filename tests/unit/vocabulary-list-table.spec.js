@@ -10,14 +10,16 @@ localVue.use(BootstrapVue);
 // Mocks for tests
 let wrapper;
 
-let state = [
-  {
-    attributes: {
-      label: 'Foobar',
-      shortDescription: 'Foobar'
+let state = {
+  list: [
+    {
+      attributes: {
+        label: 'Sample Label',
+        shortDescription: 'Sample Description'
+      }
     }
-  }
-];
+  ]
+};
 
 let actions = {
   getList() {}
@@ -66,5 +68,21 @@ describe("Test Component Functionality",() => {
   it("has Name and Description table headers", () => {
     expect(wrapper.findAll('th').at(0).text()).toBe("Name")
     expect(wrapper.findAll('th').at(1).text()).toBe("Description")
+  });
+
+  it("loads data from vocabularyList", () => {
+    expect(wrapper.findAll('td').at(0).text()).toBe(state.list[0].attributes.label)
+    expect(wrapper.findAll('td').at(1).text()).toBe(state.list[0].attributes.shortDescription)
+
+    let updatedList = {
+      attributes: {
+        label: 'New Label',
+        shortDescription: 'New Description'
+      }
+    }
+    wrapper.vm.$store.state.vocabularies.list = [updatedList]
+
+    expect(wrapper.findAll('td').at(0).text()).toBe(updatedList.attributes.label)
+    expect(wrapper.findAll('td').at(1).text()).toBe(updatedList.attributes.shortDescription)
   });
 });
