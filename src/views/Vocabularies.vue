@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1 class="m-3">Controlled Vocabularies</h1>
+    <Title msg="Controlled Vocabularies" />
     <div class="row">
       <div class="col-2 offset-1">
         <b-form-radio-group
@@ -22,6 +22,7 @@
 
 <script>
 import VocabularyListTable from "@/components/vocabulary/VocabularyListTable";
+import Title from "@/components/HelloWorld";
 
 export default {
   name: "Vocabulary",
@@ -63,7 +64,8 @@ export default {
     };
   },
   components: {
-    VocabularyListTable
+    VocabularyListTable,
+    Title
   }
 };
 </script>
