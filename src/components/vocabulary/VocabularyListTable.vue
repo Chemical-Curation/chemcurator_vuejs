@@ -1,6 +1,7 @@
 <template>
   <div>
     <b-table
+      id="vocabulary-list-table"
       class="text-left"
       striped
       hover
@@ -24,7 +25,7 @@ export default {
           label: "Name"
         },
         {
-          key: "attributes.short_description",
+          key: "attributes.shortDescription",
           label: "Description"
         }
       ]
