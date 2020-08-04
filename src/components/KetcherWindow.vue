@@ -14,7 +14,7 @@
       v-model="molfile"
       rows="3"
       max-rows="6"
-      placeholder="Paste molfile to import..."
+      placeholder="Edit the above window to generate a Molfile..."
       class="mx-auto mt-5"
       style="width:800px"
       disabled
@@ -28,7 +28,6 @@ export default {
   data() {
     return {
       ketcherURL: process.env.VUE_APP_KETCHER_URL,
-      ketcherInterval: null,
       molfile: ""
     };
   },

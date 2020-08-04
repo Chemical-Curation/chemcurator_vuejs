@@ -1,11 +1,22 @@
 import KetcherWindow from "@/components/KetcherWindow.vue";
 import Vuex from 'vuex'
-import {createLocalVue, shallowMount} from "@vue/test-utils";
+import BootstrapVue from "bootstrap-vue";
+import {createLocalVue, mount} from "@vue/test-utils";
+
+
+// Sample Molfile for testing purposes
+const sampleMolfile = `
+  Ketcher  8 42014 42D 1   1.00000     0.00000     0
+
+  1  0  0     0  0            999 V2000
+    7.2750   -6.4750    0.0000 H   0  0  0  0  0  0  0  0  0  0  0  0
+M  END
+`;
 
 const localVue = createLocalVue()
 
 localVue.use(Vuex)
-
+localVue.use(BootstrapVue)
 
 
 describe ('KetcherWindow.vue', () =>{
@@ -24,38 +35,15 @@ describe ('KetcherWindow.vue', () =>{
       state
     })
 
-    wrapper = shallowMount(KetcherWindow, {
-      stubs: [
-        "b-navbar",
-        "b-nav-item",
-        "b-navbar-nav",
-        "b-collapse",
-        "b-navbar-toggle",
-        "b-navbar-brand",
-        "router-link",
-        "router-link",
-        "b-form-input",
-        "b-form-textarea",
-        "b-button",
-        "b-nav-item-dropdown",
-        "b-icon",
-        "b-dropdown-item"
-      ],
+    wrapper = mount(KetcherWindow, {
       store,
       localVue,
     })
   })
 
-  it("starts and stops interval on iframe load and destroy", () => {
-    jest.useFakeTimers()
-    const spy = jest.spyOn(wrapper.vm,"ketcherLoaded");
-    wrapper.setMethods({"ketcherLoaded": spy})
-
-    wrapper.find("#ketcher").trigger("load");
-    expect(spy).toBeCalled();
-    expect(setInterval).toHaveBeenCalled();
-
-    wrapper.destroy();
-    expect(clearInterval).toHaveBeenCalled();
+  it("updates textarea with molfile", () => {
+    expect(wrapper.find('#ketcher-import-textarea').props().value).toBe('')
+    wrapper.setData({ molfile: sampleMolfile})
+    expect(wrapper.find('#ketcher-import-textarea').props().value).toBe('Molfile')
   })
 })
