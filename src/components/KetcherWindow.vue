@@ -8,7 +8,8 @@
       v-bind:src="ketcherURL"
       width="800"
       height="600"
-    >ketcher</iframe>
+      >ketcher</iframe
+    >
     <b-form-textarea
       id="ketcher-import-textarea"
       v-model="molfile"
