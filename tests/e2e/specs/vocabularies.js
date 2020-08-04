@@ -5,10 +5,10 @@ const TYPES = [
     text: "QC Levels",
     value: "qcLevels",
     response: {
-      "data": [
+      data: [
         {
-          "attributes": {
-            'label': "sample QC Label"
+          attributes: {
+            label: "sample QC Label"
           }
         }
       ]
@@ -18,10 +18,10 @@ const TYPES = [
     text: "Query Structure Types",
     value: "queryStructureTypes",
     response: {
-      "data": [
+      data: [
         {
-          "attributes": {
-            'label': "sample Query Structure Type Label"
+          attributes: {
+            label: "sample Query Structure Type Label"
           }
         }
       ]
@@ -31,10 +31,10 @@ const TYPES = [
     text: "Relationship Types",
     value: "relationshipTypes",
     response: {
-      "data": [
+      data: [
         {
-          "attributes": {
-            'label': "sample Relationship Type Label"
+          attributes: {
+            label: "sample Relationship Type Label"
           }
         }
       ]
@@ -44,10 +44,10 @@ const TYPES = [
     text: "Sources",
     value: "sources",
     response: {
-      "data": [
+      data: [
         {
-          "attributes": {
-            'label': "sample Source Label"
+          attributes: {
+            label: "sample Source Label"
           }
         }
       ]
@@ -57,10 +57,10 @@ const TYPES = [
     text: "Substance Types",
     value: "substanceTypes",
     response: {
-      "data": [
+      data: [
         {
-          "attributes": {
-            'label': "sample Substance Type Label"
+          attributes: {
+            label: "sample Substance Type Label"
           }
         }
       ]
@@ -70,10 +70,10 @@ const TYPES = [
     text: "Synonym Qualities",
     value: "synonymQualities",
     response: {
-      "data": [
+      data: [
         {
-          "attributes": {
-            'label': "sample Synonym Quality Label"
+          attributes: {
+            label: "sample Synonym Quality Label"
           }
         }
       ]
@@ -83,16 +83,16 @@ const TYPES = [
     text: "Synonym Types",
     value: "synonymTypes",
     response: {
-      "data": [
+      data: [
         {
-          "attributes": {
-            'label': "sample Synonym Type Label"
+          attributes: {
+            label: "sample Synonym Type Label"
           }
         }
       ]
     }
   }
-]
+];
 
 describe("The vocabularies page", () => {
   beforeEach(() => {
@@ -103,19 +103,19 @@ describe("The vocabularies page", () => {
     cy.contains("h1", "Controlled Vocabularies");
   });
   it("should load all types", () => {
-    cy.wrap(TYPES).each((type) =>{
-      cy.server()
-      cy.route(type.value, type.response)
-      cy.get('#radio-type-select')
+    cy.wrap(TYPES).each(type => {
+      cy.server();
+      cy.route(type.value, type.response);
+      cy.get("#radio-type-select")
         .contains(type.text)
-        .get('input[value=' + type.value + ']').parent()
+        .get("input[value=" + type.value + "]")
+        .parent()
         .click()
-        .then(
-          () => {
-            cy.get('#vocabulary-list-table')
-              .contains(type.response.data[0].attributes.label)
-          }
-        )
-    })
+        .then(() => {
+          cy.get("#vocabulary-list-table").contains(
+            type.response.data[0].attributes.label
+          );
+        });
+    });
   });
 });
