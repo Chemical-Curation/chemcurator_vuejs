@@ -6,12 +6,9 @@
       class="ketcher"
       data-cy="ketcher"
       v-bind:src="ketcherURL"
-      @load="ketcherLoaded"
       width="800"
       height="600"
-    >
-      ketcher
-    </iframe>
+    >ketcher</iframe>
     <b-form-textarea
       id="ketcher-import-textarea"
       v-model="molfile"
@@ -36,14 +33,6 @@ export default {
     };
   },
   methods: {
-    importMolfile: function() {
-      document
-        .getElementById("ketcher")
-        .contentWindow.postMessage(
-          { type: "importMolfile", molfile: this.molfile },
-          "*"
-        );
-    },
     loadMolfile: function() {
       document.getElementById("ketcher").contentWindow.postMessage(
         {
@@ -58,11 +47,6 @@ export default {
       document
         .getElementById("ketcher")
         .contentWindow.postMessage({ type: "exportMolfile" }, "*");
-    },
-    ketcherLoaded: function() {
-      this.ketcherInterval = setInterval(() => {
-        this.exportMolfile();
-      }, 1000);
     }
   },
   computed: {
@@ -73,9 +57,6 @@ export default {
   watch: {
     compound: function() {
       this.loadMolfile();
-    },
-    molfile: () => {
-      // console.log("molfile changed");
     }
   },
   mounted() {
@@ -85,7 +66,6 @@ export default {
       function(event) {
         if (event.data.type == "returnMolfile") {
           self.molfile = event.data.molfile;
-          this.molfile = self.$store.state.compound.molfile;
         }
       },
       false
@@ -97,9 +77,6 @@ export default {
         load();
       });
     }
-  },
-  beforeDestroy() {
-    clearInterval(this.ketcherInterval);
   }
 };
 </script>

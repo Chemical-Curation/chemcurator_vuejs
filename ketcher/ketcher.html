@@ -19,6 +19,19 @@
   <script src="Miew.min.js"></script>
 
   <script>
+    var sendMolfile = function () {
+      window.parent.postMessage({type: "returnMolfile", molfile: ketcher.getMolfile()}, "*");
+    };
+    window.addEventListener(
+      "load",
+      function() {
+        ketcher.editor.on(
+          'change',
+          sendMolfile
+        )
+      },
+        false
+    );
     window.addEventListener(
       "message",
       function(event) {
@@ -27,7 +40,7 @@
             ketcher.setMolecule(event.data.molfile)
             break;
           case "exportMolfile":
-            window.parent.postMessage({type: "returnMolfile", molfile: ketcher.getMolfile()}, "*");
+            sendMolfile()
         }
       },
       false
