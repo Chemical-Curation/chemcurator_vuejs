@@ -34,6 +34,10 @@ describe("KetcherWindow.vue", () => {
     });
 
     wrapper = mount(KetcherWindow, {
+      methods: {
+        loadMolfile: function() {},
+        exportMolfile: function() {}
+      },
       store,
       localVue
     });
@@ -45,5 +49,19 @@ describe("KetcherWindow.vue", () => {
     expect(wrapper.find("#ketcher-import-textarea").props().value).toBe(
       sampleMolfile
     );
+  });
+
+  it("loads compound from store", () => {
+    expect(wrapper.vm.compound).toBe("");
+    wrapper.vm.$store.state.compound.molfile = sampleMolfile;
+    expect(wrapper.vm.compound).toBe(sampleMolfile);
+  });
+
+  it("updates molfile when ketcher posts a returnMolfile message", async () => {
+    // Fake the iframe message and wait for async handling
+    window.postMessage({ type: "returnMolfile", molfile: sampleMolfile }, "*");
+    await new Promise(resolve => setTimeout(resolve, 100));
+
+    expect(wrapper.vm.molfile).toBe(sampleMolfile);
   });
 });
