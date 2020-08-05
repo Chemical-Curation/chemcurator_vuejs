@@ -10,33 +10,16 @@
       height="600"
       >ketcher</iframe
     >
-    <br />
-    <b-button
-      variant="secondary"
-      v-on:click="exportMolfile"
-      style="width:800px"
-      id="ketcher-export-button"
-    >
-      <b-icon-file-arrow-down></b-icon-file-arrow-down>Export
-    </b-button>
     <b-form-textarea
       id="ketcher-import-textarea"
       v-model="molfile"
       rows="3"
       max-rows="6"
-      placeholder="Paste molfile to import..."
+      placeholder="Edit the above window to generate a Molfile..."
       class="mx-auto mt-5"
       style="width:800px"
+      disabled
     ></b-form-textarea>
-    <b-button
-      variant="primary"
-      v-on:click="importMolfile"
-      class="mt-2"
-      style="width:800px"
-      id="ketcher-import-button"
-    >
-      <b-icon-file-arrow-up></b-icon-file-arrow-up>Import
-    </b-button>
   </div>
 </template>
 
@@ -50,14 +33,6 @@ export default {
     };
   },
   methods: {
-    importMolfile: function() {
-      document
-        .getElementById("ketcher")
-        .contentWindow.postMessage(
-          { type: "importMolfile", molfile: this.molfile },
-          "*"
-        );
-    },
     loadMolfile: function() {
       document.getElementById("ketcher").contentWindow.postMessage(
         {
@@ -91,7 +66,6 @@ export default {
       function(event) {
         if (event.data.type == "returnMolfile") {
           self.molfile = event.data.molfile;
-          this.molfile = self.$store.state.compound.molfile;
         }
       },
       false

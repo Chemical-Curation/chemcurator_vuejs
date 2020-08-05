@@ -70,6 +70,31 @@ describe("The home page", () => {
       .should("contain", '<cml xmlns="http://www.chemaxon.com"')
       .should("contain", "<MDocument><MChemicalStruct>");
   });
+  it("should update the import textarea when ketcher changes", () => {
+    cy.get("iframe[id=ketcher]")
+      .its("0.contentDocument.body")
+      .should("not.be.empty");
+    cy.get("#ketcher-import-textarea")
+      .invoke("val")
+      .should("be.empty");
+    cy.get("iframe[id=ketcher]")
+      .its("0.contentDocument.body")
+      .should("not.be.empty")
+      .then(cy.wrap)
+      .find("#atom")
+      .find("button", "Hydrogen (H)")
+      .first()
+      .click();
+    cy.get("iframe[id=ketcher]")
+      .its("0.contentDocument.body")
+      .should("not.be.empty")
+      .then(cy.wrap)
+      .find("#canvas")
+      .click();
+    cy.get("#ketcher-import-textarea")
+      .invoke("val")
+      .should("not.be.empty");
+  });
   it("bad search should alert invalidity", () => {
     cy.get("[data-cy=search-box]").type("compound 47");
     cy.get("[data-cy=search-button]").click();
