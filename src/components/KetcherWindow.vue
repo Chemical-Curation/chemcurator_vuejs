@@ -8,6 +8,7 @@
       v-bind:src="ketcherURL"
       width="800"
       height="600"
+      ref="ketcher"
       >ketcher</iframe
     >
     <b-form-textarea
@@ -34,7 +35,7 @@ export default {
   },
   methods: {
     loadMolfile: function() {
-      document.getElementById("ketcher").contentWindow.postMessage(
+      this.ketcherFrame.contentWindow.postMessage(
         {
           type: "importMolfile",
           molfile: this.$store.state.compound.molfile
@@ -44,14 +45,18 @@ export default {
       this.exportMolfile();
     },
     exportMolfile: function() {
-      document
-        .getElementById("ketcher")
-        .contentWindow.postMessage({ type: "exportMolfile" }, "*");
+      this.ketcherFrame.contentWindow.postMessage(
+        { type: "exportMolfile" },
+        "*"
+      );
     }
   },
   computed: {
     compound: function() {
       return this.$store.state.compound.molfile;
+    },
+    ketcherFrame: function() {
+      return this.$refs.ketcher;
     }
   },
   watch: {
@@ -72,8 +77,7 @@ export default {
     );
     if (this.$store.state.compound.molfile !== "") {
       const load = this.loadMolfile;
-      var iFrame = document.getElementById("ketcher");
-      iFrame.addEventListener("load", function() {
+      this.ketcherFrame.addEventListener("load", function() {
         load();
       });
     }
