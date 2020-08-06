@@ -67,7 +67,7 @@ export default {
   mounted() {
     window.addEventListener(
       "message",
-      (event) => {
+      event => {
         if (event.data.type === "returnMolfile") {
           this.molfile = event.data.molfile;
         }

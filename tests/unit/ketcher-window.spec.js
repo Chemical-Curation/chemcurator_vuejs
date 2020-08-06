@@ -34,13 +34,13 @@ describe("KetcherWindow.vue", () => {
       state
     });
 
-    iframe = document.createElement('iframe')
-    document.body.appendChild(iframe)
+    iframe = document.createElement("iframe");
+    document.body.appendChild(iframe);
 
     wrapper = mount(KetcherWindow, {
       computed: {
         ketcherFrame: function() {
-          return iframe
+          return iframe;
         }
       },
       store,
@@ -71,16 +71,20 @@ describe("KetcherWindow.vue", () => {
   });
 
   it("posts Molfile to iframe when loadMolfile is called", async () => {
-    wrapper.vm.$store.state.compound.molfile = sampleMolfile
+    wrapper.vm.$store.state.compound.molfile = sampleMolfile;
     const spy = jest.fn();
-    iframe.contentWindow.addEventListener("message", function(event) {
-      if (event.data.type === 'importMolfile'){
-        expect(event.data.molfile).toBe(sampleMolfile)
-        spy();
-      }
-    }, false)
+    iframe.contentWindow.addEventListener(
+      "message",
+      function(event) {
+        if (event.data.type === "importMolfile") {
+          expect(event.data.molfile).toBe(sampleMolfile);
+          spy();
+        }
+      },
+      false
+    );
 
-    wrapper.vm.loadMolfile()
+    wrapper.vm.loadMolfile();
 
     //wait for message to be received
     await new Promise(resolve => setTimeout(resolve, 100));
@@ -88,15 +92,19 @@ describe("KetcherWindow.vue", () => {
   });
 
   it("requests Molfile from iframe when exportMolfile is called", async () => {
-    expect(wrapper.vm.$store.state.compound.molfile).toBe('');
+    expect(wrapper.vm.$store.state.compound.molfile).toBe("");
     const spy = jest.fn();
-    iframe.contentWindow.addEventListener("message", function(event) {
-      if (event.data.type === 'exportMolfile'){
-        spy();
-      }
-    }, false)
+    iframe.contentWindow.addEventListener(
+      "message",
+      function(event) {
+        if (event.data.type === "exportMolfile") {
+          spy();
+        }
+      },
+      false
+    );
 
-    wrapper.vm.exportMolfile()
+    wrapper.vm.exportMolfile();
 
     //wait for message to be received
     await new Promise(resolve => setTimeout(resolve, 100));
