@@ -38,7 +38,7 @@ export default {
       this.ketcherFrame.contentWindow.postMessage(
         {
           type: "importMolfile",
-          molfile: this.$store.state.compound.molfile
+          molfile: this.compound
         },
         "*"
       );
@@ -65,22 +65,15 @@ export default {
     }
   },
   mounted() {
-    let self = this;
     window.addEventListener(
       "message",
-      function(event) {
-        if (event.data.type == "returnMolfile") {
-          self.molfile = event.data.molfile;
+      (event) => {
+        if (event.data.type === "returnMolfile") {
+          this.molfile = event.data.molfile;
         }
       },
       false
     );
-    if (this.$store.state.compound.molfile !== "") {
-      const load = this.loadMolfile;
-      this.ketcherFrame.addEventListener("load", function() {
-        load();
-      });
-    }
   }
 };
 </script>
