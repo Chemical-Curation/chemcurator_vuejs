@@ -5,7 +5,8 @@
       id="ketcher"
       class="ketcher"
       data-cy="ketcher"
-      v-bind:src="ketcherURL"
+      :src="ketcherURL"
+      @load="loadMolfile"
       width="800"
       height="600"
       ref="ketcher"
@@ -35,14 +36,16 @@ export default {
   },
   methods: {
     loadMolfile: function() {
-      this.ketcherFrame.contentWindow.postMessage(
-        {
-          type: "importMolfile",
-          molfile: this.compound
-        },
-        "*"
-      );
-      this.exportMolfile();
+      if (this.compound !== ''){
+        this.ketcherFrame.contentWindow.postMessage(
+          {
+            type: "importMolfile",
+            molfile: this.compound
+          },
+          "*"
+        );
+        this.exportMolfile();
+      }
     },
     exportMolfile: function() {
       this.ketcherFrame.contentWindow.postMessage(
