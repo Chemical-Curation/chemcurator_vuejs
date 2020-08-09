@@ -1,5 +1,5 @@
 describe("The home page", () => {
-  before(() => {
+  beforeEach(() => {
     cy.adminLogin();
     cy.visit("/");
   });
@@ -51,5 +51,61 @@ describe("The home page", () => {
               });
           });
       });
+  });
+  it("should load defined compound into ketcher window", () => {
+    cy.get("[data-cy=search-box]").type("DTXCID302000003");
+    cy.get("[data-cy=search-button]").click();
+    cy.get("iframe[id=ketcher]");
+    cy.get("#ketcher-import-textarea")
+      .invoke("val")
+      .should("contain", "Ketcher")
+      .should("contain", "V2000");
+  });
+  it("should load illdefined compound into marvin window", () => {
+    cy.get("[data-cy=search-box]").type("DTXCID502000009");
+    cy.get("[data-cy=search-button]").click();
+    cy.get("iframe[id=marvin]");
+    cy.get("#marvin-import-textarea")
+      .invoke("val")
+      .should("contain", '<cml xmlns="http://www.chemaxon.com"')
+      .should("contain", "<MDocument><MChemicalStruct>");
+  });
+  it("should update the import textarea when ketcher changes", () => {
+    cy.get("iframe[id=ketcher]")
+      .its("0.contentDocument.body")
+      .should("not.be.empty");
+    cy.get("#ketcher-import-textarea")
+      .invoke("val")
+      .should("be.empty");
+    cy.get("iframe[id=ketcher]")
+      .its("0.contentDocument.body")
+      .should("not.be.empty")
+      .then(cy.wrap)
+      .find("#atom")
+      .find("button", "Hydrogen (H)")
+      .first()
+      .click();
+    cy.get("iframe[id=ketcher]")
+      .its("0.contentDocument.body")
+      .should("not.be.empty")
+      .then(cy.wrap)
+      .find("#canvas")
+      .click();
+    cy.get("#ketcher-import-textarea")
+      .invoke("val")
+      .should("not.be.empty");
+  });
+  it("bad search should alert invalidity", () => {
+    cy.get("[data-cy=search-box]").type("compound 47");
+    cy.get("[data-cy=search-button]").click();
+    cy.get("[data-cy=alert-box]").should("contain", "compound 47 not valid");
+  });
+  it("logout should provide message to user", () => {
+    cy.get("[data-cy=user-dropdown]").click();
+    cy.get("[data-cy=logout-button]").click();
+    cy.get("[data-cy=alert-box]").should(
+      "contain",
+      "karyn, you are no longer logged in!"
+    );
   });
 });

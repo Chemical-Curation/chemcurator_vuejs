@@ -1,6 +1,7 @@
 <template>
   <div id="app">
     <NavBar />
+    <Alert />
     <transition>
       <router-view :key="$route.path" />
     </transition>
@@ -9,11 +10,13 @@
 
 <script>
 import NavBar from "@/components/NavBar.vue";
+import Alert from "@/components/Alert";
 
 export default {
   name: "App",
   components: {
-    NavBar
+    NavBar,
+    Alert
   }
 };
 </script>

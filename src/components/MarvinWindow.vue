@@ -1,5 +1,6 @@
 <template>
   <div>
+    <br />
     <iframe id="marvin" class="marvin" data-cy="marvin" v-bind:src="marvinURL"
       >marvin</iframe
     >
@@ -9,8 +10,9 @@
       v-on:click="exportMrvfile"
       style="width:800px"
       id="marvin-export-button"
-      ><b-icon-file-arrow-down></b-icon-file-arrow-down> Export</b-button
     >
+      <b-icon-file-arrow-down></b-icon-file-arrow-down>Export
+    </b-button>
     <b-form-textarea
       id="marvin-import-textarea"
       v-model="mrvfile"
@@ -26,8 +28,9 @@
       class="mt-2"
       style="width:800px"
       id="marvin-import-button"
-      ><b-icon-file-arrow-up></b-icon-file-arrow-up> Import</b-button
     >
+      <b-icon-file-arrow-up></b-icon-file-arrow-up>Import
+    </b-button>
   </div>
 </template>
 
@@ -49,10 +52,30 @@ export default {
           "*"
         );
     },
+    loadMrvfile: function() {
+      document.getElementById("marvin").contentWindow.postMessage(
+        {
+          type: "importMrvfile",
+          mrvfile: this.$store.state.compound.mrvfile
+        },
+        "*"
+      );
+      this.exportMrvfile();
+    },
     exportMrvfile: function() {
       document
         .getElementById("marvin")
         .contentWindow.postMessage({ type: "exportMrvfile" }, "*");
+    }
+  },
+  computed: {
+    compound: function() {
+      return this.$store.state.compound.mrvfile;
+    }
+  },
+  watch: {
+    compound: function() {
+      this.loadMrvfile();
     }
   },
   mounted() {
@@ -60,8 +83,15 @@ export default {
     window.addEventListener(
       "message",
       function(event) {
+        if (
+          event.data === "marvinLoaded" &&
+          self.$store.state.compound.mrvfile
+        ) {
+          self.loadMrvfile();
+        }
         if (event.data.type == "returnMrvfile") {
           self.mrvfile = event.data.mrvfile;
+          this.mrvfile = self.$store.state.compound.mrvfile;
         }
       },
       false
