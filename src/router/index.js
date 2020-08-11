@@ -5,8 +5,7 @@ import Home from "@/views/Home.vue";
 
 Vue.use(VueRouter);
 
-const routes = [
-  {
+const routes = [{
     path: "/",
     name: "home",
     component: Home,
@@ -17,15 +16,15 @@ const routes = [
   {
     path: "/about",
     name: "about",
-    component: () => import(/* webpackChunkName: "About" */ "../views/About"),
+    component: () => import("../views/About"),
     meta: {
-      requiresAuth: true
+      requiresAuth: false,
     }
   },
   {
     path: "/login",
     name: "login",
-    component: () => import(/* webpackChunkName: "Login" */ "../views/Login")
+    component: () => import("../views/Login")
   }
 ];
 
@@ -40,7 +39,9 @@ router.beforeEach(async (to, from, next) => {
   if (to.meta.requiresAuth) {
     await store.dispatch("auth/fetchUser");
     if (!store.getters["auth/isAuthenticated"]) {
-      next({ name: "login" });
+      next({
+        name: "login"
+      });
       return;
     }
   }
