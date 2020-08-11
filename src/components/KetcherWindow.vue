@@ -5,9 +5,11 @@
       id="ketcher"
       class="ketcher"
       data-cy="ketcher"
-      v-bind:src="ketcherURL"
+      :src="ketcherURL"
+      @load="loadMolfile"
       width="800"
       height="600"
+      ref="ketcher"
       >ketcher</iframe
     >
     <b-form-textarea
@@ -34,24 +36,30 @@ export default {
   },
   methods: {
     loadMolfile: function() {
-      document.getElementById("ketcher").contentWindow.postMessage(
-        {
-          type: "importMolfile",
-          molfile: this.$store.state.compound.molfile
-        },
-        "*"
-      );
-      this.exportMolfile();
+      if (this.compound !== "") {
+        this.ketcherFrame.contentWindow.postMessage(
+          {
+            type: "importMolfile",
+            molfile: this.compound
+          },
+          "*"
+        );
+        this.exportMolfile();
+      }
     },
     exportMolfile: function() {
-      document
-        .getElementById("ketcher")
-        .contentWindow.postMessage({ type: "exportMolfile" }, "*");
+      this.ketcherFrame.contentWindow.postMessage(
+        { type: "exportMolfile" },
+        "*"
+      );
     }
   },
   computed: {
     compound: function() {
       return this.$store.state.compound.molfile;
+    },
+    ketcherFrame: function() {
+      return this.$refs.ketcher;
     }
   },
   watch: {
@@ -60,23 +68,15 @@ export default {
     }
   },
   mounted() {
-    let self = this;
     window.addEventListener(
       "message",
-      function(event) {
-        if (event.data.type == "returnMolfile") {
-          self.molfile = event.data.molfile;
+      event => {
+        if (event.data.type === "returnMolfile") {
+          this.molfile = event.data.molfile;
         }
       },
       false
     );
-    if (this.$store.state.compound.molfile !== "") {
-      const load = this.loadMolfile;
-      var iFrame = document.getElementById("ketcher");
-      iFrame.addEventListener("load", function() {
-        load();
-      });
-    }
   }
 };
 </script>

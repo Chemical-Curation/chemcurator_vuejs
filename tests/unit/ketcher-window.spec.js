@@ -21,6 +21,7 @@ describe("KetcherWindow.vue", () => {
   let wrapper;
   let state;
   let store;
+  let iframe;
 
   beforeEach(() => {
     state = {
@@ -33,7 +34,15 @@ describe("KetcherWindow.vue", () => {
       state
     });
 
+    iframe = document.createElement("iframe");
+    document.body.appendChild(iframe);
+
     wrapper = mount(KetcherWindow, {
+      computed: {
+        ketcherFrame: function() {
+          return iframe;
+        }
+      },
       store,
       localVue
     });
@@ -45,5 +54,60 @@ describe("KetcherWindow.vue", () => {
     expect(wrapper.find("#ketcher-import-textarea").props().value).toBe(
       sampleMolfile
     );
+  });
+
+  it("loads compound from store", () => {
+    expect(wrapper.vm.compound).toBe("");
+    wrapper.vm.$store.state.compound.molfile = sampleMolfile;
+    expect(wrapper.vm.compound).toBe(sampleMolfile);
+  });
+
+  it("updates molfile when ketcher posts a returnMolfile message", async () => {
+    // Fake the iframe message and wait for async handling
+    window.postMessage({ type: "returnMolfile", molfile: sampleMolfile }, "*");
+    await new Promise(resolve => setTimeout(resolve, 100));
+
+    expect(wrapper.vm.molfile).toBe(sampleMolfile);
+  });
+
+  it("posts Molfile to iframe when loadMolfile is called", async () => {
+    wrapper.vm.$store.state.compound.molfile = sampleMolfile;
+    const spy = jest.fn();
+    iframe.contentWindow.addEventListener(
+      "message",
+      function(event) {
+        if (event.data.type === "importMolfile") {
+          expect(event.data.molfile).toBe(sampleMolfile);
+          spy();
+        }
+      },
+      false
+    );
+
+    wrapper.vm.loadMolfile();
+
+    //wait for message to be received
+    await new Promise(resolve => setTimeout(resolve, 100));
+    expect(spy).toBeCalled();
+  });
+
+  it("requests Molfile from iframe when exportMolfile is called", async () => {
+    expect(wrapper.vm.$store.state.compound.molfile).toBe("");
+    const spy = jest.fn();
+    iframe.contentWindow.addEventListener(
+      "message",
+      function(event) {
+        if (event.data.type === "exportMolfile") {
+          spy();
+        }
+      },
+      false
+    );
+
+    wrapper.vm.exportMolfile();
+
+    //wait for message to be received
+    await new Promise(resolve => setTimeout(resolve, 100));
+    expect(spy).toBeCalled();
   });
 });
