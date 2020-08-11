@@ -36,7 +36,7 @@ export default {
   },
   methods: {
     loadMolfile: function() {
-      if (this.compound !== ''){
+      if (this.compound !== "") {
         this.ketcherFrame.contentWindow.postMessage(
           {
             type: "importMolfile",
