@@ -6,6 +6,7 @@
       <LoginCard v-else />
     </b-col>
     <b-col>
+      <h1 class="display-4">Welcome to Chemreg</h1>
       <p class="lead text-justify">{{ aboutBlurb }}</p>
       <b-card-group deck>
         <b-card title="Lists" border-variant="light">
