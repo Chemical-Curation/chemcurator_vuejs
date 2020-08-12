@@ -9,13 +9,19 @@
       <p class="lead text-justify">{{ aboutBlurb }}</p>
       <b-card-group deck>
         <b-card title="Lists" border-variant="light">
-          {{ stats.listCount }}
+          {{
+          stats.listCount
+          }}
         </b-card>
         <b-card title="Substances" border-variant="light">
-          {{ stats.substanceCount }}
+          {{
+          stats.substanceCount
+          }}
         </b-card>
         <b-card title="Compounds" border-variant="light">
-          {{ stats.compoundCount }}
+          {{
+          stats.compoundCount
+          }}
         </b-card>
       </b-card-group>
     </b-col>
@@ -57,8 +63,7 @@ export default {
           this.stats["substanceCount"] = response.data.meta.pagination.count;
         })
         .catch(error => {
-          this.substanceCount = "error";
-          console.log(error);
+          this.stats["substanceCount"] = error;
         });
 
       await HTTP.get("/lists")
@@ -66,8 +71,7 @@ export default {
           this.stats["listCount"] = response.data.meta.pagination.count;
         })
         .catch(error => {
-          this.listCount = "error";
-          console.log(error);
+          this.stats["listCount"] = error;
         });
 
       await HTTP.get("/compounds")
@@ -75,8 +79,7 @@ export default {
           this.stats["compoundCount"] = response.data.meta.pagination.count;
         })
         .catch(error => {
-          this.listCount = "error";
-          console.log(error);
+          this.stats["compoundCount"] = error;
         });
     }
   }

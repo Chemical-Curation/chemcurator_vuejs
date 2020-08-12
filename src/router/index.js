@@ -5,8 +5,7 @@ import Home from "@/views/Home.vue";
 
 Vue.use(VueRouter);
 
-const routes = [
-  {
+const routes = [{
     path: "/",
     name: "home",
     component: Home,
@@ -41,7 +40,7 @@ router.beforeEach(async (to, from, next) => {
     await store.dispatch("auth/fetchUser");
     if (!store.getters["auth/isAuthenticated"]) {
       next({
-        name: "login"
+        name: "about"
       });
       return;
     }
