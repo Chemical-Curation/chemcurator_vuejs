@@ -8,9 +8,15 @@
     <b-col>
       <p class="lead text-justify">{{ aboutBlurb }}</p>
       <b-card-group deck>
-        <b-card title="Lists" border-variant="light">{{ stats.listCount }}</b-card>
-        <b-card title="Substances" border-variant="light">{{ stats.substanceCount }}</b-card>
-        <b-card title="Compounds" border-variant="light">{{ stats.compoundCount }}</b-card>
+        <b-card title="Lists" border-variant="light">
+          {{ stats.listCount }}
+        </b-card>
+        <b-card title="Substances" border-variant="light">
+          {{ stats.substanceCount }}
+        </b-card>
+        <b-card title="Compounds" border-variant="light">
+          {{ stats.compoundCount }}
+        </b-card>
       </b-card-group>
     </b-col>
     <b-col cols="1"></b-col>
@@ -21,7 +27,7 @@
 import ChemregLogo from "@/components/ChemregLogo";
 import LoginCard from "@/components/LoginCard";
 import { mapState, mapGetters } from "vuex";
-import axios from "axios";
+import { HTTP } from "@/store/http-common";
 
 export default {
   name: "About",
@@ -46,8 +52,7 @@ export default {
   },
   methods: {
     async getStats() {
-      await axios
-        .get("http://localhost:8099/substances")
+      await HTTP.get("/substances")
         .then(response => {
           this.stats["substanceCount"] = response.data.meta.pagination.count;
         })
@@ -56,8 +61,7 @@ export default {
           console.log(error);
         });
 
-      await axios
-        .get("http://localhost:8099/lists")
+      await HTTP.get("/lists")
         .then(response => {
           this.stats["listCount"] = response.data.meta.pagination.count;
         })
@@ -66,8 +70,7 @@ export default {
           console.log(error);
         });
 
-      await axios
-        .get("http://localhost:8099/compounds")
+      await HTTP.get("/compounds")
         .then(response => {
           this.stats["compoundCount"] = response.data.meta.pagination.count;
         })
