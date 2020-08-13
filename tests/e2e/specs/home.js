@@ -15,7 +15,12 @@ describe("The home page as seen by a visitor", () => {
 
 describe("The home page as seen by an authenticated user", () => {
   beforeEach(() => {
-    cy.adminLogin();
+    const user = Cypress.env("VUE_APP_TEST_ADMIN_USER");
+    const pass = Cypress.env("VUE_APP_TEST_ADMIN_PASS");
+
+    cy.visit("/");
+    cy.get("input[name=username]").type(user);
+    cy.get("input[name=password]").type(`${pass}{enter}`);
   });
   it("should not display the login form to an authenticated user", () => {
     cy.get('#login-card').should('not.exist');
