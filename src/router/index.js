@@ -9,16 +9,13 @@ const routes = [{
     path: "/",
     name: "home",
     component: Home,
-    meta: {
-      requiresAuth: true
-    }
   },
   {
-    path: "/about",
-    name: "about",
-    component: () => import("../views/About"),
+    path: "/substance",
+    name: "substance",
+    component: () => import("../views/Substance"),
     meta: {
-      requiresAuth: false
+      requiresAuth: true
     }
   },
   {
@@ -40,7 +37,7 @@ router.beforeEach(async (to, from, next) => {
     await store.dispatch("auth/fetchUser");
     if (!store.getters["auth/isAuthenticated"]) {
       next({
-        name: "about"
+        name: "home"
       });
       return;
     }

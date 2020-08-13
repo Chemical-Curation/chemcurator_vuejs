@@ -1,20 +1,12 @@
 <template>
   <b-navbar toggleable="lg" type="dark" variant="primary" class="shadow mb-2">
-    <component
-      :is="isAuthenticated ? 'router-link' : 'span'"
-      :to="{ name: 'home' }"
-    >
+    <router-link :to="{ name: 'home' }">
       <b-navbar-brand>
         <ChemregLogo color="white" size="35px" />
       </b-navbar-brand>
-    </component>
+    </router-link>
     <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
     <b-collapse id="nav-collapse" is-nav>
-      <b-navbar-nav>
-        <b-nav-item :to="{ name: 'about' }" v-if="isAuthenticated"
-          >About</b-nav-item
-        >
-      </b-navbar-nav>
       <b-navbar-nav class="ml-auto">
         <b-form-input
           class="mr-2 search"

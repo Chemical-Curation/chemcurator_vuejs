@@ -1,4 +1,8 @@
-import { HTTP } from "../http-common";
+import {
+  HTTP
+} from "../http-common";
+
+import router from "@/router";
 
 const state = {
   cid: "",
@@ -9,12 +13,17 @@ const state = {
 };
 // actions
 const actions = {
-  fetchCompound: async ({ commit, dispatch }, searchString) => {
-    dispatch("auth/fetchUser", null, { root: true });
+  fetchCompound: async ({
+    commit,
+    dispatch
+  }, searchString) => {
+    dispatch("auth/fetchUser", null, {
+      root: true
+    });
     const endpoint =
-      searchString.indexOf("-") > 0
-        ? "/definedCompounds?filter[inchikey]="
-        : "/compounds?filter[cid]=";
+      searchString.indexOf("-") > 0 ?
+      "/definedCompounds?filter[inchikey]=" :
+      "/compounds?filter[cid]=";
     await HTTP.get(endpoint + searchString)
       .then(response => {
         const data = response.data.data;
@@ -22,6 +31,9 @@ const actions = {
           const obj = data.shift();
           commit("setType", obj.type);
           commit("setCompound", obj.attributes);
+          router.push({
+            name: "substance"
+          });
         } else {
           const alert = {
             message: `${searchString} not valid`,
@@ -29,18 +41,29 @@ const actions = {
             dismissCountDown: 4
           };
           commit("setType", "definedCompound");
-          dispatch("alert/alert", alert, { root: true });
+          dispatch("alert/alert", alert, {
+            root: true
+          });
         }
       })
       // this catch won't likely be used without any permissions set on GET
-      .catch(() => dispatch("auth/logout", { root: true }));
+      .catch(() =>
+        dispatch("auth/logout", {
+          root: true
+        })
+      );
   }
 };
 
 // mutations
 const mutations = {
   setCompound(state, obj) {
-    const { cid, inchikey, mrvfile, molfileV3000 } = obj;
+    const {
+      cid,
+      inchikey,
+      mrvfile,
+      molfileV3000
+    } = obj;
     state.cid = cid;
     state.inchikey = inchikey;
     state.mrvfile = mrvfile;
