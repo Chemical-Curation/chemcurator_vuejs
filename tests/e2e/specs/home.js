@@ -16,7 +16,6 @@ describe("The home page as seen by a visitor", () => {
 describe("The home page as seen by an authenticated user", () => {
   beforeEach(() => {
     cy.adminLogin();
-    cy.visit("/");
   });
   it("should not display the login form to an authenticated user", () => {
     cy.get('#login-card').should('not.exist');
