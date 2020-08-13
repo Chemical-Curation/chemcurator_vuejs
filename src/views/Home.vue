@@ -10,13 +10,13 @@
       <p class="lead text-justify">{{ aboutBlurb }}</p>
       <b-card-group deck>
         <b-card title="Lists" border-variant="light">
-          {{ stats.listCount }}
+          <h4>{{ stats.listCount }}</h4>
         </b-card>
         <b-card title="Substances" border-variant="light">
-          {{ stats.substanceCount }}
+          <h4>{{ stats.substanceCount }}</h4>
         </b-card>
         <b-card title="Compounds" border-variant="light">
-          {{ stats.compoundCount }}
+          <h4>{{ stats.compoundCount }}</h4>
         </b-card>
       </b-card-group>
     </b-col>
