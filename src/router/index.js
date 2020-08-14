@@ -26,6 +26,7 @@ const routes = [{
         /* webpackChunkName: "ControlledVocabularies" */ "../views/Vocabularies"
       ),
     meta: {
+      // todo: Admin Only
       requiresAuth: true
     }
   },
