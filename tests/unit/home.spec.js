@@ -11,7 +11,7 @@ import BootstrapVue, {
 const localVue = createLocalVue()
 localVue.use(BootstrapVue);
 
-const wrapper = mount(Home, {
+const wrapper_auth = mount(Home, {
   localVue,
   computed: {
     isAuthenticated() {
@@ -20,23 +20,40 @@ const wrapper = mount(Home, {
     username() {
       return "karyn";
     }
-  }
+  },
+  stubs: ['b-icon']
+});
+
+const wrapper_noauth = mount(Home, {
+  localVue,
+  computed: {
+    isAuthenticated() {
+      return false;
+    },
+    username() {
+      return "";
+    }
+  },
+  stubs: ['b-icon']
 });
 
 describe("Home.vue", () => {
   it("Displays the HelloWorld.vue message", () => {
-    expect(wrapper.find(".hello").find("h1").text()).toBe("Welcome to ChemReg")
+    expect(wrapper_auth.find(".hello").find("h1").text()).toBe("Welcome to ChemReg")
   })
   it("Does not display the login card when isAuthenticated is true", () => {
-    expect(wrapper.find("#login-card").exists()).toBe(false)
+    expect(wrapper_auth.find("#login-card").exists()).toBe(false)
+  })
+  it("Displays the login card when isAuthenticated is not true", () => {
+    expect(wrapper_noauth.find("#login-card").exists()).toBe(true)
   })
   it("Displays the list counts", () => {
-    expect(wrapper.find(".list-count").exists()).toBe(true)
+    expect(wrapper_auth.find(".list-count").exists()).toBe(true)
   })
   it("Displays the substance counts", () => {
-    expect(wrapper.find(".substance-count").exists()).toBe(true)
+    expect(wrapper_auth.find(".substance-count").exists()).toBe(true)
   })
   it("Displays the compound counts", () => {
-    expect(wrapper.find(".compound-count").exists()).toBe(true)
+    expect(wrapper_auth.find(".compound-count").exists()).toBe(true)
   })
 });
