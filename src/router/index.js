@@ -5,10 +5,11 @@ import Home from "@/views/Home.vue";
 
 Vue.use(VueRouter);
 
-const routes = [{
+const routes = [
+  {
     path: "/",
     name: "home",
-    component: Home,
+    component: Home
   },
   {
     path: "/substance",

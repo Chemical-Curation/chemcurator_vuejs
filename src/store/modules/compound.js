@@ -1,6 +1,4 @@
-import {
-  HTTP
-} from "../http-common";
+import { HTTP } from "../http-common";
 
 import router from "@/router";
 
@@ -13,17 +11,14 @@ const state = {
 };
 // actions
 const actions = {
-  fetchCompound: async ({
-    commit,
-    dispatch
-  }, searchString) => {
+  fetchCompound: async ({ commit, dispatch }, searchString) => {
     dispatch("auth/fetchUser", null, {
       root: true
     });
     const endpoint =
-      searchString.indexOf("-") > 0 ?
-      "/definedCompounds?filter[inchikey]=" :
-      "/compounds?filter[cid]=";
+      searchString.indexOf("-") > 0
+        ? "/definedCompounds?filter[inchikey]="
+        : "/compounds?filter[cid]=";
     await HTTP.get(endpoint + searchString)
       .then(response => {
         const data = response.data.data;
@@ -58,12 +53,7 @@ const actions = {
 // mutations
 const mutations = {
   setCompound(state, obj) {
-    const {
-      cid,
-      inchikey,
-      mrvfile,
-      molfileV3000
-    } = obj;
+    const { cid, inchikey, mrvfile, molfileV3000 } = obj;
     state.cid = cid;
     state.inchikey = inchikey;
     state.mrvfile = mrvfile;

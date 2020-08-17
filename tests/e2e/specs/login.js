@@ -1,5 +1,5 @@
 describe("The login page", () => {
-  it("sets and deletes sessionid cookie on login/logout", function () {
+  it("sets and deletes sessionid cookie on login/logout", function() {
     const user = Cypress.env("VUE_APP_TEST_ADMIN_USER");
     const pass = Cypress.env("VUE_APP_TEST_ADMIN_PASS");
 
@@ -17,13 +17,13 @@ describe("The login page", () => {
     cy.get("[name='logout']").click();
     cy.getCookie("sessionid").should("not.exist");
   });
-  it("refuses bad logins", function () {
+  it("refuses bad logins", function() {
     cy.visit("/login");
     cy.get("input[name=username]").type("foo");
     cy.get("input[name=password]").type("bar{enter}");
     cy.get(".alert").contains("Invalid username/password");
   });
-  it("username/password required", function () {
+  it("username/password required", function() {
     cy.visit("/login");
     cy.get("input[name=username]")
       .invoke("attr", "required")
