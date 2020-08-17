@@ -1,17 +1,17 @@
 <template>
   <div>
-    <br />
-    <iframe
-      id="ketcher"
-      class="ketcher"
-      data-cy="ketcher"
-      :src="ketcherURL"
-      @load="loadMolfile"
-      width="800"
-      height="600"
-      ref="ketcher"
-      >ketcher</iframe
-    >
+    <div class="d-flex m-3">
+      <iframe
+        id="ketcher"
+        class="ketcher flex-fill"
+        data-cy="ketcher"
+        :src="ketcherURL"
+        @load="loadMolfile"
+        height="600"
+        ref="ketcher"
+        >ketcher</iframe
+      >
+    </div>
     <b-form-textarea
       id="ketcher-import-textarea"
       v-model="molfile"

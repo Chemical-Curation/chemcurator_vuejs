@@ -1,19 +1,28 @@
 <template>
-  <div class="home">
+  <b-container fluid="true" class="mx-5">
     <HelloWorld msg="Welcome to ChemReg" />
-    <ChemicalEditors />
-  </div>
+    <b-row>
+      <b-col cols="4">
+        <SubstanceForm />
+      </b-col>
+      <b-col>
+        <ChemicalEditors />
+      </b-col>
+    </b-row>
+  </b-container>
 </template>
 
 <script>
 import HelloWorld from "@/components/HelloWorld";
 import ChemicalEditors from "@/components/ChemicalEditors";
+import SubstanceForm from "@/components/SubstanceForm";
 
 export default {
   name: "home",
   components: {
     HelloWorld,
-    ChemicalEditors
+    ChemicalEditors,
+    SubstanceForm
   }
 };
 </script>
