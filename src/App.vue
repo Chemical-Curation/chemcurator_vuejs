@@ -1,11 +1,11 @@
 <template>
-  <b-container fluid id="app">
+  <div id="app">
     <NavBar />
     <Alert />
     <transition>
       <router-view :key="$route.path" />
     </transition>
-  </b-container>
+  </div>
 </template>
 
 <script>
