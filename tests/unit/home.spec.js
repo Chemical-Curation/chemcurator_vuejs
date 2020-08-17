@@ -37,6 +37,9 @@ const wrapper_noauth = mount(Home, {
 });
 
 describe("Home.vue", () => {
+  it("Displays the lorem ipsum", () => {
+    expect(wrapper_noauth.find(".lead").text()).toContain("Lorem ipsum dolor sit amet, ")
+  })
   it("Displays the HelloWorld.vue message", () => {
     expect(wrapper_auth.find(".hello").find("h1").text()).toBe("Welcome to ChemReg")
   })
