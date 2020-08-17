@@ -1,12 +1,11 @@
 <template>
   <b-row class="about">
     <b-col cols="3">
-      <ChemregLogo size="100px" v-bind:animate="true" />
+      <HelloWorld msg="Welcome to ChemReg" />
       <p v-if="username"></p>
       <LoginCard v-else />
     </b-col>
     <b-col>
-      <HelloWorld msg="Welcome to ChemReg" />
       <p class="lead text-justify">{{ aboutBlurb }}</p>
       <b-card-group deck>
         <b-card title="Lists" border-variant="light">
@@ -25,7 +24,6 @@
 </template>
 
 <script>
-import ChemregLogo from "@/components/ChemregLogo";
 import HelloWorld from "@/components/HelloWorld";
 import LoginCard from "@/components/LoginCard";
 import { mapState, mapGetters } from "vuex";
@@ -42,7 +40,6 @@ export default {
   },
   components: {
     HelloWorld,
-    ChemregLogo,
     LoginCard
   },
   data() {
