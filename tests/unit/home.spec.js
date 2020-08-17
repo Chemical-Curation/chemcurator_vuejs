@@ -20,8 +20,7 @@ const wrapper_auth = mount(Home, {
     username() {
       return "karyn";
     }
-  },
-  stubs: ['b-icon']
+  }
 });
 
 const wrapper_noauth = mount(Home, {
