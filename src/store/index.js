@@ -4,6 +4,8 @@ import auth from "./modules/auth";
 import compound from "./modules/compound";
 import alert from "./modules/alert";
 import vocabularies from "./modules/vocabularies";
+import substance from "./modules/substance";
+import list from "./modules/list";
 
 Vue.use(Vuex);
 
@@ -12,7 +14,9 @@ const store = new Vuex.Store({
     auth,
     compound,
     alert,
-    vocabularies
+    vocabularies,
+    substance,
+    list
   }
 });
 

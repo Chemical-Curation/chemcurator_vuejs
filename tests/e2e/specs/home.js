@@ -11,6 +11,19 @@ describe("The home page as seen by a visitor", () => {
   it("should not display the search bar form to a non-authenticated user", () => {
     cy.get("[data-cy=search-box]").should("not.exist");
   });
+  it("refuses bad logins", function() {
+    cy.get("input[name=username]").type("foo");
+    cy.get("input[name=password]").type("bar{enter}");
+    cy.get(".alert").contains("Invalid username/password");
+  });
+  it("username/password required", function() {
+    cy.get("input[name=username]")
+      .invoke("attr", "required")
+      .should("exist");
+    cy.get("input[name=password]")
+      .invoke("attr", "required")
+      .should("exist");
+  });
 });
 
 describe("The home page as seen by an authenticated user", () => {
@@ -27,5 +40,17 @@ describe("The home page as seen by an authenticated user", () => {
   });
   it("should display the search bar form to an authenticated user", () => {
     cy.get("[data-cy=search-box]");
+  });
+  it("sets and deletes sessionid cookie on login/logout", function() {
+    // we should be redirected to /
+    cy.url().should("eq", Cypress.config().baseUrl);
+    // our auth cookie should be present
+    cy.getCookie("sessionid").should("exist");
+    // UI should reflect this user being logged in
+    cy.get("[name='user-profile']").should("contain", "karyn");
+    // cookie should be deleted on logout
+    cy.get("[name='user-profile']").click();
+    cy.get("[name='logout']").click();
+    cy.getCookie("sessionid").should("not.exist");
   });
 });

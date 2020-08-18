@@ -1,8 +1,12 @@
 import { HTTP } from "../http-common";
+import rootActions from "../actions.js";
+import rootMutations from "../mutations.js";
 
 import router from "@/router";
 
 const state = {
+  count: 0,
+  list: [],
   cid: "",
   inchikey: "",
   mrvfile: "",
@@ -10,7 +14,8 @@ const state = {
   type: "definedCompound"
 };
 // actions
-const actions = {
+let actions = {
+  ...rootActions,
   fetchCompound: async ({ commit, dispatch }, searchString) => {
     dispatch("auth/fetchUser", null, {
       root: true
@@ -52,6 +57,7 @@ const actions = {
 
 // mutations
 const mutations = {
+  ...rootMutations,
   setCompound(state, obj) {
     const { cid, inchikey, mrvfile, molfileV3000 } = obj;
     state.cid = cid;
