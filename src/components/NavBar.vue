@@ -18,6 +18,11 @@
         >
       </b-navbar-nav>
       <b-navbar-nav>
+        <b-nav-item :to="{ name: 'lists' }" v-if="isAuthenticated"
+          >Lists</b-nav-item
+        >
+      </b-navbar-nav>
+      <b-navbar-nav>
         <b-nav-item :to="{ name: 'about' }" v-if="isAuthenticated"
           >About</b-nav-item
         >
