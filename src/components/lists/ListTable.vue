@@ -38,11 +38,6 @@ export default {
       this.$store.dispatch("lists/getList");
     }
   },
-  watch: {
-    type: function() {
-      this.getList();
-    }
-  },
   computed: {
     list: function() {
       return this.$store.state.lists.list;
