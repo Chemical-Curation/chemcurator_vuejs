@@ -2,7 +2,7 @@
   <b-container fluid="true" class="mx-5">
     <HelloWorld msg="Welcome to ChemReg" />
     <b-row>
-      <b-col cols="4">
+      <b-col cols="12" order="1" lg="4" order-lg="0">
         <SubstanceForm />
       </b-col>
       <b-col>

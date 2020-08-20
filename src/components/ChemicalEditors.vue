@@ -1,17 +1,40 @@
 <template>
   <div>
-    <b-form-select
-      id="compound-type-dropdown"
-      v-model="type"
-      :options="options"
-    />
-    <KetcherWindow v-if="type == 'definedCompound'" />
-    <MarvinWindow v-if="type == 'illDefinedCompound'" />
+    <b-form>
+      <div class="row mb-3">
+        <b-form-group
+          label="Record Compound ID:"
+          label-align="left"
+          label-cols="4"
+          label-for="recordCompoundID"
+          class="col"
+        >
+          <b-form-input id="recordCompoundID" :value="cid" disabled />
+        </b-form-group>
+        <b-form-group
+          label="Substance Type:"
+          label-align="left"
+          label-cols="4"
+          label-for="compound-type-dropdown"
+          class="col"
+        >
+          <b-form-select
+            id="compound-type-dropdown"
+            v-model="type"
+            :options="options"
+          />
+        </b-form-group>
+      </div>
+      <KetcherWindow v-show="type == 'definedCompound'" />
+      <MarvinWindow v-show="type == 'illDefinedCompound'" />
+      <div class="my-3">
+        <b-button type="submit" variant="primary">Save Compound</b-button>
+      </div>
+    </b-form>
   </div>
 </template>
 
 <script>
-import { mapState } from "vuex";
 import KetcherWindow from "@/components/KetcherWindow";
 import MarvinWindow from "@/components/MarvinWindow";
 
@@ -38,7 +61,15 @@ export default {
         this.$store.commit("compound/setType", value);
       }
     },
-    ...mapState("compound", ["cid"])
+    cid: function() {
+      if (this.type === "definedCompound") {
+        return this.$store.state.compound.definedCompound.cid;
+      }
+      if (this.type === "illDefinedCompound") {
+        return this.$store.state.compound.illDefinedCompound.cid;
+      }
+      return "Undefined Type";
+    }
   }
 };
 </script>

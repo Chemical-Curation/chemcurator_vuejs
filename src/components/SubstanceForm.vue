@@ -7,10 +7,7 @@
       label-for="substanceID"
       class="pb-3"
     >
-      <b-form-input
-        id="substanceID"
-        disabled
-      ></b-form-input>
+      <b-form-input id="substanceID" v-model="form.sid" disabled></b-form-input>
     </b-form-group>
     <b-form-group
       label="Preferred Name:"
@@ -21,6 +18,8 @@
     >
       <b-form-input
         id="preferredName"
+        v-model="form.preferredName"
+        :disabled="!isAuthenticated"
       ></b-form-input>
     </b-form-group>
     <b-form-group
@@ -32,6 +31,8 @@
     >
       <b-form-input
         id="casrn"
+        v-model="form.casrn"
+        :disabled="!isAuthenticated"
       ></b-form-input>
     </b-form-group>
     <b-form-group
@@ -43,6 +44,8 @@
     >
       <b-form-select
         id="qcLevel"
+        v-model="form.qcLevel"
+        :disabled="!isAuthenticated"
       ></b-form-select>
     </b-form-group>
     <b-form-group
@@ -54,6 +57,8 @@
     >
       <b-form-select
         id="source"
+        v-model="form.source"
+        :disabled="!isAuthenticated"
       ></b-form-select>
     </b-form-group>
     <b-form-group
@@ -65,6 +70,8 @@
     >
       <b-form-select
         id="substanceType"
+        v-model="form.substanceType"
+        :disabled="!isAuthenticated"
       ></b-form-select>
     </b-form-group>
     <b-form-group
@@ -76,6 +83,8 @@
     >
       <b-form-textarea
         id="substanceDescription"
+        v-model="form.substanceDescription"
+        :disabled="!isAuthenticated"
       ></b-form-textarea>
     </b-form-group>
     <b-form-group
@@ -87,6 +96,8 @@
     >
       <b-form-textarea
         id="privateQCNotes"
+        v-model="form.privateQCNotes"
+        :disabled="!isAuthenticated"
       ></b-form-textarea>
     </b-form-group>
     <b-form-group
@@ -98,17 +109,37 @@
     >
       <b-form-textarea
         id="publicQCNotes"
+        v-model="form.publicQCNotes"
+        :disabled="!isAuthenticated"
       ></b-form-textarea>
     </b-form-group>
   </b-form>
 </template>
 
 <script>
+import { mapGetters } from "vuex";
+
 export default {
-  name: "SubstanceForm"
-}
+  name: "SubstanceForm",
+  data() {
+    return {
+      form: {
+        sid: "",
+        preferredName: "",
+        casrn: "",
+        qcLevel: "",
+        source: "",
+        substanceType: "",
+        substanceDescription: "",
+        privateQCNotes: "",
+        publicQCNotes: ""
+      }
+    };
+  },
+  computed: {
+    ...mapGetters("auth", ["isAuthenticated"])
+  }
+};
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

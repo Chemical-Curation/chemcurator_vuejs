@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="d-flex m-3">
+    <div class="d-flex">
       <iframe
         id="ketcher"
         class="ketcher flex-fill"
@@ -12,16 +12,16 @@
         >ketcher</iframe
       >
     </div>
-    <b-form-textarea
-      id="ketcher-import-textarea"
-      v-model="molfile"
-      rows="3"
-      max-rows="6"
-      placeholder="Edit the above window to generate a Molfile..."
-      class="mx-auto mt-5"
-      style="width:800px"
-      disabled
-    ></b-form-textarea>
+    <!--    <b-form-textarea-->
+    <!--      id="ketcher-import-textarea"-->
+    <!--      v-model="molfile"-->
+    <!--      rows="3"-->
+    <!--      max-rows="6"-->
+    <!--      placeholder="Edit the above window to generate a Molfile..."-->
+    <!--      class="mx-auto mt-5"-->
+    <!--      style="width:800px"-->
+    <!--      disabled-->
+    <!--    ></b-form-textarea>-->
   </div>
 </template>
 
@@ -56,7 +56,7 @@ export default {
   },
   computed: {
     compound: function() {
-      return this.$store.state.compound.molfile;
+      return this.$store.state.compound.definedCompound.molfile;
     },
     ketcherFrame: function() {
       return this.$refs.ketcher;
