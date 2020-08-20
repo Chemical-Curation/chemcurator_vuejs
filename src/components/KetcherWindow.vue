@@ -6,11 +6,12 @@
         class="ketcher flex-fill"
         data-cy="ketcher"
         :src="ketcherURL"
-        @load="loadMolfile"
         height="600"
         ref="ketcher"
         >ketcher</iframe
       >
+<!--              @load="loadMolfile"-->
+
     </div>
     <!--    <b-form-textarea-->
     <!--      id="ketcher-import-textarea"-->
@@ -36,20 +37,24 @@ export default {
   },
   methods: {
     loadMolfile: function() {
-      if (this.compound !== "") {
-        this.ketcherFrame.contentWindow.postMessage(
-          {
-            type: "importMolfile",
-            molfile: this.compound
-          },
-          "*"
-        );
-        this.exportMolfile();
-      }
+      this.ketcherFrame.contentWindow.postMessage(
+        {
+          type: "importMolfile",
+          molfile: this.compound
+        },
+        "*"
+      );
+      this.exportMolfile();
     },
     exportMolfile: function() {
       this.ketcherFrame.contentWindow.postMessage(
         { type: "exportMolfile" },
+        "*"
+      );
+    },
+    clearMolfile: function (){
+      this.ketcherFrame.contentWindow.postMessage(
+        { type: "clearMolfile" },
         "*"
       );
     }
@@ -64,7 +69,12 @@ export default {
   },
   watch: {
     compound: function() {
-      this.loadMolfile();
+      if (this.compound){
+        this.loadMolfile();
+      }
+      else {
+        this.clearMolfile();
+      }
     }
   },
   mounted() {

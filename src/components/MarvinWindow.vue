@@ -6,6 +6,7 @@
         class="marvin flex-fill"
         data-cy="marvin"
         v-bind:src="marvinURL"
+        ref="marvin"
       >
         marvin
       </iframe>
@@ -53,54 +54,53 @@ export default {
     };
   },
   methods: {
-    importMrvfile: function() {
-      document
-        .getElementById("marvin")
-        .contentWindow.postMessage(
-          { type: "importMrvfile", mrvfile: this.mrvfile },
-          "*"
-        );
+    importMrvfile: function () {
+      this.marvinFrame.contentWindow.postMessage(
+        {type: "importMrvfile", mrvfile: this.mrvfile},
+        "*"
+      );
     },
-    loadMrvfile: function() {
-      document.getElementById("marvin").contentWindow.postMessage(
+    loadMrvfile: function () {
+      this.marvinFrame.contentWindow.postMessage(
         {
           type: "importMrvfile",
-          mrvfile: this.$store.state.compound.illDefinedCompound.mrvfile
+          mrvfile: this.compound
         },
         "*"
       );
       this.exportMrvfile();
     },
-    exportMrvfile: function() {
-      document
-        .getElementById("marvin")
-        .contentWindow.postMessage({ type: "exportMrvfile" }, "*");
+    exportMrvfile: function () {
+      this.marvinFrame.contentWindow.postMessage({type: "exportMrvfile"}, "*");
+    },
+    clearMarvin: function () {
+      this.marvinFrame.contentWindow.postMessage({type: "clearMrvfile"}, "*")
     }
   },
   computed: {
-    compound: function() {
+    compound: function () {
       return this.$store.state.compound.illDefinedCompound.mrvfile;
+    },
+    marvinFrame: function () {
+      return this.$refs.marvin;
     }
   },
   watch: {
-    compound: function() {
-      this.loadMrvfile();
+    compound: function () {
+      if (this.compound) {
+        this.loadMrvfile();
+      } else {
+        this.clearMarvin();
+      }
     }
   },
   mounted() {
-    let self = this;
+    // let self = this;
     window.addEventListener(
       "message",
-      function(event) {
-        if (
-          event.data === "marvinLoaded" &&
-          self.$store.state.compound.illDefinedCompound.mrvfile
-        ) {
-          self.loadMrvfile();
-        }
-        if (event.data.type == "returnMrvfile") {
-          self.mrvfile = event.data.mrvfile;
-          this.mrvfile = self.$store.state.compound.illDefinedCompound.mrvfile;
+      event => {
+        if (event.data.type === "returnMrvfile") {
+          this.mrvfile = event.data.mrvfile;
         }
       },
       false

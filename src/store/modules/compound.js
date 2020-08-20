@@ -25,12 +25,12 @@ const actions = {
       searchString.indexOf("-") > 0
         ? "/definedCompounds?filter[inchikey]="
         : "/compounds?filter[cid]=";
-    commit("clearState");
     await HTTP.get(endpoint + searchString)
       .then(response => {
         const data = response.data.data;
         if (data.length > 0) {
           const obj = data.shift();
+          commit("clearState");
           commit("setType", obj.type);
           commit("setCompound", { ...obj.attributes, type: obj.type });
         } else {
