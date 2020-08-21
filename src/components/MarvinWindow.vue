@@ -54,13 +54,13 @@ export default {
     };
   },
   methods: {
-    importMrvfile: function () {
+    importMrvfile: function() {
       this.marvinFrame.contentWindow.postMessage(
-        {type: "importMrvfile", mrvfile: this.mrvfile},
+        { type: "importMrvfile", mrvfile: this.mrvfile },
         "*"
       );
     },
-    loadMrvfile: function () {
+    loadMrvfile: function() {
       this.marvinFrame.contentWindow.postMessage(
         {
           type: "importMrvfile",
@@ -70,23 +70,26 @@ export default {
       );
       this.exportMrvfile();
     },
-    exportMrvfile: function () {
-      this.marvinFrame.contentWindow.postMessage({type: "exportMrvfile"}, "*");
+    exportMrvfile: function() {
+      this.marvinFrame.contentWindow.postMessage(
+        { type: "exportMrvfile" },
+        "*"
+      );
     },
-    clearMarvin: function () {
-      this.marvinFrame.contentWindow.postMessage({type: "clearMrvfile"}, "*")
+    clearMarvin: function() {
+      this.marvinFrame.contentWindow.postMessage({ type: "clearMrvfile" }, "*");
     }
   },
   computed: {
-    compound: function () {
+    compound: function() {
       return this.$store.state.compound.illDefinedCompound.mrvfile;
     },
-    marvinFrame: function () {
+    marvinFrame: function() {
       return this.$refs.marvin;
     }
   },
   watch: {
-    compound: function () {
+    compound: function() {
       if (this.compound) {
         this.loadMrvfile();
       } else {
@@ -99,6 +102,9 @@ export default {
     window.addEventListener(
       "message",
       event => {
+        if (event.data === "marvinLoaded" && this.compound) {
+          this.loadMrvfile();
+        }
         if (event.data.type === "returnMrvfile") {
           this.mrvfile = event.data.mrvfile;
         }

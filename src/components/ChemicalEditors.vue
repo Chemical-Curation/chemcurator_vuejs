@@ -25,8 +25,8 @@
           />
         </b-form-group>
       </div>
-      <KetcherWindow v-show="type == 'definedCompound'" />
-      <MarvinWindow v-show="type == 'illDefinedCompound'" />
+      <KetcherWindow v-show="type === 'definedCompound'" />
+      <MarvinWindow v-show="type === 'illDefinedCompound'" />
       <div class="my-3">
         <b-button type="submit" variant="primary">Save Compound</b-button>
       </div>
