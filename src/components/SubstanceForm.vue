@@ -117,7 +117,7 @@
 </template>
 
 <script>
-import { mapGetters } from "vuex";
+import { mapGetters, mapState } from "vuex";
 
 export default {
   name: "SubstanceForm",
@@ -137,7 +137,26 @@ export default {
     };
   },
   computed: {
-    ...mapGetters("auth", ["isAuthenticated"])
+    ...mapGetters("auth", ["isAuthenticated"]),
+    ...mapState("compound", ["type"]),
+    ...mapState("compound/illdefinedcompound", {
+      idcRelationships: "relationships",
+      idcIncluded: "included"
+    }),
+    ...mapState("compound/definedcompound", {
+      dcRelationships: "relationships",
+      dcIncluded: "included"
+    })
+  },
+  watch: {
+    type: function() {
+      this.loadSubstance();
+    }
+  },
+  methods: {
+    loadSubstance: function() {
+      this.form.sid = this.idcIncluded[0].attributes.sid;
+    }
   }
 };
 </script>

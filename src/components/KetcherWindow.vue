@@ -26,6 +26,8 @@
 </template>
 
 <script>
+import { mapState } from "vuex";
+
 export default {
   name: "KetcherWindow",
   data() {
@@ -36,11 +38,11 @@ export default {
   },
   methods: {
     loadMolfile: function() {
-      if (this.compound) {
+      if (this.attributes.molfileV3000) {
         this.ketcherFrame.contentWindow.postMessage(
           {
             type: "importMolfile",
-            molfile: this.compound
+            molfile: this.attributes.molfileV3000
           },
           "*"
         );
@@ -61,16 +63,14 @@ export default {
     }
   },
   computed: {
-    compound: function() {
-      return this.$store.state.compound.definedCompound.molfile;
-    },
+    ...mapState("compound/definedcompound", ["attributes"]),
     ketcherFrame: function() {
       return this.$refs.ketcher;
     }
   },
   watch: {
-    compound: function() {
-      if (this.compound) {
+    attributes: function() {
+      if (this.attributes.molfileV3000) {
         this.loadMolfile();
       } else {
         this.clearMolfile();

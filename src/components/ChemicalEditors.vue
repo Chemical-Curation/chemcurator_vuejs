@@ -63,10 +63,10 @@ export default {
     },
     cid: function() {
       if (this.type === "definedCompound") {
-        return this.$store.state.compound.definedCompound.cid;
+        return this.$store.state.compound.definedcompound.attributes.cid;
       }
       if (this.type === "illDefinedCompound") {
-        return this.$store.state.compound.illDefinedCompound.cid;
+        return this.$store.state.compound.illdefinedcompound.attributes.cid;
       }
       return "Undefined Type";
     }

@@ -45,6 +45,8 @@
 </template>
 
 <script>
+import { mapState } from "vuex";
+
 export default {
   name: "MarvinWindow",
   data() {
@@ -64,7 +66,7 @@ export default {
       this.marvinFrame.contentWindow.postMessage(
         {
           type: "importMrvfile",
-          mrvfile: this.compound
+          mrvfile: this.attributes.mrvfile
         },
         "*"
       );
@@ -81,16 +83,14 @@ export default {
     }
   },
   computed: {
-    compound: function() {
-      return this.$store.state.compound.illDefinedCompound.mrvfile;
-    },
+    ...mapState("compound/illdefinedcompound", ["attributes"]),
     marvinFrame: function() {
       return this.$refs.marvin;
     }
   },
   watch: {
-    compound: function() {
-      if (this.compound) {
+    attributes: function() {
+      if (this.attributes.mrvfile) {
         this.loadMrvfile();
       } else {
         this.clearMarvin();
@@ -102,7 +102,7 @@ export default {
     window.addEventListener(
       "message",
       event => {
-        if (event.data === "marvinLoaded" && this.compound) {
+        if (event.data === "marvinLoaded" && this.attributes.mrvfile) {
           this.loadMrvfile();
         }
         if (event.data.type === "returnMrvfile") {
