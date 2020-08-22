@@ -3,6 +3,7 @@ import Vuex from "vuex";
 import auth from "./modules/auth";
 import compound from "./modules/compound";
 import alert from "./modules/alert";
+import vocabularies from "./modules/vocabularies";
 
 Vue.use(Vuex);
 
@@ -10,7 +11,8 @@ const store = new Vuex.Store({
   modules: {
     auth,
     compound,
-    alert
+    alert,
+    vocabularies
   }
 });
 
