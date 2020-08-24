@@ -28,8 +28,12 @@ const actions = {
           dismissCountDown: 4
         };
         commit("setUser", {});
-        router.push("login");
-        dispatch("alert/alert", alert, { root: true });
+        router.push({
+          name: "home"
+        });
+        dispatch("alert/alert", alert, {
+          root: true
+        });
       });
   },
   login: async ({ commit }, { username, password }) => {
@@ -37,7 +41,10 @@ const actions = {
       "/login/",
       {},
       {
-        auth: { username: username, password: password }
+        auth: {
+          username: username,
+          password: password
+        }
       }
     );
     commit("setUser", response.data);
@@ -52,13 +59,21 @@ const actions = {
     await HTTP.delete("/login/")
       .then(() => {
         commit("setUser", {});
-        router.push("login");
-        dispatch("alert/alert", alert, { root: true });
+        router.push({
+          name: "home"
+        });
+        dispatch("alert/alert", alert, {
+          root: true
+        });
       })
       .catch(() => {
         commit("setUser", {});
-        router.push("login");
-        dispatch("alert/alert", alert, { root: true });
+        router.push({
+          name: "home"
+        });
+        dispatch("alert/alert", alert, {
+          root: true
+        });
       });
   }
 };

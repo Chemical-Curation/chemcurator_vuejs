@@ -1,17 +1,24 @@
 import { HTTP } from "../http-common";
+import rootActions from "../actions.js";
+import rootMutations from "../mutations.js";
+
+import router from "@/router";
 
 import definedcompound from "./defined-compound";
 import illdefinedcompound from "./illdefined-compound";
 
 const defaultState = () => {
   return {
+    count: 0,
+    list: [],
     type: "definedCompound"
   };
 };
 
 const state = defaultState();
 // actions
-const actions = {
+let actions = {
+  ...rootActions,
   fetchCompound: async ({ commit, dispatch }, searchString) => {
     dispatch("auth/fetchUser", null, { root: true });
     const endpoint =
@@ -43,6 +50,9 @@ const actions = {
               commit("illdefinedcompound/setIncluded", data.included);
             }
           }
+          router.push({
+            name: "substance"
+          });
         } else {
           const alert = {
             message: `${searchString} not valid`,
@@ -50,16 +60,23 @@ const actions = {
             dismissCountDown: 4
           };
           commit("clearState");
-          dispatch("alert/alert", alert, { root: true });
+          dispatch("alert/alert", alert, {
+            root: true
+          });
         }
       })
       // this catch won't likely be used without any permissions set on GET
-      .catch(() => dispatch("auth/logout", { root: true }));
+      .catch(() =>
+        dispatch("auth/logout", {
+          root: true
+        })
+      );
   }
 };
 
 // mutations
 const mutations = {
+  ...rootMutations,
   clearState(state) {
     Object.assign(state, defaultState());
   },

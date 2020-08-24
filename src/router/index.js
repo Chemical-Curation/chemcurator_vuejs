@@ -9,15 +9,12 @@ const routes = [
   {
     path: "/",
     name: "home",
-    component: Home,
-    meta: {
-      requiresAuth: true
-    }
+    component: Home
   },
   {
-    path: "/about",
-    name: "about",
-    component: () => import(/* webpackChunkName: "About" */ "../views/About"),
+    path: "/substance",
+    name: "substance",
+    component: () => import("../views/Substance"),
     meta: {
       requiresAuth: true
     }
@@ -25,18 +22,16 @@ const routes = [
   {
     path: "/vocabularies",
     name: "controlled-vocabularies",
-    component: () =>
-      import(
-        /* webpackChunkName: "ControlledVocabularies" */ "../views/Vocabularies"
-      ),
+    component: () => import("../views/Vocabularies"),
     meta: {
+      // todo: Admin Only
       requiresAuth: true
     }
   },
   {
-    path: "/login",
-    name: "login",
-    component: () => import(/* webpackChunkName: "Login" */ "../views/Login")
+    path: "/lists",
+    name: "lists",
+    component: () => import("../views/Lists")
   }
 ];
 
@@ -51,7 +46,9 @@ router.beforeEach(async (to, from, next) => {
   if (to.meta.requiresAuth) {
     await store.dispatch("auth/fetchUser");
     if (!store.getters["auth/isAuthenticated"]) {
-      next({ name: "login" });
+      next({
+        name: "home"
+      });
       return;
     }
   }
