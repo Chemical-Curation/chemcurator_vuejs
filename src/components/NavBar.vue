@@ -16,6 +16,9 @@
         <b-nav-item :to="{ name: 'substance' }" v-if="isAuthenticated"
           >Substances</b-nav-item
         >
+        <b-nav-item :to="{ name: 'lists' }" v-if="isAuthenticated"
+          >Lists</b-nav-item
+        >
       </b-navbar-nav>
       <b-navbar-nav class="ml-auto">
         <b-form-input

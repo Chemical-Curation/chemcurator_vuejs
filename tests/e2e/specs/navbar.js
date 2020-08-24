@@ -10,4 +10,12 @@ describe("The navbar", () => {
     cy.visit("/substance");
     cy.contains("nav", "chemreg");
   });
+  it("about should have navbar", () => {
+    cy.visit("/vocabularies");
+    cy.contains("nav", "chemreg");
+  });
+  it("about should have navbar", () => {
+    cy.visit("/lists");
+    cy.contains("nav", "chemreg");
+  });
 });

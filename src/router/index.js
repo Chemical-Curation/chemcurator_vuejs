@@ -22,15 +22,16 @@ const routes = [
   {
     path: "/vocabularies",
     name: "controlled-vocabularies",
-    component: () =>
-      import(
-        /* webpackChunkName: "ControlledVocabularies" */
-        "../views/Vocabularies"
-      ),
+    component: () => import("../views/Vocabularies"),
     meta: {
       // todo: Admin Only
       requiresAuth: true
     }
+  },
+  {
+    path: "/lists",
+    name: "lists",
+    component: () => import("../views/Lists")
   }
 ];
 
