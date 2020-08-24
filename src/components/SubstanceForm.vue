@@ -44,7 +44,8 @@
     >
       <b-form-select
         id="qcLevel"
-        v-model="form.qcLevel"
+        v-model="form.qcLevelID"
+        :options="qcLevelsOptions"
         :disabled="!isAuthenticated"
       ></b-form-select>
     </b-form-group>
@@ -57,7 +58,8 @@
     >
       <b-form-select
         id="source"
-        v-model="form.source"
+        v-model="form.sourceID"
+        :options="sourceOptions"
         :disabled="!isAuthenticated"
       ></b-form-select>
     </b-form-group>
@@ -70,7 +72,8 @@
     >
       <b-form-select
         id="substanceType"
-        v-model="form.substanceType"
+        v-model="form.substanceTypeID"
+        :options="substanceTypeOptions"
         :disabled="!isAuthenticated"
       ></b-form-select>
     </b-form-group>
@@ -117,8 +120,7 @@
 </template>
 
 <script>
-// import { mapGetters, mapState } from "vuex";
-import { mapGetters } from "vuex";
+import { mapGetters, mapState } from "vuex";
 
 export default {
   name: "SubstanceForm",
@@ -126,56 +128,43 @@ export default {
     // Type compound being displayed.  Important for knowing which store to fetch from.
     type: String
   },
-  data() {
-    return {
-      // form: {
-      //   sid: "",
-      //   preferredName: "",
-      //   casrn: "",
-      //   qcLevel: "",
-      //   source: "",
-      //   substanceType: "",
-      //   substanceDescription: "",
-      //   privateQCNotes: "",
-      //   publicQCNotes: ""
-      // }
-    };
-  },
   computed: {
     ...mapGetters("auth", ["isAuthenticated"]),
-    ...mapGetters('compound/definedcompound', {"getDefFoobar": "getSubstanceForm"}),
-    // ...mapGetters('compound/illdefinedcompound', {"getIndefFoobar": "getSubstanceForm"}),
+
+    ...mapGetters('compound/definedcompound', {"getDefSubstanceForm": "getSubstanceForm"}),
+    ...mapGetters('compound/illdefinedcompound', {"getIndefSubstanceForm": "getSubstanceForm"}),
+
+    ...mapState("source", {sourceList: 'list'}),
+    ...mapState("substanceType", {substanceTypeList: 'list'}),
+    ...mapState("qcLevel", {qcLevelList: 'list'}),
+
     form: function () {
-      if (this.type === 'definedCompound') {
-        return this.getDefFoobar
-      }
-      else {
-        // return this.getIndefFoobar
-        return {
-          sid: "",
-          preferredName: "",
-          casrn: "",
-          qcLevel: "",
-          source: "",
-          substanceType: "",
-          substanceDescription: "",
-          privateQCNotes: "",
-          publicQCNotes: ""
-        }
-      }
+      return this.type === 'definedCompound' ? this.getDefSubstanceForm : this.getIndefSubstanceForm
+    },
+    sourceOptions: function() {
+      return this.buildOptions(this.sourceList)
+    },
+    substanceTypeOptions: function() {
+      return this.buildOptions(this.substanceTypeList)
+    },
+    qcLevelsOptions: function() {
+      return this.buildOptions(this.qcLevelList)
     }
-
-    // ...mapState("compound/illdefinedcompound", {
-    //   idcRelationships: "relationships",
-    //   idcIncluded: "included"
-    // }),
-    //
-    // ...mapState("compound/definedcompound", {
-    //   dcRelationships: "relationships",
-    //   dcIncluded: "included"
-    // })
-
   },
+  methods: {
+    buildOptions: function(list) {
+      let item
+      let options = []
+      for (item of list)
+        options.push({value: item.id, text: item.attributes.label})
+      return options
+    }
+  },
+  mounted() {
+    this.$store.dispatch("source/getList", "sources")
+    this.$store.dispatch("substanceType/getList", "substanceTypes")
+    this.$store.dispatch("qcLevel/getList", "qcLevels")
+  }
 };
 </script>
 

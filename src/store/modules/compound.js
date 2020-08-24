@@ -38,16 +38,15 @@ let actions = {
               relationships: obj.relationships
             });
             if (data.included) {
-              commit("definedcompound/setIncluded", data.included);
+              commit("definedcompound/storeIncluded", data.included);
             }
           } else if (obj.type === "illDefinedCompound") {
             commit("illdefinedcompound/setAttributes", {
               attributes: obj.attributes,
               relationships: obj.relationships
             });
-            console.log(data);
             if (data.included) {
-              commit("illdefinedcompound/setIncluded", data.included);
+              commit("definedcompound/storeIncluded", data.included);
             }
           }
           router.push({

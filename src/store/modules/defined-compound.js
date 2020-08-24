@@ -1,35 +1,59 @@
+import rootActions from "../actions.js";
+import rootMutations from "../mutations.js";
+
 const defaultState = () => {
   return {
     attributes: {},
     relationships: {},
-    included: []
+    included: {}
   };
 };
 
 const state = defaultState();
 // actions
 const actions = {
+  ...rootActions
 };
 
 const getters = {
   getSubstanceForm: state => {
     state  // REMOVE THIS LINE.  IT IS ONLY MEANT TO ALLOW LINTING
+    if (state.relationships.substance === undefined) {
+      return {
+        sid: "",
+        preferredName: "",
+        casrn: "",
+        substanceDescription: "",
+        privateQCNotes: "",
+        publicQCNotes: "",
+        qcLevelID: "",
+        sourceID: "",
+        substanceTypeID: ""
+      }
+    }
+    // todo: if this is 1 to 1 we need to clarify that.
+    let type = state.relationships.substance.data[0].type
+    let id = state.relationships.substance.data[0].id
+
+    let attributes = state.included[type][id].attributes
+    let relationships = state.included[type][id].relationships
     return {
-      sid: "Fart",
-      preferredName: "",
-      casrn: "",
-      qcLevel: "",
-      source: "",
-      substanceType: "",
-      substanceDescription: "",
-      privateQCNotes: "",
-      publicQCNotes: ""
+      sid: attributes.sid,
+      preferredName: attributes.preferredName,
+      casrn: attributes.casrn,
+      substanceDescription: attributes.description,
+      privateQCNotes: attributes.privateQcNote,
+      publicQCNotes: attributes.publicQcNote,
+      qcLevelID: relationships.qcLevel.data.id,
+      sourceID: relationships.source.data.id,
+      substanceTypeID: relationships.substanceType.data.id
     }
   }
 };
 
 // mutations
 const mutations = {
+  ...rootMutations,
   clearState(state) {
     Object.assign(state, defaultState());
   },
@@ -37,10 +61,6 @@ const mutations = {
     state.attributes = attributes;
     state.relationships = relationships;
   },
-  setIncluded(state, included) {
-    /** todo: this probably needs to place these attributes next to the relationships **/
-    state.included = included;
-  }
 };
 
 export default {
