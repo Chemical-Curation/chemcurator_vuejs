@@ -1,22 +1,9 @@
-import { HTTP } from "../http-common";
+import actions from "../actions.js";
+import mutations from "../mutations.js";
 
 const state = {
+  count: 0,
   list: []
-};
-
-const mutations = {
-  storeList(state, payload) {
-    state.list = payload;
-  }
-};
-
-// actions
-const actions = {
-  getList: async (context, resource) => {
-    await HTTP.get("/" + resource).then(response => {
-      context.commit("storeList", response.data.data);
-    });
-  }
 };
 
 export default {

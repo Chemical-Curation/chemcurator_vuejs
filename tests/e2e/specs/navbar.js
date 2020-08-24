@@ -6,8 +6,8 @@ describe("The navbar", () => {
     cy.visit("/");
     cy.contains("nav", "chemreg");
   });
-  it("about should have navbar", () => {
-    cy.visit("/about");
+  it("substance should have navbar", () => {
+    cy.visit("/substance");
     cy.contains("nav", "chemreg");
   });
   it("about should have navbar", () => {

@@ -35,12 +35,12 @@ export default {
   },
   methods: {
     getList: function() {
-      this.$store.dispatch("lists/getList");
+      this.$store.dispatch("list/getList", "lists");
     }
   },
   computed: {
     list: function() {
-      return this.$store.state.lists.list;
+      return this.$store.state.list.list;
     }
   },
   mounted() {
