@@ -1,12 +1,36 @@
 <template>
-  <b-container fluid="true" className="mx-5">
+  <b-container fluid="true" class="mx-5">
     <HelloWorld msg="Welcome to ChemReg"/>
     <b-row>
       <b-col cols="12" order="1" lg="4" order-lg="0">
-        <SubstanceForm/>
+        <SubstanceForm :type="type" />
       </b-col>
       <b-col>
-        <ChemicalEditors/>
+        <div class="row mb-3">
+          <b-form-group
+            label="Record Compound ID:"
+            label-align="left"
+            label-cols="4"
+            label-for="recordCompoundID"
+            class="col"
+          >
+            <b-form-input id="recordCompoundID" :value="cid" disabled />
+          </b-form-group>
+          <b-form-group
+            label="Substance Type:"
+            label-align="left"
+            label-cols="4"
+            label-for="compound-type-dropdown"
+            class="col"
+          >
+            <b-form-select
+              id="compound-type-dropdown"
+              v-model="type"
+              :options="options"
+            />
+          </b-form-group>
+        </div>
+        <ChemicalEditors :type="type" />
       </b-col>
     </b-row>
   </b-container>
@@ -19,6 +43,26 @@ import SubstanceForm from "@/components/SubstanceForm";
 
 export default {
   name: "home",
+  data() {
+    return {
+      type: 'definedCompound',
+      options: [
+        { value: "definedCompound", text: "defined" },
+        { value: "illDefinedCompound", text: "ill-defined" }
+      ]
+    }
+  },
+  computed: {
+    cid: function() {
+      if (this.type === "definedCompound") {
+        return this.$store.state.compound.definedcompound.attributes.cid;
+      }
+      if (this.type === "illDefinedCompound") {
+        return this.$store.state.compound.illdefinedcompound.attributes.cid;
+      }
+      return "Undefined Type";
+    }
+  },
   components: {
     HelloWorld,
     ChemicalEditors,

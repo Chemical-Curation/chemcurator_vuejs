@@ -117,47 +117,65 @@
 </template>
 
 <script>
-import { mapGetters, mapState } from "vuex";
+// import { mapGetters, mapState } from "vuex";
+import { mapGetters } from "vuex";
 
 export default {
   name: "SubstanceForm",
+  props: {
+    // Type compound being displayed.  Important for knowing which store to fetch from.
+    type: String
+  },
   data() {
     return {
-      form: {
-        sid: "",
-        preferredName: "",
-        casrn: "",
-        qcLevel: "",
-        source: "",
-        substanceType: "",
-        substanceDescription: "",
-        privateQCNotes: "",
-        publicQCNotes: ""
-      }
+      // form: {
+      //   sid: "",
+      //   preferredName: "",
+      //   casrn: "",
+      //   qcLevel: "",
+      //   source: "",
+      //   substanceType: "",
+      //   substanceDescription: "",
+      //   privateQCNotes: "",
+      //   publicQCNotes: ""
+      // }
     };
   },
   computed: {
     ...mapGetters("auth", ["isAuthenticated"]),
-    ...mapState("compound", ["type"]),
-    ...mapState("compound/illdefinedcompound", {
-      idcRelationships: "relationships",
-      idcIncluded: "included"
-    }),
-    ...mapState("compound/definedcompound", {
-      dcRelationships: "relationships",
-      dcIncluded: "included"
-    })
-  },
-  watch: {
-    type: function() {
-      this.loadSubstance();
+    ...mapGetters('compound/definedcompound', {"getDefFoobar": "getSubstanceForm"}),
+    // ...mapGetters('compound/illdefinedcompound', {"getIndefFoobar": "getSubstanceForm"}),
+    form: function () {
+      if (this.type === 'definedCompound') {
+        return this.getDefFoobar
+      }
+      else {
+        // return this.getIndefFoobar
+        return {
+          sid: "",
+          preferredName: "",
+          casrn: "",
+          qcLevel: "",
+          source: "",
+          substanceType: "",
+          substanceDescription: "",
+          privateQCNotes: "",
+          publicQCNotes: ""
+        }
+      }
     }
+
+    // ...mapState("compound/illdefinedcompound", {
+    //   idcRelationships: "relationships",
+    //   idcIncluded: "included"
+    // }),
+    //
+    // ...mapState("compound/definedcompound", {
+    //   dcRelationships: "relationships",
+    //   dcIncluded: "included"
+    // })
+
   },
-  methods: {
-    loadSubstance: function() {
-      this.form.sid = this.idcIncluded[0].attributes.sid;
-    }
-  }
 };
 </script>
 

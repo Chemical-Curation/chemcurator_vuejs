@@ -8,7 +8,25 @@ const defaultState = () => {
 
 const state = defaultState();
 // actions
-const actions = {};
+const actions = {
+};
+
+const getters = {
+  getSubstanceForm: state => {
+    state  // REMOVE THIS LINE.  IT IS ONLY MEANT TO ALLOW LINTING
+    return {
+      sid: "Fart",
+      preferredName: "",
+      casrn: "",
+      qcLevel: "",
+      source: "",
+      substanceType: "",
+      substanceDescription: "",
+      privateQCNotes: "",
+      publicQCNotes: ""
+    }
+  }
+};
 
 // mutations
 const mutations = {
@@ -29,5 +47,6 @@ export default {
   namespaced: true,
   state,
   actions,
+  getters,
   mutations
 };
