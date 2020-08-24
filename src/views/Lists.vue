@@ -11,7 +11,6 @@ import Title from "@/components/HelloWorld";
 
 export default {
   name: "Lists",
-  data() {},
   components: {
     ListTable,
     Title
