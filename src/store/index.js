@@ -6,6 +6,10 @@ import alert from "./modules/alert";
 import vocabularies from "./modules/vocabularies";
 import substance from "./modules/substance";
 import list from "./modules/list";
+import accessibilityType from "./modules/accessibility-type";
+import user from "./modules/user";
+import externalContact from "./modules/external-contact";
+import listType from "./modules/list-type";
 
 Vue.use(Vuex);
 
@@ -16,7 +20,11 @@ const store = new Vuex.Store({
     alert,
     vocabularies,
     substance,
-    list
+    list,
+    accessibilityType,
+    user,
+    externalContact,
+    listType
   }
 });
 
