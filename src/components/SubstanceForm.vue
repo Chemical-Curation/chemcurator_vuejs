@@ -131,39 +131,45 @@ export default {
   computed: {
     ...mapGetters("auth", ["isAuthenticated"]),
 
-    ...mapGetters('compound/definedcompound', {"getDefSubstanceForm": "getSubstanceForm"}),
-    ...mapGetters('compound/illdefinedcompound', {"getIndefSubstanceForm": "getSubstanceForm"}),
+    ...mapGetters("compound/definedcompound", {
+      getDefSubstanceForm: "getSubstanceForm"
+    }),
+    ...mapGetters("compound/illdefinedcompound", {
+      getIndefSubstanceForm: "getSubstanceForm"
+    }),
 
-    ...mapState("source", {sourceList: 'list'}),
-    ...mapState("substanceType", {substanceTypeList: 'list'}),
-    ...mapState("qcLevel", {qcLevelList: 'list'}),
+    ...mapState("source", { sourceList: "list" }),
+    ...mapState("substanceType", { substanceTypeList: "list" }),
+    ...mapState("qcLevel", { qcLevelList: "list" }),
 
-    form: function () {
-      return this.type === 'definedCompound' ? this.getDefSubstanceForm : this.getIndefSubstanceForm
+    form: function() {
+      return this.type === "definedCompound"
+        ? this.getDefSubstanceForm
+        : this.getIndefSubstanceForm;
     },
     sourceOptions: function() {
-      return this.buildOptions(this.sourceList)
+      return this.buildOptions(this.sourceList);
     },
     substanceTypeOptions: function() {
-      return this.buildOptions(this.substanceTypeList)
+      return this.buildOptions(this.substanceTypeList);
     },
     qcLevelsOptions: function() {
-      return this.buildOptions(this.qcLevelList)
+      return this.buildOptions(this.qcLevelList);
     }
   },
   methods: {
     buildOptions: function(list) {
-      let item
-      let options = []
+      let item;
+      let options = [];
       for (item of list)
-        options.push({value: item.id, text: item.attributes.label})
-      return options
+        options.push({ value: item.id, text: item.attributes.label });
+      return options;
     }
   },
   mounted() {
-    this.$store.dispatch("source/getList", "sources")
-    this.$store.dispatch("substanceType/getList", "substanceTypes")
-    this.$store.dispatch("qcLevel/getList", "qcLevels")
+    this.$store.dispatch("source/getList", "sources");
+    this.$store.dispatch("substanceType/getList", "substanceTypes");
+    this.$store.dispatch("qcLevel/getList", "qcLevels");
   }
 };
 </script>

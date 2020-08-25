@@ -10,8 +10,7 @@ import illdefinedcompound from "./illdefined-compound";
 const defaultState = () => {
   return {
     count: 0,
-    list: [],
-    type: "definedCompound"
+    list: []
   };
 };
 
@@ -30,25 +29,16 @@ let actions = {
         const data = response.data;
         if (data.data.length > 0) {
           const obj = data.data.shift();
-          commit("clearState");
-          commit("setType", obj.type);
-          if (obj.type === "definedCompound") {
-            commit("definedcompound/setAttributes", {
-              attributes: obj.attributes,
-              relationships: obj.relationships
-            });
-            if (data.included) {
-              commit("definedcompound/storeIncluded", data.included);
-            }
-          } else if (obj.type === "illDefinedCompound") {
-            commit("illdefinedcompound/setAttributes", {
-              attributes: obj.attributes,
-              relationships: obj.relationships
-            });
-            if (data.included) {
-              commit("definedcompound/storeIncluded", data.included);
-            }
-          }
+
+          dispatch("clearAllStates");
+
+          let targetModule = obj.type.toLowerCase();
+          commit(`${targetModule}/storeFetch`, {
+            attributes: obj.attributes,
+            relationships: obj.relationships
+          });
+          commit(`${targetModule}/storeIncluded`, data.included);
+
           router.push({
             name: "substance"
           });
@@ -70,18 +60,17 @@ let actions = {
           root: true
         })
       );
+  },
+  clearAllStates: async ({ commit }) => {
+    commit("clearState");
+    commit("definedcompound/clearState");
+    commit("illdefinedcompound/clearState");
   }
 };
 
 // mutations
 const mutations = {
-  ...rootMutations,
-  clearState(state) {
-    Object.assign(state, defaultState());
-  },
-  setType(state, type) {
-    state.type = type;
-  }
+  ...rootMutations
 };
 
 export default {
@@ -94,3 +83,44 @@ export default {
     illdefinedcompound
   }
 };
+
+// Exports for child modules
+export function substanceForm(state) {
+  if (
+    !(
+      state.relationships &&
+      state.relationships.substance &&
+      state.relationships.substance.data &&
+      state.relationships.substance.data.length !== 0
+    )
+  ) {
+    return {
+      sid: "",
+      preferredName: "",
+      casrn: "",
+      substanceDescription: "",
+      privateQCNotes: "",
+      publicQCNotes: "",
+      qcLevelID: "",
+      sourceID: "",
+      substanceTypeID: ""
+    };
+  }
+  // todo: if this is 1 to 1 we need to clarify that.
+  let type = state.relationships.substance.data[0].type;
+  let id = state.relationships.substance.data[0].id;
+
+  let attributes = state.included[type][id].attributes;
+  let relationships = state.included[type][id].relationships;
+  return {
+    sid: attributes.sid,
+    preferredName: attributes.preferredName,
+    casrn: attributes.casrn,
+    substanceDescription: attributes.description,
+    privateQCNotes: attributes.privateQcNote,
+    publicQCNotes: attributes.publicQcNote,
+    qcLevelID: relationships.qcLevel.data.id,
+    sourceID: relationships.source.data.id,
+    substanceTypeID: relationships.substanceType.data.id
+  };
+}

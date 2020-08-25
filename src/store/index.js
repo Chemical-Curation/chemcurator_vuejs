@@ -22,7 +22,7 @@ const store = new Vuex.Store({
     substanceType,
     source,
     qcLevel,
-    list,
+    list
   }
 });
 

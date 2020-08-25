@@ -1,6 +1,6 @@
 <template>
   <b-container fluid="true" class="mx-5">
-    <HelloWorld msg="Welcome to ChemReg"/>
+    <HelloWorld msg="Welcome to ChemReg" />
     <b-row>
       <b-col cols="12" order="1" lg="4" order-lg="0">
         <SubstanceForm :type="type" />
@@ -17,7 +17,7 @@
             <b-form-input id="recordCompoundID" :value="cid" disabled />
           </b-form-group>
           <b-form-group
-            label="Substance Type:"
+            label="Structure Type:"
             label-align="left"
             label-cols="4"
             label-for="compound-type-dropdown"
@@ -40,27 +40,34 @@
 import HelloWorld from "@/components/HelloWorld";
 import ChemicalEditors from "@/components/ChemicalEditors";
 import SubstanceForm from "@/components/SubstanceForm";
+import { mapState } from "vuex";
 
 export default {
   name: "home",
   data() {
     return {
-      type: 'definedCompound',
+      type: "definedCompound",
       options: [
         { value: "definedCompound", text: "defined" },
         { value: "illDefinedCompound", text: "ill-defined" }
       ]
-    }
+    };
   },
   computed: {
+    ...mapState("compound/definedcompound", { defAttr: "attributes" }),
+    ...mapState("compound/illdefinedcompound", { illDefAttr: "attributes" }),
     cid: function() {
-      if (this.type === "definedCompound") {
+      if (this.type === "definedCompound")
         return this.$store.state.compound.definedcompound.attributes.cid;
-      }
-      if (this.type === "illDefinedCompound") {
-        return this.$store.state.compound.illdefinedcompound.attributes.cid;
-      }
-      return "Undefined Type";
+      else return this.$store.state.compound.illdefinedcompound.attributes.cid;
+    }
+  },
+  watch: {
+    defAttr: function() {
+      this.type = "definedCompound";
+    },
+    illDefAttr: function() {
+      this.type = "illDefinedCompound";
     }
   },
   components: {
