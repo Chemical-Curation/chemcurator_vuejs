@@ -1,5 +1,3 @@
-let defaultState = {};
-
 export default {
   storeList(state, payload) {
     state.list = payload;
@@ -24,7 +22,6 @@ export default {
     state.relationships = relationships;
   },
   clearState(state) {
-    if (defaultState !== {}) Object.assign(state, defaultState);
-    else console.log("Is defaultState defined on your module?");
+    Object.assign(state, {});
   }
 };

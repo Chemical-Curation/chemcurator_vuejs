@@ -7,9 +7,12 @@ const state = {
   list: []
 };
 
+const getResourceURI = () => { return "lists" }    // eslint-disable-line no-unused-vars
+
 // actions
 let actions = {
-  ...rootActions
+  ...rootActions,
+  getResourceURI: () => { return "lists" }
 };
 
 // mutations

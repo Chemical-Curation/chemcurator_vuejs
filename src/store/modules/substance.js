@@ -9,7 +9,8 @@ const state = {
 
 // actions
 let actions = {
-  ...rootActions
+  ...rootActions,
+  getResourceURI: () => { return "substances" }
 };
 
 // mutations

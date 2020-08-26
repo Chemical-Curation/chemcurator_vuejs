@@ -167,9 +167,9 @@ export default {
     }
   },
   mounted() {
-    this.$store.dispatch("source/getList", "sources");
-    this.$store.dispatch("substanceType/getList", "substanceTypes");
-    this.$store.dispatch("qcLevel/getList", "qcLevels");
+    this.$store.dispatch("source/getList");
+    this.$store.dispatch("substanceType/getList");
+    this.$store.dispatch("qcLevel/getList");
   }
 };
 </script>
