@@ -23,6 +23,7 @@ let actions = {
     // Search drops you on the Substance page.
     if (push && router.currentRoute.name !== "substance")
       await router.push("substance")
+    dispatch("clearAllStates");
 
     dispatch("auth/fetchUser", null, { root: true });
     const endpoint =
@@ -34,8 +35,6 @@ let actions = {
         const data = response.data;
         if (data.data.length > 0) {
           const obj = data.data.shift();
-
-          dispatch("clearAllStates");
 
           let targetModule = obj.type.toLowerCase();
           commit(`${targetModule}/storeFetch`, {
@@ -71,7 +70,10 @@ let actions = {
 
 // mutations
 const mutations = {
-  ...rootMutations
+  ...rootMutations,
+  clearState(state) {
+    Object.assign(state, defaultState());
+  }
 };
 
 export default {

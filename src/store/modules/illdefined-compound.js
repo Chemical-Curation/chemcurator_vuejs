@@ -24,7 +24,10 @@ const getters = {
 
 // mutations
 const mutations = {
-  ...rootMutations
+  ...rootMutations,
+  clearState(state) {
+    Object.assign(state, defaultState());
+  }
 };
 
 export default {

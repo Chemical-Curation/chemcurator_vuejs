@@ -21,7 +21,4 @@ export default {
     state.attributes = attributes;
     state.relationships = relationships;
   },
-  clearState(state) {
-    Object.assign(state, {});
-  }
 };
