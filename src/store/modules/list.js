@@ -41,27 +41,23 @@ const getters = {
         types: ""
       } 
     }
-
+    
     let attributes = state.attributes
-    // let relationships = state.relationships
+    let relationships = state.relationships
 
     return {
       name: attributes.name,
       label: attributes.label,
       shortDescription: attributes.shortDescription,
       longDescription: attributes.longDescription,
-      // listAccessibility: relationships.accesibilityType.data.id,
-      listAccessibility: "",
-      // owners: relationships.owners.data,
-      owners: "",
+      listAccessibility: relationships.accesibilityType,
+      owners: relationships.owners,
       sourceUrl: attributes.sourceUrl,
       sourceReference: attributes.sourceReference,
       sourceDoi: attributes.sourceDoi,
-      // externalContact: relationships.externalContact.data.id,
-      externalContact: "",
+      externalContact: relationships.externalContact,
       dateOfSourceCollection: attributes.dateOfSourceCollection,
-      // types: relationships.listType.data.id
-      types: ""
+      types: relationships.listType
     }
   }
 };

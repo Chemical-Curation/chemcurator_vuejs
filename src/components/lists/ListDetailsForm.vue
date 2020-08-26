@@ -28,10 +28,10 @@
       label-for="shortDescription"
       class="pb-3"
     >
-      <b-form-input
+      <b-form-textarea
         id="shortDescription"
         v-model="form.shortDescription"
-      ></b-form-input>
+      ></b-form-textarea>
     </b-form-group>
     <b-form-group
       label="Long Description:"
@@ -55,7 +55,7 @@
       <b-form-select
         id="listAccessibility"
         v-model="form.listAccessibility"
-
+        :options="accessibilityTypeOptions"
       ></b-form-select>
     </b-form-group>
     <b-form-group
@@ -65,10 +65,6 @@
       label-for="owners"
       class="pb-3"
     >
-      <b-form-select
-        id="owners"
-        v-model="form.owners"
-      ></b-form-select>
     </b-form-group>
     <b-form-group
       label="Source Url:"
@@ -106,12 +102,13 @@
         v-model="form.sourceDoi"
       ></b-form-textarea>
     </b-form-group>
-    <b-form-group 
+    <b-form-group
+      label="External Contact:"
+      label-align="left"
+      label-cols="3"
+      label-for="externalContact"
+      class="pb-3"
     >
-      <b-form-select
-        id="externalContact"
-        v-model="form.externalContact"        
-      ></b-form-select>
     </b-form-group>
     <b-form-group
       label="Date of Source Collection:"
@@ -135,24 +132,31 @@
       <b-form-select
         id="types"
         v-model="form.types"
+        :options="listTypeOptions"
       ></b-form-select>
     </b-form-group>
   </b-form>
 </template>
 
-
 <script>
-import {mapGetters} from 'vuex'
+import { mapGetters, mapState } from "vuex";
 
 export default {
   name: "ListDetailsForm",
   computed: {
-    ...mapGetters("list", {form: "getListDetailsForm"}),
+    ...mapGetters("list", { form: "getListDetailsForm" }),
+    ...mapState("accessibilityType", { accessibilityTypeList: "list" }),
+    ...mapState("externalContact", { externalContactList: "list" }),
+    ...mapState("listType", { listTypeList: "list" }),
+    ...mapState("user", { userList: "list" }),
     id: function() {
       return this.$route.params.id;
     },
     attribute: function() {
-      return this.$store.state.list.attributes ?? {}
+      return this.$store.state.list.attributes ?? {};
+    },
+    relationship: function() {
+      return this.$store.state.list.relationships ?? {};
     },
     accessibilityTypeOptions: function() {
       return this.buildOptions(this.accessibilityTypeList);
@@ -169,19 +173,20 @@ export default {
   },
   methods: {
     buildOptions: function(list) {
-      let item
-      let options = []
+      let item;
+      let options = [];
       for (item of list)
-        options.push({value: item.id, text: item.attributes.label})
-      return options
-    } 
+        options.push({ value: item.id, text: item.attributes.name });
+      return options;
+    }
   },
   mounted() {
+    // TODO: Once CRUD for ExternalContact and User is completed, add additional text areas for both relationships
     this.$store.dispatch("list/getObject", this.id);
-    // this.$store.dispatch("accessibilityType/getList", "accessibilityTypes");
-    // this.$store.dispatch("user/getList", "users");
-    // this.$store.dispatch("externalContact/getList", "externalContacts");
-    // this.$store.dispatch("listType/getList", "listTypes");
+    this.$store.dispatch("accessibilityType/getList", "accessibilityTypes");
+    this.$store.dispatch("externalContact/getList", "externalContacts");
+    this.$store.dispatch("listType/getList", "listTypes");
+    this.$store.dispatch("user/getList", "users");
   }
 };
 </script>
