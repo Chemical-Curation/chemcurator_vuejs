@@ -18,7 +18,11 @@ const state = defaultState();
 // actions
 let actions = {
   ...rootActions,
-  fetchCompound: async ({ commit, dispatch }, searchString) => {
+  fetchCompound: async ({ commit, dispatch }, {searchString, push}) => {
+    // Search drops you on the Substance page.
+    if (push && router.currentRoute.name !== "substance")
+      await router.push("substance")
+
     dispatch("auth/fetchUser", null, { root: true });
     const endpoint =
       searchString.indexOf("-") > 0
@@ -38,10 +42,6 @@ let actions = {
             relationships: obj.relationships
           });
           commit(`${targetModule}/storeIncluded`, data.included);
-
-          router.push({
-            name: "substance"
-          });
         } else {
           const alert = {
             message: `${searchString} not valid`,
