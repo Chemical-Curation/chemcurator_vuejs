@@ -9,7 +9,7 @@ const defaultState = () => {
     loaded: false,
     count: 0,
     list: []
-  }
+  };
 };
 
 const state = defaultState();
@@ -39,11 +39,11 @@ const getters = {
         externalContact: "",
         dateOfSourceCollection: "",
         types: ""
-      } 
+      };
     }
-    
-    let attributes = state.attributes
-    let relationships = state.relationships
+
+    let attributes = state.attributes;
+    let relationships = state.relationships;
 
     return {
       name: attributes.name,
@@ -58,7 +58,7 @@ const getters = {
       externalContact: relationships.externalContact,
       dateOfSourceCollection: attributes.dateOfSourceCollection,
       types: relationships.listType
-    }
+    };
   }
 };
 

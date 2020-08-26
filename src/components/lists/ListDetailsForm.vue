@@ -16,10 +16,7 @@
       label-for="label"
       class="pb-3"
     >
-      <b-form-input
-        id="label"
-        v-model="form.label"
-      ></b-form-input>
+      <b-form-input id="label" v-model="form.label"></b-form-input>
     </b-form-group>
     <b-form-group
       label="Short Description:"
