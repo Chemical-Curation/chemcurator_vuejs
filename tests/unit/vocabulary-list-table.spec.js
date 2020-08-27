@@ -14,6 +14,7 @@ let state = {
   list: [
     {
       attributes: {
+        name: "sample-label",
         label: "Sample Label",
         shortDescription: "Sample Description"
       }
@@ -77,6 +78,12 @@ describe("Test Component Functionality", () => {
         .findAll("th")
         .at(1)
         .text()
+    ).toBe("Label");
+    expect(
+      wrapper
+        .findAll("th")
+        .at(2)
+        .text()
     ).toBe("Description");
   });
 
@@ -86,16 +93,23 @@ describe("Test Component Functionality", () => {
         .findAll("td")
         .at(0)
         .text()
-    ).toBe(state.list[0].attributes.label);
+    ).toBe(state.list[0].attributes.name);
     expect(
       wrapper
         .findAll("td")
         .at(1)
         .text()
+    ).toBe(state.list[0].attributes.label);
+    expect(
+      wrapper
+        .findAll("td")
+        .at(2)
+        .text()
     ).toBe(state.list[0].attributes.shortDescription);
 
     let updatedList = {
       attributes: {
+        name: "new-label",
         label: "New Label",
         shortDescription: "New Description"
       }
@@ -107,11 +121,17 @@ describe("Test Component Functionality", () => {
         .findAll("td")
         .at(0)
         .text()
-    ).toBe(updatedList.attributes.label);
+    ).toBe(updatedList.attributes.name);
     expect(
       wrapper
         .findAll("td")
         .at(1)
+        .text()
+    ).toBe(updatedList.attributes.label);
+    expect(
+      wrapper
+        .findAll("td")
+        .at(2)
         .text()
     ).toBe(updatedList.attributes.shortDescription);
   });
