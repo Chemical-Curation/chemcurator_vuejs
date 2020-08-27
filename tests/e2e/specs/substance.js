@@ -22,7 +22,7 @@ describe("The substance page", () => {
       .find("#canvas")
       .children()
       .find("text")
-      .should("not.exist")
+      .should("not.exist");
 
     // Search
     cy.get("[data-cy=search-box]").type("DTXCID302000003");
@@ -36,7 +36,7 @@ describe("The substance page", () => {
       .find("#canvas")
       .children()
       .find("text")
-      .should("exist")
+      .should("exist");
   });
   it("should load illdefined compound into marvin window", () => {
     // Marvin uses a custom "canvas" node with no children to render molecules
@@ -57,7 +57,7 @@ describe("The substance page", () => {
           .then(cy.wrap)
           .find("textarea")
           .invoke("val")
-          .should("equal", "<cml><MDocument></MDocument></cml>")
+          .should("equal", "<cml><MDocument></MDocument></cml>");
 
         // Close the window.  If the export window isn't closed, then the next compound won't load.
         cy.get("iframe[id=marvin]")
@@ -65,8 +65,8 @@ describe("The substance page", () => {
           .should("not.be.empty")
           .then(cy.wrap)
           .find("div.gwt-HTML.mjs-CloseButton")
-          .click({ force: true })
-      })
+          .click({ force: true });
+      });
 
     // Search
     cy.get("[data-cy=search-box]").type("DTXCID502000009");
@@ -86,8 +86,8 @@ describe("The substance page", () => {
           .then(cy.wrap)
           .find("textarea")
           .invoke("val")
-          .should("not.equal", "<cml><MDocument></MDocument></cml>")
-      })
+          .should("not.equal", "<cml><MDocument></MDocument></cml>");
+      });
   });
   // This test verifies functionality that no longer exists works.
   //   It should be updated and readded when something uses these messages.
@@ -121,16 +121,20 @@ describe("The substance page", () => {
     cy.get("[data-cy=search-box]").type("DTXCID302000003");
     cy.get("[data-cy=search-button]").click();
 
-    cy.get("#substanceID").should("have.value", "DTXSID502000000")
-    cy.get("#preferredName").should("have.value", "Sample Substance")
-    cy.get("#casrn").should("have.value", "1234567-89-5")
-    cy.get("#qcLevel").should("have.value", "1")
-    cy.get("#source").should("have.value", "1")
-    cy.get("#substanceType").should("have.value", "1")
-    cy.get("#substanceDescription").should("have.value", "This is the description for the test substance")
-    cy.get("#privateQCNotes").should("have.value", "Private QC notes")
-    cy.get("#publicQCNotes").should("have.value", "Public QC notes")
-  })
+    cy.get("#recordCompoundID").should("have.value", "DTXCID302000003");
+    cy.get("#substanceID").should("have.value", "DTXSID502000000");
+    cy.get("#preferredName").should("have.value", "Sample Substance");
+    cy.get("#casrn").should("have.value", "1234567-89-5");
+    cy.get("#qcLevel").should("have.value", "1");
+    cy.get("#source").should("have.value", "1");
+    cy.get("#substanceType").should("have.value", "1");
+    cy.get("#substanceDescription").should(
+      "have.value",
+      "This is the description for the test substance"
+    );
+    cy.get("#privateQCNotes").should("have.value", "Private QC notes");
+    cy.get("#publicQCNotes").should("have.value", "Public QC notes");
+  });
   it("bad search should alert invalidity", () => {
     cy.get("[data-cy=search-box]").type("compound 47");
     cy.get("[data-cy=search-button]").click();
