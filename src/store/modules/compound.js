@@ -18,11 +18,13 @@ const state = defaultState();
 // actions
 let actions = {
   ...rootActions,
-  getResourceURI: () => { return "compounds" },
-  fetchCompound: async ({ commit, dispatch }, {searchString, push}) => {
+  getResourceURI: () => {
+    return "compounds";
+  },
+  fetchCompound: async ({ commit, dispatch }, { searchString, push }) => {
     // Search drops you on the Substance page.
     if (push && router.currentRoute.name !== "substance")
-      await router.push("substance")
+      await router.push("substance");
     dispatch("clearAllStates");
 
     dispatch("auth/fetchUser", null, { root: true });

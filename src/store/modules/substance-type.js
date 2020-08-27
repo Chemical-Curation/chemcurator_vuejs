@@ -10,7 +10,9 @@ const state = {
 // actions
 let actions = {
   ...rootActions,
-  getResourceURI: () => { return "substanceTypes" }
+  getResourceURI: () => {
+    return "substanceTypes";
+  }
 };
 
 // mutations

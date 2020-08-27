@@ -15,7 +15,9 @@ const state = defaultState();
 // actions
 const actions = {
   ...rootActions,
-  getResourceURI: () => { return "illDefinedCompounds" }
+  getResourceURI: () => {
+    return "illDefinedCompounds";
+  }
 };
 
 const getters = {

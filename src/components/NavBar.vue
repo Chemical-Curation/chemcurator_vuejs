@@ -82,7 +82,10 @@ export default {
       this.$store.dispatch("auth/logout");
     },
     searchCompound: function() {
-      this.$store.dispatch("compound/fetchCompound", {searchString: this.searchString, push: true});
+      this.$store.dispatch("compound/fetchCompound", {
+        searchString: this.searchString,
+        push: true
+      });
     }
   },
   components: {

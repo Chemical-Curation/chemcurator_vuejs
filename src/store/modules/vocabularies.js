@@ -1,6 +1,6 @@
 import rootActions from "../actions.js";
 import rootMutations from "../mutations.js";
-import {HTTP} from "@/store/http-common";
+import { HTTP } from "@/store/http-common";
 
 const state = {
   count: 0,
@@ -15,15 +15,15 @@ const actions = {
       context.commit("storeCount", response.data.meta.pagination.count);
     });
   }
-}
+};
 
 const mutations = {
   ...rootMutations
-}
+};
 
 export default {
   namespaced: true,
   state,
   actions,
-  mutations,
+  mutations
 };

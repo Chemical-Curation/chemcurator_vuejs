@@ -20,5 +20,5 @@ export default {
   storeFetch(state, { attributes, relationships }) {
     state.attributes = attributes;
     state.relationships = relationships;
-  },
+  }
 };
