@@ -1,8 +1,8 @@
 <template>
   <div>
-    <Title msg="Controlled Vocabularies" />
+  <Title :msg="title" />
     <div class="row">
-      <div class="col-2 offset-2">
+      <div class="col-2 offset-1">
         <b-form-radio-group
           id="radio-type-select"
           class="d-flex flex-fill"
@@ -13,7 +13,7 @@
           stacked
         />
       </div>
-      <div class="col-6">
+      <div class="col-8">
         <VocabularyListTable :type="type" />
       </div>
     </div>
@@ -62,6 +62,12 @@ export default {
       // Set the default type as the first type.
       type: types[0].value
     };
+  },
+  computed: {
+    title: function () {
+      let val = this.type;
+      return this.types.find(elem => elem.value === val).text
+    }
   },
   components: {
     VocabularyListTable,
