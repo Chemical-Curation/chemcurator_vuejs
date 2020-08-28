@@ -88,6 +88,7 @@ describe("The lists page", () => {
       "have.value",
       LIST.response.data.relationships.listAccessibility.data.id
     );
+    // WIP
     cy.get("#types").should("have.value", [
       LIST.response.data.relationships.types.data[0].id
     ]);
