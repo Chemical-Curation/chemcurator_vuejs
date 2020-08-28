@@ -25,7 +25,11 @@ let actions = {
 
 const getters = {
   getListDetailsForm: state => {
-    if (state.attributes === {}) {
+    if (
+      state.attributes === {} ||
+      !state.relationships.listAccessibility ||
+      !state.relationships.types
+    ) {
       return {
         name: "",
         label: "",
@@ -45,19 +49,21 @@ const getters = {
     let attributes = state.attributes;
     let relationships = state.relationships;
 
+    console.log(relationships.types.data.map(x => x.id));
+
     return {
       name: attributes.name,
       label: attributes.label,
       shortDescription: attributes.shortDescription,
       longDescription: attributes.longDescription,
-      listAccessibility: relationships.accesibilityType,
+      listAccessibility: relationships.listAccessibility.data.id,
       owners: relationships.owners,
       sourceUrl: attributes.sourceUrl,
       sourceReference: attributes.sourceReference,
       sourceDoi: attributes.sourceDoi,
       externalContact: relationships.externalContact,
       dateOfSourceCollection: attributes.dateOfSourceCollection,
-      types: relationships.listType
+      types: relationships.types.data.map(x => x.id)
     };
   }
 };

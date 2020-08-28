@@ -1,5 +1,5 @@
 <template>
-  <b-form class="pb-3">
+  <b-form id="list-details-form" class="pb-3">
     <b-form-group
       label="Name:"
       label-align="left"
@@ -129,6 +129,8 @@
       <b-form-select
         id="types"
         v-model="form.types"
+        multiple
+        :select-size="3"
         :options="listTypeOptions"
       ></b-form-select>
     </b-form-group>

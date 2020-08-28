@@ -1,8 +1,7 @@
 <template>
   <b-container>
-      <Title :msg="message"
-      />
-      <ListDetailsForm />
+    <Title :msg="message" />
+    <ListDetailsForm />
   </b-container>
 </template>
 
@@ -13,12 +12,12 @@ import Title from "@/components/HelloWorld";
 export default {
   name: "ListDetails",
   components: {
-      ListDetailsForm,
-      Title
+    ListDetailsForm,
+    Title
   },
   computed: {
     message: function() {
-      return this.$store.state.list.attributes.name + " Details"
+      return this.$store.state.list.attributes.name + " Details";
     }
   }
 };
