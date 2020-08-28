@@ -17,16 +17,13 @@ export function substanceFormFromRelationship(state) {
     !(
       state.relationships &&
       state.relationships.substance &&
-      state.relationships.substance.data &&
-      state.relationships.substance.data.length !== 0
+      state.relationships.substance.data
     )
   ) {
     return blankForm;
   }
-
-  // todo: if this is 1 to 1 we need to clarify that.
-  let type = state.relationships.substance.data[0].type;
-  let id = state.relationships.substance.data[0].id;
+  let type = state.relationships.substance.data.type;
+  let id = state.relationships.substance.data.id;
 
   // Resource not found in includes.  Return blank
   if (!(state.included && state.included[type] && state.included[type][id]))
