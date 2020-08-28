@@ -1,6 +1,6 @@
 import rootActions from "../actions.js";
 import rootMutations from "../mutations.js";
-import { substanceForm } from "./compound";
+import { substanceFormFromRelationship } from "../getters";
 
 const defaultState = () => {
   return {
@@ -21,7 +21,7 @@ const actions = {
 };
 
 const getters = {
-  getSubstanceForm: substanceForm
+  getSubstanceForm: substanceFormFromRelationship
 };
 
 // mutations
