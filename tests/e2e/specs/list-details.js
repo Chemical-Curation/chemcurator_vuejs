@@ -89,8 +89,10 @@ describe("The lists page", () => {
       LIST.response.data.relationships.listAccessibility.data.id
     );
     // WIP
-    cy.get("#types").should("have.value", [
-      LIST.response.data.relationships.types.data[0].id
-    ]);
+    cy.get("#types")
+      .invoke("val")
+      .should("deep.equal", [
+        LIST.response.data.relationships.types.data[0].id
+      ]);
   });
 });
