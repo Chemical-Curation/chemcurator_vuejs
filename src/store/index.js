@@ -9,6 +9,7 @@ import substanceType from "./modules/substance-type";
 import source from "./modules/source";
 import qcLevel from "./modules/qc-level";
 import list from "./modules/list";
+import queryStructureType from "./modules/query-structure-type";
 
 Vue.use(Vuex);
 
@@ -22,7 +23,8 @@ const store = new Vuex.Store({
     substanceType,
     source,
     qcLevel,
-    list
+    list,
+    queryStructureType
   }
 });
 

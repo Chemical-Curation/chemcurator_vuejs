@@ -30,7 +30,7 @@
             />
           </b-form-group>
         </div>
-        <ChemicalEditors :type="type" />
+        <ChemicalEditors v-show="type !== 'none'" :type="type" />
       </b-col>
     </b-row>
   </b-container>
@@ -46,34 +46,53 @@ export default {
   name: "home",
   data() {
     return {
-      type: "definedCompound",
-      options: [
-        { value: "definedCompound", text: "defined" },
-        { value: "illDefinedCompound", text: "ill-defined" }
-      ]
+      type: 'none'
     };
   },
   computed: {
     ...mapState("compound/definedcompound", { defAttr: "attributes" }),
-    ...mapState("compound/illdefinedcompound", { illDefAttr: "attributes" }),
+    ...mapState("compound/illdefinedcompound", { illDefAttr: "attributes", illDefRel: "relationships" }),
+    ...mapState("queryStructureType", { qstList: "list" }),
     cid: function() {
       if (this.type === "definedCompound")
-        return this.$store.state.compound.definedcompound.attributes.cid;
-      else return this.$store.state.compound.illdefinedcompound.attributes.cid;
+        return this.defAttr.cid;
+      else if (this.type === 'none')
+        return ""
+      return this.illDefAttr.cid;
+    },
+    options: function() {
+      return this.buildOptions(this.qstList)
     }
   },
   watch: {
     defAttr: function() {
-      this.type = "definedCompound";
+      // Verify this is loaded.  If it is set it to the type (perhaps we should use a loaded flag)
+      if (this.defAttr.cid)
+        this.type = "definedCompound";
     },
     illDefAttr: function() {
-      this.type = "illDefinedCompound";
+      // Verify this is loaded.  If it is set the type to that queryStructureType
+      if (this.illDefAttr.cid)
+        this.type = this.illDefRel.queryStructureType.data.id;
+    }
+  },
+  methods: {
+    buildOptions: function(list) {
+      let item;
+      let options = [{ value: 'none', text: "None" },
+      { value: 'definedCompound', text: "Defined Compound" }];
+      for (item of list)
+        options.push({ value: item.id, text: item.attributes.label });
+      return options;
     }
   },
   components: {
     HelloWorld,
     ChemicalEditors,
     SubstanceForm
+  },
+  mounted() {
+    this.$store.dispatch("queryStructureType/getList");
   }
 };
 </script>
