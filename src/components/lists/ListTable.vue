@@ -35,7 +35,7 @@ export default {
   },
   methods: {
     getList: function() {
-      this.$store.dispatch("list/getList", "lists");
+      this.$store.dispatch("list/getList");
     }
   },
   computed: {

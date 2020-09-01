@@ -11,7 +11,7 @@ const state = {
 let actions = {
   ...rootActions,
   getResourceURI: () => {
-    return "substances";
+    return "sources";
   }
 };
 

@@ -5,6 +5,9 @@ import compound from "./modules/compound";
 import alert from "./modules/alert";
 import vocabularies from "./modules/vocabularies";
 import substance from "./modules/substance";
+import substanceType from "./modules/substance-type";
+import source from "./modules/source";
+import qcLevel from "./modules/qc-level";
 import list from "./modules/list";
 
 Vue.use(Vuex);
@@ -16,6 +19,9 @@ const store = new Vuex.Store({
     alert,
     vocabularies,
     substance,
+    substanceType,
+    source,
+    qcLevel,
     list
   }
 });
