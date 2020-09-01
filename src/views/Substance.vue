@@ -46,24 +46,25 @@ export default {
   name: "home",
   data() {
     return {
-      type: 'none'
+      type: "none"
     };
   },
   computed: {
     ...mapState("compound", { compoundType: "type" }),
     ...mapState("compound/definedcompound", { defAttr: "attributes" }),
-    ...mapState("compound/illdefinedcompound", { illDefAttr: "attributes", illDefRel: "relationships" }),
+    ...mapState("compound/illdefinedcompound", {
+      illDefAttr: "attributes",
+      illDefRel: "relationships"
+    }),
     ...mapState("queryStructureType", { qstList: "list" }),
 
     cid: function() {
-      if (this.type === "definedCompound")
-        return this.defAttr.cid;
-      else if (this.type === 'none')
-        return ""
+      if (this.type === "definedCompound") return this.defAttr.cid;
+      else if (this.type === "none") return "";
       return this.illDefAttr.cid;
     },
     options: function() {
-      return this.buildOptions(this.qstList)
+      return this.buildOptions(this.qstList);
     }
   },
   watch: {
@@ -74,8 +75,10 @@ export default {
   methods: {
     buildOptions: function(list) {
       let item;
-      let options = [{ value: 'none', text: "None" },
-      { value: 'definedCompound', text: "Defined Compound" }];
+      let options = [
+        { value: "none", text: "None" },
+        { value: "definedCompound", text: "Defined Compound" }
+      ];
       for (item of list)
         options.push({ value: item.id, text: item.attributes.label });
       return options;

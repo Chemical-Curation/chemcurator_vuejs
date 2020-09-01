@@ -4,24 +4,24 @@ let qstResponse = {
       id: 1,
       type: "queryStructureType",
       attributes: {
-        label: "Markush",
+        label: "Markush"
       }
     },
     {
       id: 2,
       type: "queryStructureType",
       attributes: {
-        label: "Ill Defined",
+        label: "Ill Defined"
       }
     }
   ]
-}
+};
 
 describe("The substance page", () => {
   beforeEach(() => {
     cy.adminLogin();
-    cy.server()
-    cy.route("queryStructureTypes", qstResponse)
+    cy.server();
+    cy.route("queryStructureTypes", qstResponse);
     cy.visit("/substance");
   });
   it("should have dropdown", () => {
