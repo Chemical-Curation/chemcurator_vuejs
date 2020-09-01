@@ -50,9 +50,11 @@ export default {
     };
   },
   computed: {
+    ...mapState("compound", { compoundType: "type" }),
     ...mapState("compound/definedcompound", { defAttr: "attributes" }),
     ...mapState("compound/illdefinedcompound", { illDefAttr: "attributes", illDefRel: "relationships" }),
     ...mapState("queryStructureType", { qstList: "list" }),
+
     cid: function() {
       if (this.type === "definedCompound")
         return this.defAttr.cid;
@@ -65,15 +67,8 @@ export default {
     }
   },
   watch: {
-    defAttr: function() {
-      // Verify this is loaded.  If it is set it to the type (perhaps we should use a loaded flag)
-      if (this.defAttr.cid)
-        this.type = "definedCompound";
-    },
-    illDefAttr: function() {
-      // Verify this is loaded.  If it is set the type to that queryStructureType
-      if (this.illDefAttr.cid)
-        this.type = this.illDefRel.queryStructureType.data.id;
+    compoundType: function() {
+      this.type = this.compoundType;
     }
   },
   methods: {
