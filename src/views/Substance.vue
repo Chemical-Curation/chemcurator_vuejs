@@ -53,8 +53,7 @@ export default {
     ...mapState("compound", { compoundType: "type" }),
     ...mapState("compound/definedcompound", { defAttr: "attributes" }),
     ...mapState("compound/illdefinedcompound", {
-      illDefAttr: "attributes",
-      illDefRel: "relationships"
+      illDefAttr: "attributes"
     }),
     ...mapState("queryStructureType", { qstList: "list" }),
 
