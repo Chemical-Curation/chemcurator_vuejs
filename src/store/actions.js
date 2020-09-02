@@ -19,5 +19,12 @@ export default {
       context.commit("storeList", response.data.data);
       context.commit("storeCount", response.data.meta.pagination.count);
     });
+  },
+  patch: async (context, {id, body}) => {
+    let resource = await context.dispatch("getResourceURI");
+    if (!resource)
+      console.exception("Did you define getResourceURI action on your module?");
+
+    await HTTP.patch(`/${resource}/${id}`, {data: {...body}});
   }
-};
+}

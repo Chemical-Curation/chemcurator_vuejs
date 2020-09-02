@@ -51,7 +51,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions("synonym", ["getList"]),
+    ...mapActions("synonym", ["getList", "patch"]),
     resetRowData: function () {
       this.rowData = _.cloneDeep(this.list)
       this.gridOptions.api.refreshCells({
@@ -63,8 +63,8 @@ export default {
       let i
       for (i in this.rowData) {
         if (!_.isEqual(this.rowData[i], this.list[i])){
-          // log changed rows todo: save
           console.log(this.rowData[i])
+          this.patch({ id: this.rowData[i].id, body: this.rowData[i] } )
         }
       }
     }
