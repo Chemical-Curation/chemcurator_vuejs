@@ -33,6 +33,7 @@
         <ChemicalEditors :type="type" />
       </b-col>
     </b-row>
+    <SynonymTable :substance-id="substanceId" />
   </b-container>
 </template>
 
@@ -40,6 +41,7 @@
 import HelloWorld from "@/components/HelloWorld";
 import ChemicalEditors from "@/components/ChemicalEditors";
 import SubstanceForm from "@/components/SubstanceForm";
+import SynonymTable from "@/components/synonyms/SynonymTable";
 import { mapState } from "vuex";
 
 export default {
@@ -60,6 +62,13 @@ export default {
       if (this.type === "definedCompound")
         return this.$store.state.compound.definedcompound.attributes.cid;
       else return this.$store.state.compound.illdefinedcompound.attributes.cid;
+    },
+    substanceId: function() {
+      if (this.type === "definedCompound" && this.$store.state.compound.definedcompound.relationships.substance)
+        return this.$store.state.compound.definedcompound.relationships.substance.data.id;
+      else if (this.$store.state.compound.illdefinedcompound.relationships.substance)
+        return this.$store.state.compound.illdefinedcompound.relationships.substance.data.id;
+      return ""
     }
   },
   watch: {
@@ -73,7 +82,8 @@ export default {
   components: {
     HelloWorld,
     ChemicalEditors,
-    SubstanceForm
+    SubstanceForm,
+    SynonymTable
   }
 };
 </script>

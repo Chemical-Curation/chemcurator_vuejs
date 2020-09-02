@@ -1,6 +1,6 @@
 <template>
   <div>
-  <Title :msg="title" />
+    <Title :msg="title" />
     <div class="row">
       <div class="col-2 offset-1">
         <b-form-radio-group
@@ -64,9 +64,9 @@ export default {
     };
   },
   computed: {
-    title: function () {
+    title: function() {
       let val = this.type;
-      return this.types.find(elem => elem.value === val).text
+      return this.types.find(elem => elem.value === val).text;
     }
   },
   components: {
