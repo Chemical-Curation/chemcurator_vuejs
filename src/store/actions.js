@@ -7,11 +7,11 @@ export default {
     if (!resource)
       console.exception("Did you define getResourceURI action on your module?");
 
-    let params_string = "?"
-    if (request_details && request_details.params){
-      let param
-      for (param of request_details.params){
-        params_string += `${param.key}=${param.value}`
+    let params_string = "?";
+    if (request_details && request_details.params) {
+      let param;
+      for (param of request_details.params) {
+        params_string += `${param.key}=${param.value}`;
       }
     }
 
@@ -20,11 +20,11 @@ export default {
       context.commit("storeCount", response.data.meta.pagination.count);
     });
   },
-  patch: async (context, {id, body}) => {
+  patch: async (context, { id, body }) => {
     let resource = await context.dispatch("getResourceURI");
     if (!resource)
       console.exception("Did you define getResourceURI action on your module?");
 
-    await HTTP.patch(`/${resource}/${id}`, {data: {...body}});
+    await HTTP.patch(`/${resource}/${id}`, { data: { ...body } });
   }
-}
+};

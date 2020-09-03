@@ -47,5 +47,4 @@ h1 {
   opacity: 0;
   transform: translateX(-30%);
 }
-
 </style>

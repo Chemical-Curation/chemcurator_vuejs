@@ -64,11 +64,18 @@ export default {
       else return this.$store.state.compound.illdefinedcompound.attributes.cid;
     },
     substanceId: function() {
-      if (this.type === "definedCompound" && this.$store.state.compound.definedcompound.relationships.substance)
-        return this.$store.state.compound.definedcompound.relationships.substance.data.id;
-      else if (this.$store.state.compound.illdefinedcompound.relationships.substance)
-        return this.$store.state.compound.illdefinedcompound.relationships.substance.data.id;
-      return ""
+      if (
+        this.type === "definedCompound" &&
+        this.$store.state.compound.definedcompound.relationships.substance
+      )
+        return this.$store.state.compound.definedcompound.relationships
+          .substance.data.id;
+      else if (
+        this.$store.state.compound.illdefinedcompound.relationships.substance
+      )
+        return this.$store.state.compound.illdefinedcompound.relationships
+          .substance.data.id;
+      return "";
     }
   },
   watch: {

@@ -10,6 +10,8 @@ import source from "./modules/source";
 import qcLevel from "./modules/qc-level";
 import list from "./modules/list";
 import synonym from "./modules/synonym";
+import synonymQuality from "./modules/synonymQuality";
+import synonymType from "./modules/synonymType";
 
 Vue.use(Vuex);
 
@@ -24,7 +26,9 @@ const store = new Vuex.Store({
     source,
     qcLevel,
     list,
-    synonym
+    synonym,
+    synonymQuality,
+    synonymType
   }
 });
 
