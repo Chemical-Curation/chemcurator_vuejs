@@ -9,16 +9,16 @@
       :gridOptions="gridOptions"
     />
     <div class="d-flex flex-row justify-content-end my-3">
-      <b-button @click="resetRowData">Reset</b-button>
-      <b-button class="ml-1" variant="primary" @click="save"
-        >Save Synonyms</b-button
-      >
+      <b-button @click="resetRowData" :disabled="!buttonsEnabled && isAuthenticated">Reset</b-button>
+      <b-button class="ml-1" variant="primary" @click="save" :disabled="!buttonsEnabled">
+        Save Synonyms
+      </b-button>
     </div>
   </div>
 </template>
 
 <script>
-import { mapActions, mapState } from "vuex";
+import {mapActions, mapGetters, mapState} from "vuex";
 import _ from "lodash";
 import { AgGridVue } from "ag-grid-vue";
 import {
@@ -39,10 +39,12 @@ export default {
       originalData: null,
       rowData: null,
       defaultColDef: null,
-      gridOptions: null
+      gridOptions: null,
+      buttonsEnabled: false,
     };
   },
   computed: {
+    ...mapGetters("auth", ["isAuthenticated"]),
     ...mapState("synonym", ["list", "loading"]),
     ...mapState("source", { sourceList: "list" }),
     ...mapState("synonymQuality", { qualityList: "list" }),
@@ -133,15 +135,14 @@ export default {
     },
     substanceId: function() {
       if (this.substanceId)
-        this.getList({
-          params: [{ key: "filter[substance.id]", value: this.substanceId }]
-        });
+        this.loadSynonyms()
     },
     loading: function() {
       this.manageOverlay();
     }
   },
   methods: {
+    ...mapActions("alert", ["alert"]),
     ...mapActions("synonym", ["getList", "patch"]),
     ...mapActions("synonymQuality", { loadQualityList: "getList" }),
     ...mapActions("synonymType", { loadTypeList: "getList" }),
@@ -153,21 +154,68 @@ export default {
         suppressFlash: false
       });
     },
-    save: function() {
+    save: async function() {
       let i;
+      let responses = []
       for (i in this.rowData) {
         if (!_.isEqual(this.rowData[i], this.list[i])) {
-          this.patch({ id: this.rowData[i].id, body: this.rowData[i] });
+          responses.push(this.patch({id: this.rowData[i].id, body: this.rowData[i]}).catch(err => {
+            console.log(err.response)
+            return {
+              failed: true,
+              body: this.rowData[i],
+              errors: err.response.data.errors
+            };
+          }))
         }
       }
+      await Promise.allSettled(responses)
+        .then((responses) => {
+          let rejected = responses.filter(obj => { return obj.value.failed })
+          if (rejected.length === 0) {
+            this.alert({
+              message: "All synonyms saved successfully",
+              color: "success",
+              dismissCountDown: 15
+            })
+          }
+          else {
+            console.log(rejected)
+            let header = "The following Synonyms could not be updated."
+            let message = ""
+            for (let reject of rejected) {
+              console.log(reject)
+              message += `The synonym with identifier ${reject.value.body.attributes.identifer} was rejected for the following reasons: <br>`
+              for (let error of reject.value.errors) {
+                message += `${error.detail} <br>`
+              }
+            }
+            this.alert({
+              header: header,
+              message: message,
+              color: "warning",
+              dismissCountDown: 15
+            })
+          }
+        })
+      window.scrollTo(0,0)
+      this.loadSynonyms()
+    },
+    loadSynonyms: function () {
+      this.getList({
+        params: [{ key: "filter[substance.id]", value: this.substanceId }]
+      });
     },
     manageOverlay: function() {
       if (this.loading) {
         this.gridOptions.api.showLoadingOverlay();
+        this.buttonsEnabled = false
       } else if (!this.loading && _.isEqual(this.list, [])) {
         this.gridOptions.api.showNoRowsOverlay();
+        this.buttonsEnabled = false
       } else {
         this.gridOptions.api.hideOverlay();
+        this.buttonsEnabled = true
       }
     }
   },
