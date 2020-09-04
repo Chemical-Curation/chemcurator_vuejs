@@ -7,6 +7,7 @@ export default {
     if (!resource)
       console.exception("Did you define getResourceURI action on your module?");
 
+    context.commit("loading");
     let params_string = "?";
     if (request_details && request_details.params) {
       let param;
@@ -19,6 +20,7 @@ export default {
       context.commit("storeList", response.data.data);
       context.commit("storeCount", response.data.meta.pagination.count);
     });
+    await context.commit("loaded");
   },
   patch: async (context, { id, body }) => {
     let resource = await context.dispatch("getResourceURI");

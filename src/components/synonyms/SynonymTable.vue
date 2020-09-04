@@ -10,7 +10,9 @@
     />
     <div class="d-flex flex-row justify-content-end my-3">
       <b-button @click="resetRowData">Reset</b-button>
-      <b-button variant="primary" @click="save">Save Synonyms</b-button>
+      <b-button class="ml-1" variant="primary" @click="save"
+        >Save Synonyms</b-button
+      >
     </div>
   </div>
 </template>
@@ -41,7 +43,7 @@ export default {
     };
   },
   computed: {
-    ...mapState("synonym", ["list"]),
+    ...mapState("synonym", ["list", "loading"]),
     ...mapState("source", { sourceList: "list" }),
     ...mapState("synonymQuality", { qualityList: "list" }),
     ...mapState("synonymType", { typeList: "list" }),
@@ -134,6 +136,9 @@ export default {
         this.getList({
           params: [{ key: "filter[substance.id]", value: this.substanceId }]
         });
+    },
+    loading: function() {
+      this.manageOverlay();
     }
   },
   methods: {
@@ -155,6 +160,15 @@ export default {
           this.patch({ id: this.rowData[i].id, body: this.rowData[i] });
         }
       }
+    },
+    manageOverlay: function() {
+      if (this.loading) {
+        this.gridOptions.api.showLoadingOverlay();
+      } else if (!this.loading && _.isEqual(this.list, [])) {
+        this.gridOptions.api.showNoRowsOverlay();
+      } else {
+        this.gridOptions.api.hideOverlay();
+      }
     }
   },
   beforeMount() {
@@ -172,6 +186,7 @@ export default {
     };
   },
   mounted() {
+    this.manageOverlay();
     this.loadQualityList();
     this.loadSourceList();
     this.loadTypeList();

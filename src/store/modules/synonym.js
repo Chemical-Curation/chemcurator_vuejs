@@ -2,7 +2,7 @@ import rootActions from "../actions.js";
 import rootMutations from "../mutations.js";
 
 const state = {
-  loaded: false,
+  loading: false,
   count: 0,
   list: []
 };
