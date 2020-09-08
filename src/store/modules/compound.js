@@ -4,43 +4,57 @@ import rootMutations from "../mutations.js";
 
 import router from "@/router";
 
-const state = {
-  count: 0,
-  list: [],
-  cid: "",
-  inchikey: "",
-  mrvfile: "",
-  molfile: "",
-  type: "definedCompound"
+import definedcompound from "./defined-compound";
+import illdefinedcompound from "./illdefined-compound";
+
+const defaultState = () => {
+  return {
+    count: 0,
+    type: "none",
+    list: []
+  };
 };
+
+const state = defaultState();
 // actions
 let actions = {
   ...rootActions,
-  fetchCompound: async ({ commit, dispatch }, searchString) => {
-    dispatch("auth/fetchUser", null, {
-      root: true
-    });
+  getResourceURI: () => {
+    return "compounds";
+  },
+  fetchCompound: async ({ commit, dispatch }, { searchString, push }) => {
+    // Search drops you on the Substance page.
+    if (push && router.currentRoute.name !== "substance")
+      await router.push("substance");
+    dispatch("clearAllStates");
+
+    dispatch("auth/fetchUser", null, { root: true });
     const endpoint =
       searchString.indexOf("-") > 0
-        ? "/definedCompounds?filter[inchikey]="
-        : "/compounds?filter[cid]=";
+        ? "/definedCompounds?include=substance&filter[inchikey]="
+        : "/compounds?include=substance&filter[cid]=";
     await HTTP.get(endpoint + searchString)
       .then(response => {
-        const data = response.data.data;
-        if (data.length > 0) {
-          const obj = data.shift();
-          commit("setType", obj.type);
-          commit("setCompound", obj.attributes);
-          router.push({
-            name: "substance"
+        const data = response.data;
+        if (data.data.length > 0) {
+          const obj = data.data.shift();
+
+          if (obj.type === "definedCompound") commit("setType", obj.type);
+          else commit("setType", obj.relationships.queryStructureType.data.id);
+
+          let targetModule = obj.type.toLowerCase();
+          commit(`${targetModule}/storeFetch`, {
+            attributes: obj.attributes,
+            relationships: obj.relationships
           });
+          commit(`${targetModule}/storeIncluded`, data.included);
         } else {
           const alert = {
             message: `${searchString} not valid`,
             color: "warning",
             dismissCountDown: 4
           };
-          commit("setType", "definedCompound");
+          commit("clearState");
           dispatch("alert/alert", alert, {
             root: true
           });
@@ -52,21 +66,22 @@ let actions = {
           root: true
         })
       );
+  },
+  clearAllStates: async ({ commit }) => {
+    commit("clearState");
+    commit("definedcompound/clearState");
+    commit("illdefinedcompound/clearState");
   }
 };
 
 // mutations
 const mutations = {
   ...rootMutations,
-  setCompound(state, obj) {
-    const { cid, inchikey, mrvfile, molfileV3000 } = obj;
-    state.cid = cid;
-    state.inchikey = inchikey;
-    state.mrvfile = mrvfile;
-    state.molfile = molfileV3000;
-  },
   setType(state, type) {
     state.type = type;
+  },
+  clearState(state) {
+    Object.assign(state, defaultState());
   }
 };
 
@@ -74,5 +89,9 @@ export default {
   namespaced: true,
   state,
   actions,
-  mutations
+  mutations,
+  modules: {
+    definedcompound,
+    illdefinedcompound
+  }
 };

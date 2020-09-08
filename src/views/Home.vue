@@ -59,9 +59,9 @@ export default {
   },
   methods: {
     loadData() {
-      this.$store.dispatch("compound/getList", "compounds");
-      this.$store.dispatch("substance/getList", "substances");
-      this.$store.dispatch("list/getList", "lists");
+      this.$store.dispatch("compound/getList");
+      this.$store.dispatch("substance/getList");
+      this.$store.dispatch("list/getList");
     }
   }
 };

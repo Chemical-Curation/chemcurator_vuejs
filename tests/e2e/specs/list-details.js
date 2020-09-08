@@ -61,7 +61,7 @@ const LIST_TYPE = {
   }
 };
 
-describe("The lists page", () => {
+describe("The lists detail page", () => {
   beforeEach(() => {
     cy.adminLogin();
     cy.server();

@@ -20,6 +20,9 @@ let actions = {
     await HTTP.get(`/lists/${id}`).then(response => {
       context.commit("setAttributes", response.data.data);
     });
+  },
+  getResourceURI: () => {
+    return "lists";
   }
 };
 

@@ -5,11 +5,15 @@ import compound from "./modules/compound";
 import alert from "./modules/alert";
 import vocabularies from "./modules/vocabularies";
 import substance from "./modules/substance";
+import substanceType from "./modules/substance-type";
+import source from "./modules/source";
+import qcLevel from "./modules/qc-level";
 import list from "./modules/list";
 import accessibilityType from "./modules/accessibility-type";
 import user from "./modules/user";
 import externalContact from "./modules/external-contact";
 import listType from "./modules/list-type";
+import queryStructureType from "./modules/query-structure-type";
 
 Vue.use(Vuex);
 
@@ -24,7 +28,11 @@ const store = new Vuex.Store({
     accessibilityType,
     user,
     externalContact,
-    listType
+    listType,
+    substanceType,
+    source,
+    qcLevel,
+    queryStructureType
   }
 });
 
