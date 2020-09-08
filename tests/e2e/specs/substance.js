@@ -1,16 +1,39 @@
+let qstResponse = {
+  data: [
+    {
+      id: 1,
+      type: "queryStructureType",
+      attributes: {
+        label: "Markush"
+      }
+    },
+    {
+      id: 2,
+      type: "queryStructureType",
+      attributes: {
+        label: "Ill Defined"
+      }
+    }
+  ]
+};
+
 describe("The substance page", () => {
   beforeEach(() => {
     cy.adminLogin();
+    cy.server();
+    cy.route("queryStructureTypes", qstResponse);
     cy.visit("/substance");
   });
   it("should have dropdown", () => {
-    cy.get("#compound-type-dropdown").contains("defined");
-    cy.get("#compound-type-dropdown").contains("ill-defined");
+    cy.get("#compound-type-dropdown").contains("None");
+    cy.get("#compound-type-dropdown").contains("Defined Compound");
+    cy.get("#compound-type-dropdown").contains("Ill Defined");
+    cy.get("#compound-type-dropdown").contains("Markush");
   });
   it("should toggle ketcher/marvinjs on dropdown", () => {
-    cy.get("#compound-type-dropdown").select("defined");
+    cy.get("#compound-type-dropdown").select("Defined Compound");
     cy.get("iframe[id=ketcher]");
-    cy.get("#compound-type-dropdown").select("ill-defined");
+    cy.get("#compound-type-dropdown").select("Ill Defined");
     cy.get("iframe[id=marvin]");
   });
   it("should load defined compound into ketcher window", () => {
