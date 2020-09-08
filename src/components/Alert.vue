@@ -10,7 +10,7 @@
   >
     <h4 class="alert-heading">{{ header }}</h4>
     <hr v-show="header" />
-    <p v-html="message"></p>
+    <span v-html="message"></span>
   </b-alert>
 </template>
 
