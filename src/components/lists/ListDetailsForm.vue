@@ -106,6 +106,12 @@
       label-for="externalContact"
       class="pb-3"
     >
+      <div id="contacts" v-if="this.form.externalContact.data" class="form-row">
+        <b-button variant="outline-dark" class="m-2">Contact: {{ this.form.externalContact.data.id }}</b-button>
+      </div>
+      <div v-else class="form-row">
+        <b-button variant="outline-secondary" class="m-2" disabled>No Associated Types</b-button>
+      </div>
     </b-form-group>
     <b-form-group
       label="Date of Source Collection:"
@@ -126,7 +132,7 @@
       label-for="types"
     >
       <div id="types" v-if="this.form.types.length > 0" class="form-row">
-        <b-button variant="outline-primary" v-for="type in this.form.types" :key="type.id" class="m-2">Type: {{type.id}}</b-button>
+        <b-button variant="outline-dark" v-for="type in this.form.types" :key="type.id" class="m-2">Type: {{type.id}}</b-button>
       </div>
       <div v-else class="form-row">
         <b-button variant="outline-secondary" class="m-2" disabled>No Associated Types</b-button>
