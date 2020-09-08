@@ -7,10 +7,20 @@
       :defaultColDef="defaultColDef"
       :rowData="rowData"
       :gridOptions="gridOptions"
+      :rowClassRules="rowClassRules"
     />
     <div class="d-flex flex-row justify-content-end my-3">
-      <b-button @click="resetRowData" :disabled="!buttonsEnabled && isAuthenticated">Reset</b-button>
-      <b-button class="ml-1" variant="primary" @click="save" :disabled="!buttonsEnabled">
+      <b-button
+        @click="resetRowData"
+        :disabled="!buttonsEnabled && isAuthenticated"
+        >Reset</b-button
+      >
+      <b-button
+        class="ml-1"
+        variant="primary"
+        @click="save"
+        :disabled="!buttonsEnabled"
+      >
         Save Synonyms
       </b-button>
     </div>
@@ -18,7 +28,7 @@
 </template>
 
 <script>
-import {mapActions, mapGetters, mapState} from "vuex";
+import { mapActions, mapGetters, mapState } from "vuex";
 import _ from "lodash";
 import { AgGridVue } from "ag-grid-vue";
 import {
@@ -41,6 +51,7 @@ export default {
       defaultColDef: null,
       gridOptions: null,
       buttonsEnabled: false,
+      errorRows: []
     };
   },
   computed: {
@@ -98,6 +109,17 @@ export default {
         }
       ];
     },
+    rowClassRules: function() {
+      return {
+        "error-row": params => {
+          // console.log(params.data.id)
+          // console.log(this.errorRows)
+          // console.log(this.errorRows.includes(params.data.id))
+          // console.log(this.errorRows.includes(params.data.id.toString()))
+          return this.errorRows.includes(params.data.id.toString());
+        }
+      };
+    },
     sourceListOptions: function() {
       return this.sourceList.map(i => {
         return { value: i.id, text: i.attributes.label };
@@ -134,8 +156,7 @@ export default {
       this.resetRowData();
     },
     substanceId: function() {
-      if (this.substanceId)
-        this.loadSynonyms()
+      if (this.substanceId) this.loadSynonyms();
     },
     loading: function() {
       this.manageOverlay();
@@ -155,53 +176,55 @@ export default {
       });
     },
     save: async function() {
-      let i;
-      let responses = []
-      for (i in this.rowData) {
+      let responses = [];
+      for (let i in this.rowData) {
         if (!_.isEqual(this.rowData[i], this.list[i])) {
-          responses.push(this.patch({id: this.rowData[i].id, body: this.rowData[i]}).catch(err => {
-            console.log(err.response)
-            return {
-              failed: true,
-              body: this.rowData[i],
-              errors: err.response.data.errors
-            };
-          }))
+          responses.push(
+            this.patch({ id: this.rowData[i].id, body: this.rowData[i] }).catch(
+              err => {
+                return {
+                  failed: true,
+                  body: this.rowData[i],
+                  errors: err.response.data.errors
+                };
+              }
+            )
+          );
         }
       }
-      await Promise.allSettled(responses)
-        .then((responses) => {
-          let rejected = responses.filter(obj => { return obj.value.failed })
-          if (rejected.length === 0) {
-            this.alert({
-              message: "All synonyms saved successfully",
-              color: "success",
-              dismissCountDown: 15
-            })
-          }
-          else {
-            console.log(rejected)
-            let header = "The following Synonyms could not be updated."
-            let message = ""
-            for (let reject of rejected) {
-              console.log(reject)
-              message += `The synonym with identifier ${reject.value.body.attributes.identifer} was rejected for the following reasons: <br>`
-              for (let error of reject.value.errors) {
-                message += `${error.detail} <br>`
-              }
+      await Promise.allSettled(responses).then(responses => {
+        let rejected = responses.filter(obj => {
+          return obj.value.failed;
+        });
+        this.errorRows = [];
+        if (rejected.length === 0) {
+          this.alert({
+            message: "All synonyms saved successfully",
+            color: "success",
+            dismissCountDown: 15
+          });
+        } else {
+          let header = "The following Synonyms could not be updated.";
+          let message = "";
+          for (let reject of rejected) {
+            this.errorRows.push(reject.value.body.id);
+            message += `The synonym with identifier '${reject.value.body.attributes.identifier}' was rejected for the following reasons: <br>`;
+            for (let error of reject.value.errors) {
+              message += `${error.detail} <br>`;
             }
-            this.alert({
-              header: header,
-              message: message,
-              color: "warning",
-              dismissCountDown: 15
-            })
           }
-        })
-      window.scrollTo(0,0)
-      this.loadSynonyms()
+          this.alert({
+            header: header,
+            message: message,
+            color: "warning",
+            dismissCountDown: 15
+          });
+        }
+      });
+      window.scrollTo(0, 0);
+      this.loadSynonyms();
     },
-    loadSynonyms: function () {
+    loadSynonyms: function() {
       this.getList({
         params: [{ key: "filter[substance.id]", value: this.substanceId }]
       });
@@ -209,13 +232,13 @@ export default {
     manageOverlay: function() {
       if (this.loading) {
         this.gridOptions.api.showLoadingOverlay();
-        this.buttonsEnabled = false
+        this.buttonsEnabled = false;
       } else if (!this.loading && _.isEqual(this.list, [])) {
         this.gridOptions.api.showNoRowsOverlay();
-        this.buttonsEnabled = false
+        this.buttonsEnabled = false;
       } else {
         this.gridOptions.api.hideOverlay();
-        this.buttonsEnabled = true
+        this.buttonsEnabled = true;
       }
     }
   },
@@ -242,4 +265,8 @@ export default {
 };
 </script>
 
-<style scoped></style>
+<style>
+.error-row {
+  background-color: sandybrown !important;
+}
+</style>

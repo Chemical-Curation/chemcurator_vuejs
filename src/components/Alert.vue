@@ -6,9 +6,10 @@
     :variant="color"
     v-on:dismissed="clearState"
     @dismiss-count-down="countDownChanged"
-    data-cy="alert-box">
+    data-cy="alert-box"
+  >
     <h4 class="alert-heading">{{ header }}</h4>
-    <hr v-show="header">
+    <hr v-show="header" />
     <p v-html="message"></p>
   </b-alert>
 </template>
