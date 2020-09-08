@@ -52,8 +52,6 @@ const getters = {
     let attributes = state.attributes;
     let relationships = state.relationships;
 
-    console.log(relationships.types.data.map(x => x.id));
-
     return {
       name: attributes.name,
       label: attributes.label,
@@ -66,7 +64,7 @@ const getters = {
       sourceDoi: attributes.sourceDoi,
       externalContact: relationships.externalContact,
       dateOfSourceCollection: attributes.dateOfSourceCollection,
-      types: relationships.types.data.map(x => x.id)
+      types: relationships.types.data
     };
   }
 };

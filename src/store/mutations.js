@@ -6,10 +6,9 @@ export default {
     state.count = payload;
   },
   storeIncluded(state, payload) {
-    let resource;
     if (payload) {
       state.included = {};
-      for (resource of payload) {
+      for (let resource of payload) {
         if (state.included[resource.type] === undefined)
           state.included[resource.type] = {};
         state.included[resource.type][resource.id] = {

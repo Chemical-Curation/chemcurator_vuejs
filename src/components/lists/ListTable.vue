@@ -13,7 +13,7 @@
 </template>
 
 <script>
-import router from "@/router"
+import router from "@/router";
 
 export default {
   name: "List",
@@ -41,7 +41,7 @@ export default {
       this.$store.dispatch("list/getList", "lists");
     },
     showRow: function(row) {
-      router.push({path: `/lists/${row.id}`})
+      router.push({ path: `/lists/${row.id}` });
     }
   },
   computed: {

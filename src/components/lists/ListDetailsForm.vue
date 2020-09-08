@@ -1,5 +1,5 @@
 <template>
-  <b-form id="list-details-form" class="pb-3">
+  <b-col id="list-details-form" class="pb-3">
     <b-form-group
       label="Name:"
       label-align="left"
@@ -124,17 +124,15 @@
       label-align="left"
       label-cols="3"
       label-for="types"
-      class="pb-3"
     >
-      <b-form-select
-        id="types"
-        v-model="form.types"
-        multiple
-        :select-size="3"
-        :options="listTypeOptions"
-      ></b-form-select>
+      <div id="types" v-if="this.form.types.length > 0" class="form-row">
+        <b-button variant="outline-primary" v-for="type in this.form.types" :key="type.id" class="m-2">Type: {{type.id}}</b-button>
+      </div>
+      <div v-else class="form-row">
+        <b-button variant="outline-secondary" class="m-2" disabled>No Associated Types</b-button>
+      </div>
     </b-form-group>
-  </b-form>
+  </b-col>
 </template>
 
 <script>
