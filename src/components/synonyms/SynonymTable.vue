@@ -1,5 +1,8 @@
 <template>
   <div>
+    <div v-show="selectedError" class="text-left">
+      <b-table :items="selectedError" :fields="errorFields" borderless table-variant="danger"></b-table>
+    </div>
     <ag-grid-vue
       style="height: 250px;"
       class="ag-theme-alpine"
@@ -8,6 +11,8 @@
       :rowData="rowData"
       :gridOptions="gridOptions"
       :rowClassRules="rowClassRules"
+      @selection-changed="getSelectedError"
+      rowSelection='single'
     />
     <div class="d-flex flex-row justify-content-end my-3">
       <b-button
@@ -51,7 +56,10 @@ export default {
       defaultColDef: null,
       gridOptions: null,
       buttonsEnabled: false,
-      errorRows: []
+      errorRows: {},
+      selectedError: null,
+      rowSelection: null,
+      errorFields: [{label: "Errors", key: "detail"}],
     };
   },
   computed: {
@@ -111,12 +119,8 @@ export default {
     },
     rowClassRules: function() {
       return {
-        "error-row": params => {
-          // console.log(params.data.id)
-          // console.log(this.errorRows)
-          // console.log(this.errorRows.includes(params.data.id))
-          // console.log(this.errorRows.includes(params.data.id.toString()))
-          return this.errorRows.includes(params.data.id.toString());
+        "bg-danger": params => {
+          return this.errorRows.hasOwnProperty(params.data.id);
         }
       };
     },
@@ -196,7 +200,7 @@ export default {
         let rejected = responses.filter(obj => {
           return obj.value.failed;
         });
-        this.errorRows = [];
+        this.errorRows = {};
         if (rejected.length === 0) {
           this.alert({
             message: "All synonyms saved successfully",
@@ -204,17 +208,11 @@ export default {
             dismissCountDown: 15
           });
         } else {
-          let header = "The following Synonyms could not be updated.";
-          let message = "";
+          let message = "Some synonyms could not be saved.";
           for (let reject of rejected) {
-            this.errorRows.push(reject.value.body.id);
-            message += `The synonym with identifier '${reject.value.body.attributes.identifier}' was rejected for the following reasons: <br>`;
-            for (let error of reject.value.errors) {
-              message += `${error.detail} <br>`;
-            }
+            this.errorRows[reject.value.body.id] = reject.value.errors;
           }
           this.alert({
-            header: header,
             message: message,
             color: "warning",
             dismissCountDown: 15
@@ -240,7 +238,10 @@ export default {
         this.gridOptions.api.hideOverlay();
         this.buttonsEnabled = true;
       }
-    }
+    },
+    getSelectedError: function() {
+      this.selectedError = this.errorRows[this.gridOptions.api.getSelectedRows()[0].id] ?? null
+    },
   },
   beforeMount() {
     this.gridOptions = {
@@ -265,8 +266,4 @@ export default {
 };
 </script>
 
-<style>
-.error-row {
-  background-color: sandybrown !important;
-}
-</style>
+<style scoped></style>
