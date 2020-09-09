@@ -139,6 +139,15 @@ export default {
     },
 
     /**
+     * Synonym objects to be looked up by id.  (used to verify changes)
+     */
+    synonymListMap: function() {
+      let map = {};
+      for (let synonym of this.list) map[synonym.id] = synonym;
+      return map;
+    },
+
+    /**
      * Source objects to be used in a select dropdown
      */
     sourceListOptions: function() {
@@ -255,18 +264,16 @@ export default {
 
       this.selectedError = null
 
-      for (let i in this.rowData) {
-        // todo: this compare is weak.  It requires the list index to be the same as the row index.
-        // this should be done with a map.
-        if (!_.isEqual(this.rowData[i], this.list[i])) {
+      for (let row of this.rowData) {
+        if (!_.isEqual(row, this.synonymListMap[row.id])) {
           // Patch this object and save the response to the response promise array.
           // If the patch fails, catch the failure and return information regarding why.
           responses.push(
-            this.patch({ id: this.rowData[i].id, body: this.rowData[i] }).catch(
+            this.patch({ id: row.id, body: row }).catch(
               err => {
                 return {
                   failed: true,
-                  body: this.rowData[i],
+                  body: row,
                   errors: err.response.data.errors
                 };
               }
