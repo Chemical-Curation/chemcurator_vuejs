@@ -180,6 +180,8 @@ export default {
       });
     },
     save: async function() {
+      this.gridOptions.api.stopEditing()
+      this.selectedError = null
       let responses = [];
       for (let i in this.rowData) {
         if (!_.isEqual(this.rowData[i], this.list[i])) {
@@ -208,12 +210,11 @@ export default {
             dismissCountDown: 15
           });
         } else {
-          let message = "Some synonyms could not be saved.";
           for (let reject of rejected) {
             this.errorRows[reject.value.body.id] = reject.value.errors;
           }
           this.alert({
-            message: message,
+            message: "Some synonyms could not be saved.",
             color: "warning",
             dismissCountDown: 15
           });

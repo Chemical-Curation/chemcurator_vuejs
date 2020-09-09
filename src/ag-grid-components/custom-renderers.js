@@ -20,6 +20,8 @@ function SelectObjectCellEditor() {}
 
 SelectObjectCellEditor.prototype.init = function(params) {
   this.eGui = document.createElement("select");
+  this.eGui.style.width = "100%"
+  this.eGui.style.height = "100%"
   for (let value of params.values) {
     if (
       params.value !== "" ||
