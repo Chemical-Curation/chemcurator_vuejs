@@ -1,3 +1,11 @@
+/**
+ * This is an AG Grid cell renderer component that can take an id
+ * and return the `attributes.label` instead of the id for display.
+ *
+ * This should be usable for Controlled vocabularies but will need
+ * expansion on what the source field is if it will be used for
+ * non-controlled vocabulary models.
+ */
 function MappableCellRenderer() {}
 
 MappableCellRenderer.prototype.init = function(params) {
@@ -16,6 +24,14 @@ MappableCellRenderer.prototype.getGui = function() {
   return this.eGui;
 };
 
+
+/**
+ * This is an AG Cell Editor using the select dropdown that allows
+ * for both a value (id) and text (string) object to be passed in.
+ *
+ * The current AG Grid option only allows for text to be passed
+ * in as an array which is unusable without a unique constraint.
+ */
 function SelectObjectCellEditor() {}
 
 SelectObjectCellEditor.prototype.init = function(params) {
