@@ -1,7 +1,7 @@
 <template>
   <div>
-    <div v-show="selectedError" class="text-left">
-      <b-table :items="selectedError" :fields="errorFields" borderless table-variant="danger"></b-table>
+    <div class="text-left">
+      <h3>Synonyms</h3>
     </div>
     <ag-grid-vue
       style="height: 250px;"
@@ -12,8 +12,16 @@
       :gridOptions="gridOptions"
       :rowClassRules="rowClassRules"
       @selection-changed="getSelectedError"
-      rowSelection='single'
+      rowSelection="single"
     />
+    <div v-show="selectedError" class="mt-3 text-left">
+      <b-table
+        :items="selectedError"
+        :fields="errorFields"
+        borderless
+        table-variant="danger"
+      ></b-table>
+    </div>
     <div class="d-flex flex-row justify-content-end my-3">
       <b-button
         @click="resetRowData"
@@ -63,7 +71,7 @@ export default {
       // Currently selected error row.  Null if no errors
       selectedError: null,
       // Display options for error table.
-      errorFields: [{label: "Errors", key: "detail"}],
+      errorFields: [{ label: "Errors", key: "detail" }]
     };
   },
   computed: {
@@ -161,7 +169,7 @@ export default {
      */
     sourceListMap: function() {
       let map = {};
-      for (let source of this.sourceList) map[source.id] = { ...source };
+      for (let source of this.sourceList) map[source.id] = source;
       return map;
     },
 
@@ -179,7 +187,7 @@ export default {
      */
     qualityListMap: function() {
       let map = {};
-      for (let quality of this.qualityList) map[quality.id] = { ...quality };
+      for (let quality of this.qualityList) map[quality.id] = quality;
       return map;
     },
 
@@ -197,7 +205,7 @@ export default {
      */
     typeListMap: function() {
       let map = {};
-      for (let type of this.typeList) map[type.id] = { ...type };
+      for (let type of this.typeList) map[type.id] = type;
       return map;
     }
   },
@@ -257,27 +265,25 @@ export default {
     save: async function() {
       // Stop editing (if a dropdown is selected but has not blurred,
       //               those changes should be considered valid)
-      this.gridOptions.api.stopEditing()
+      this.gridOptions.api.stopEditing();
       // Responses is an array of promises from the patch requests.
       // We need these all to finish before we can proceed.
       let responses = [];
 
-      this.selectedError = null
+      this.selectedError = null;
 
       for (let row of this.rowData) {
         if (!_.isEqual(row, this.synonymListMap[row.id])) {
           // Patch this object and save the response to the response promise array.
           // If the patch fails, catch the failure and return information regarding why.
           responses.push(
-            this.patch({ id: row.id, body: row }).catch(
-              err => {
-                return {
-                  failed: true,
-                  body: row,
-                  errors: err.response.data.errors
-                };
-              }
-            )
+            this.patch({ id: row.id, body: row }).catch(err => {
+              return {
+                failed: true,
+                body: row,
+                errors: err.response.data.errors
+              };
+            })
           );
         }
       }
@@ -349,8 +355,9 @@ export default {
      * Sets the selected error to the selected row's error.  Otherwise returns null
      */
     getSelectedError: function() {
-      this.selectedError = this.errorRows[this.gridOptions.api.getSelectedRows()[0].id] ?? null
-    },
+      this.selectedError =
+        this.errorRows[this.gridOptions.api.getSelectedRows()[0].id] ?? null;
+    }
   },
   beforeMount() {
     // Load grid options
@@ -365,7 +372,8 @@ export default {
     this.defaultColDef = {
       flex: 1,
       editable: true,
-      resizable: true
+      resizable: true,
+      sortable: true
     };
   },
   mounted() {
