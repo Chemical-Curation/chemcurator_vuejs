@@ -31,7 +31,15 @@ const routes = [
   {
     path: "/lists",
     name: "lists",
-    component: () => import("../views/Lists")
+    component: () => import("../views/Lists"),
+    meta: {
+      requiresAuth: true
+    }
+  },
+  {
+    path: "/unauthorized",
+    name: "unauthorized",
+    component: () => import("../views/Unauthorized")
   }
 ];
 
@@ -47,7 +55,7 @@ router.beforeEach(async (to, from, next) => {
     await store.dispatch("auth/fetchUser");
     if (!store.getters["auth/isAuthenticated"]) {
       next({
-        name: "home"
+        name: "unauthorized"
       });
       return;
     }
