@@ -149,3 +149,21 @@ describe("The substance page", () => {
     );
   });
 });
+
+describe("The substance page's Synonym Table", () => {
+  beforeEach(() => {
+    cy.adminLogin();
+    cy.visit("/substance");
+  });
+  it("should show the substance table", () => {
+    cy.get("#substanceTable").should("contain.text", "No Rows To Show")
+  });
+  it.only("should load synonyms", () => {
+    cy.get("[data-cy=search-box]").type("DTXCID502000009");
+    cy.get("[data-cy=search-button]").click();
+    cy.get("#substanceTable")
+      .find("div.ag-center-cols-clipper")
+      .find("div.ag-row[role=row]")
+      .should("have.length", 8);
+  })
+});
