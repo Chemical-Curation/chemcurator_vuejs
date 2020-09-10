@@ -90,6 +90,7 @@ export default {
         {
           headerName: "Source",
           field: "relationships.source.data.id",
+          comparator: this.sourceMapCompare,
           cellRenderer: "mappableCellRenderer",
           cellRendererParams: {
             map: this.sourceListMap
@@ -103,6 +104,7 @@ export default {
         {
           headerName: "Quality",
           field: "relationships.synonymQuality.data.id",
+          comparator: this.qualityMapCompare,
           cellRenderer: "mappableCellRenderer",
           cellRendererParams: {
             map: this.qualityListMap
@@ -116,6 +118,7 @@ export default {
         {
           headerName: "Type",
           field: "relationships.synonymType.data.id",
+          comparator: this.typeMapCompare,
           cellRenderer: "mappableCellRenderer",
           cellRendererParams: {
             map: this.typeListMap
@@ -357,6 +360,48 @@ export default {
     getSelectedError: function() {
       this.selectedError =
         this.errorRows[this.gridOptions.api.getSelectedRows()[0].id] ?? null;
+    },
+
+    /**
+     * Returns a boolean comparing the map.attribute.labels for two objects
+     *
+     * @param valueA - The id of object 1
+     * @param valueB - The id of object 2
+     * @returns {int} - 1 if object 1's label is first alphabetically otherwise -1
+     */
+    sourceMapCompare: function(valueA, valueB) {
+      let comparison =
+        this.sourceListMap[valueA].attributes.label.toLowerCase() >
+        this.sourceListMap[valueB].attributes.label.toLowerCase();
+      return comparison ? 1 : -1;
+    },
+
+    /**
+     * Returns a boolean comparing the map.attribute.labels for two objects
+     *
+     * @param valueA - The id of object 1
+     * @param valueB - The id of object 2
+     * @returns {int} - 1 if object 1's label is first alphabetically otherwise -1
+     */
+    qualityMapCompare: function(valueA, valueB) {
+      let comparison =
+        this.qualityListMap[valueA].attributes.label.toLowerCase() >
+        this.qualityListMap[valueB].attributes.label.toLowerCase();
+      return comparison ? 1 : -1;
+    },
+
+    /**
+     * Returns a boolean comparing the map.attribute.labels for two objects
+     *
+     * @param valueA - The id of object 1
+     * @param valueB - The id of object 2
+     * @returns {boolean} - 1 if object 1's label is first alphabetically otherwise -1
+     */
+    typeMapCompare: function(valueA, valueB) {
+      let comparison =
+        this.typeListMap[valueA].attributes.label.toLowerCase() >
+        this.typeListMap[valueB].attributes.label.toLowerCase();
+      return comparison ? 1 : -1;
     }
   },
   beforeMount() {
