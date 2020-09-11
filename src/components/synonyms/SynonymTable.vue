@@ -28,7 +28,7 @@
       <b-button
         id="synonym-reset-button"
         @click="resetRowData"
-        :disabled="!buttonsEnabled && isAuthenticated"
+        :disabled="!buttonsEnabled || !isAuthenticated"
         >Reset</b-button
       >
       <b-button
@@ -36,7 +36,7 @@
         class="ml-1"
         variant="primary"
         @click="save"
-        :disabled="!buttonsEnabled && isAuthenticated"
+        :disabled="!buttonsEnabled || !isAuthenticated"
       >
         Save Synonyms
       </b-button>
@@ -430,7 +430,7 @@ export default {
     // Load grid styling
     this.defaultColDef = {
       flex: 1,
-      editable: true,
+      editable: this.isAuthenticated,
       resizable: true,
       sortable: true
     };
@@ -441,8 +441,10 @@ export default {
 
     // Load related info
     this.loadQualityList();
-    this.loadSourceList();
     this.loadTypeList();
+    // sources are loaded on the substance page.
+    // This is redundant but will be required if reuse this component.
+    // this.loadSourceList();
   }
 };
 </script>

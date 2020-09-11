@@ -154,6 +154,10 @@ describe("The substance page's Synonym Table", () => {
   beforeEach(() => {
     cy.adminLogin();
     cy.visit("/substance");
+    cy.server()
+
+    // fixture loading the synonyms
+    cy.route("GET", "/synonyms?*", 'fx:../responses/synonyms.json')
   });
 
   it("should show the substance table", () => {
@@ -170,8 +174,6 @@ describe("The substance page's Synonym Table", () => {
   });
 
   it("should allow editing", () => {
-    cy.server()
-
     // Queue a simple success message (actual response is not currently used)
     cy.route("PATCH", "/synonyms/*", "success")
 
@@ -198,7 +200,6 @@ describe("The substance page's Synonym Table", () => {
     let sampleErrorMessage = "Sample Error"
 
     // Queue a failure response
-    cy.server()
     cy.route({
       method: "PATCH",
       url: "/synonyms/*",
@@ -270,6 +271,6 @@ describe("The substance page's Synonym Table", () => {
       .first()
       .children()
       .first()
-      .should('contain.text', 'foobar')
+      .should('contain.text', 'Synonym 1')
   });
 });
