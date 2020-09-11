@@ -155,15 +155,121 @@ describe("The substance page's Synonym Table", () => {
     cy.adminLogin();
     cy.visit("/substance");
   });
+
   it("should show the substance table", () => {
-    cy.get("#substanceTable").should("contain.text", "No Rows To Show")
+    cy.get("#substanceTable").should("contain.text", "No Rows To Show");
   });
-  it.only("should load synonyms", () => {
+
+  it("should load synonyms", () => {
     cy.get("[data-cy=search-box]").type("DTXCID502000009");
     cy.get("[data-cy=search-button]").click();
     cy.get("#substanceTable")
       .find("div.ag-center-cols-clipper")
       .find("div.ag-row[role=row]")
       .should("have.length", 8);
-  })
+  });
+
+  it("should allow editing", () => {
+    cy.server()
+
+    // Queue a simple success message (actual response is not currently used)
+    cy.route("PATCH", "/synonyms/*", "success")
+
+    cy.get("[data-cy=search-box]").type("DTXCID502000009");
+    cy.get("[data-cy=search-button]").click();
+
+    // Find the first row's first cell and type
+    cy.get("#substanceTable")
+      .find("div.ag-center-cols-clipper")
+      .find("div.ag-row[role=row]")
+      .first()
+      .children()
+      .first()
+      .type("Hello World\n")
+
+    // Save the cell edit
+    cy.get('#synonym-save-button')
+      .click()
+
+    cy.get('body').should("contain.text", "All synonyms saved successfully")
+  });
+
+  it("should allow handle errors", () => {
+    let sampleErrorMessage = "Sample Error"
+
+    // Queue a failure response
+    cy.server()
+    cy.route({
+      method: "PATCH",
+      url: "/synonyms/*",
+      status: 400,
+      response: {
+        errors: [{
+          code: "invalid",
+          detail: sampleErrorMessage,
+          status: "400",
+          source: {pointer: "/data/attributes/nonFieldErrors"}
+        }]
+      }
+    })
+
+    cy.get("[data-cy=search-box]").type("DTXCID502000009");
+    cy.get("[data-cy=search-button]").click();
+
+    // Find the first row's first cell and type
+    cy.get("#substanceTable")
+      .find("div.ag-center-cols-clipper")
+      .find("div.ag-row[role=row]")
+      .first()
+      .children()
+      .first()
+      .type("Hello World\n")
+
+    // Save the cell edit
+    cy.get('#synonym-save-button')
+      .click()
+
+    cy.get('body').should("contain.text", "Some synonyms could not be saved")
+
+    // Relocate the first row and select
+    cy.get("#substanceTable")
+      .should('not.contain.text', "Loading...")
+      .find("div.ag-center-cols-clipper")
+      .find("div.ag-row[role=row]")
+      .should('have.class', "bg-danger")
+      .first()
+      .children()
+      .first()
+      .click()
+
+    cy.get('#synonym-error-table')
+      .should("contain.text", sampleErrorMessage)
+  });
+
+  it("should be able to reset", () => {
+    cy.get("[data-cy=search-box]").type("DTXCID502000009");
+    cy.get("[data-cy=search-button]").click();
+
+    // Find the first row's first cell and type
+    cy.get("#substanceTable")
+      .find("div.ag-center-cols-clipper")
+      .find("div.ag-row[role=row]")
+      .first()
+      .children()
+      .first()
+      .type("Hello World\n")
+
+    // Save the cell edit
+    cy.get('#synonym-reset-button')
+      .click()
+
+    // Find the first row's first cell and type
+    cy.get("#substanceTable")
+      .find("div.ag-center-cols-clipper")
+      .find("div.ag-row[role=row]")
+      .first()
+      .children()
+      .first()
+      .should('contain.text', 'foobar')
+  });
 });

@@ -17,6 +17,7 @@
     />
     <div v-show="selectedError" class="mt-3 text-left">
       <b-table
+        id="synonym-error-table"
         :items="selectedError"
         :fields="errorFields"
         borderless
@@ -25,15 +26,17 @@
     </div>
     <div class="d-flex flex-row justify-content-end my-3">
       <b-button
+        id="synonym-reset-button"
         @click="resetRowData"
         :disabled="!buttonsEnabled && isAuthenticated"
         >Reset</b-button
       >
       <b-button
+        id="synonym-save-button"
         class="ml-1"
         variant="primary"
         @click="save"
-        :disabled="!buttonsEnabled"
+        :disabled="!buttonsEnabled && isAuthenticated"
       >
         Save Synonyms
       </b-button>
@@ -267,6 +270,16 @@ export default {
      * work well here.
      */
     save: async function() {
+      if(!this.isAuthenticated){
+        this.alert({
+          message: "Unauthenticated",
+          color: "warning",
+          dismissCountDown: 15
+        });
+        window.scrollTo(0, 0);
+        return
+      }
+
       // Stop editing (if a dropdown is selected but has not blurred,
       //               those changes should be considered valid)
       this.gridOptions.api.stopEditing();
@@ -316,7 +329,7 @@ export default {
           }
           // Alert the user that some errors happened
           this.alert({
-            message: "Some synonyms could not be saved.",
+            message: "Some synonyms could not be saved",
             color: "warning",
             dismissCountDown: 15
           });
