@@ -21,7 +21,7 @@ describe("The substance page", () => {
   beforeEach(() => {
     cy.adminLogin();
     cy.server();
-    cy.route("queryStructureTypes", qstResponse);
+    cy.route("/queryStructureTypes*", qstResponse);
     cy.visit("/substance");
   });
   it("should have dropdown", () => {
