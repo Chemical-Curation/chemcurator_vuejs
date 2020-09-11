@@ -30,7 +30,7 @@
             />
           </b-form-group>
         </div>
-        <ChemicalEditors :type="type" />
+        <ChemicalEditors v-show="type !== 'none'" :type="type" />
       </b-col>
     </b-row>
     <SynonymTable :substance-id="substanceId" />
@@ -48,14 +48,11 @@ export default {
   name: "home",
   data() {
     return {
-      type: "definedCompound",
-      options: [
-        { value: "definedCompound", text: "defined" },
-        { value: "illDefinedCompound", text: "ill-defined" }
-      ]
+      type: "none"
     };
   },
   computed: {
+    ...mapState("compound", { compoundType: "type" }),
     ...mapState("compound/definedcompound", {
       defAttr: "attributes",
       defRels: "relationships"
@@ -64,10 +61,15 @@ export default {
       illDefAttr: "attributes",
       illDefRels: "relationships"
     }),
+    ...mapState("queryStructureType", { qstList: "list" }),
+
     cid: function() {
-      if (this.type === "definedCompound")
-        return this.$store.state.compound.definedcompound.attributes.cid;
-      else return this.$store.state.compound.illdefinedcompound.attributes.cid;
+      if (this.type === "definedCompound") return this.defAttr.cid;
+      else if (this.type === "none") return "";
+      return this.illDefAttr.cid;
+    },
+    options: function() {
+      return this.buildOptions(this.qstList);
     },
     substanceId: function() {
       if (this.type === "definedCompound" && this.defRels.substance)
@@ -78,11 +80,20 @@ export default {
     }
   },
   watch: {
-    defAttr: function() {
-      this.type = "definedCompound";
-    },
-    illDefAttr: function() {
-      this.type = "illDefinedCompound";
+    compoundType: function() {
+      this.type = this.compoundType;
+    }
+  },
+  methods: {
+    buildOptions: function(list) {
+      let item;
+      let options = [
+        { value: "none", text: "None" },
+        { value: "definedCompound", text: "Defined Compound" }
+      ];
+      for (item of list)
+        options.push({ value: item.id, text: item.attributes.label });
+      return options;
     }
   },
   components: {
@@ -90,6 +101,9 @@ export default {
     ChemicalEditors,
     SubstanceForm,
     SynonymTable
+  },
+  mounted() {
+    this.$store.dispatch("queryStructureType/getList");
   }
 };
 </script>

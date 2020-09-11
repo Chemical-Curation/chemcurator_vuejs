@@ -11,6 +11,7 @@ const defaultState = () => {
   return {
     loading: false,
     count: 0,
+    type: "none",
     list: []
   };
 };
@@ -38,6 +39,9 @@ let actions = {
         const data = response.data;
         if (data.data.length > 0) {
           const obj = data.data.shift();
+
+          if (obj.type === "definedCompound") commit("setType", obj.type);
+          else commit("setType", obj.relationships.queryStructureType.data.id);
 
           let targetModule = obj.type.toLowerCase();
           commit(`${targetModule}/storeFetch`, {
@@ -74,6 +78,9 @@ let actions = {
 // mutations
 const mutations = {
   ...rootMutations,
+  setType(state, type) {
+    state.type = type;
+  },
   clearState(state) {
     Object.assign(state, defaultState());
   }

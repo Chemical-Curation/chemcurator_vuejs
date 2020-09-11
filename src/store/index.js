@@ -12,6 +12,7 @@ import list from "./modules/list";
 import synonym from "./modules/synonym";
 import synonymQuality from "./modules/synonymQuality";
 import synonymType from "./modules/synonymType";
+import queryStructureType from "./modules/query-structure-type";
 
 Vue.use(Vuex);
 
@@ -28,7 +29,8 @@ const store = new Vuex.Store({
     list,
     synonym,
     synonymQuality,
-    synonymType
+    synonymType,
+    queryStructureType
   }
 });
 
