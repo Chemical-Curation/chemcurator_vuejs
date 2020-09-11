@@ -1,5 +1,5 @@
 const LISTS = {
-  value: "lists",
+  value: "/lists*",
   response: {
     data: [
       {
