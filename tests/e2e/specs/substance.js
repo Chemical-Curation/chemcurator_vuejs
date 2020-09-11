@@ -154,10 +154,10 @@ describe("The substance page's Synonym Table", () => {
   beforeEach(() => {
     cy.adminLogin();
     cy.visit("/substance");
-    cy.server()
+    cy.server();
 
     // fixture loading the synonyms
-    cy.route("GET", "/synonyms?*", 'fx:../responses/synonyms.json')
+    cy.route("GET", "/synonyms?*", "fx:../responses/synonyms.json");
   });
 
   it("should show the substance table", () => {
@@ -175,7 +175,7 @@ describe("The substance page's Synonym Table", () => {
 
   it("should allow editing", () => {
     // Queue a simple success message (actual response is not currently used)
-    cy.route("PATCH", "/synonyms/*", "success")
+    cy.route("PATCH", "/synonyms/*", "success");
 
     cy.get("[data-cy=search-box]").type("DTXCID502000009");
     cy.get("[data-cy=search-button]").click();
@@ -187,17 +187,16 @@ describe("The substance page's Synonym Table", () => {
       .first()
       .children()
       .first()
-      .type("Hello World\n")
+      .type("Hello World\n");
 
     // Save the cell edit
-    cy.get('#synonym-save-button')
-      .click()
+    cy.get("#synonym-save-button").click();
 
-    cy.get('body').should("contain.text", "All synonyms saved successfully")
+    cy.get("body").should("contain.text", "All synonyms saved successfully");
   });
 
   it("should allow handle errors", () => {
-    let sampleErrorMessage = "Sample Error"
+    let sampleErrorMessage = "Sample Error";
 
     // Queue a failure response
     cy.route({
@@ -205,14 +204,16 @@ describe("The substance page's Synonym Table", () => {
       url: "/synonyms/*",
       status: 400,
       response: {
-        errors: [{
-          code: "invalid",
-          detail: sampleErrorMessage,
-          status: "400",
-          source: {pointer: "/data/attributes/nonFieldErrors"}
-        }]
+        errors: [
+          {
+            code: "invalid",
+            detail: sampleErrorMessage,
+            status: "400",
+            source: { pointer: "/data/attributes/nonFieldErrors" }
+          }
+        ]
       }
-    })
+    });
 
     cy.get("[data-cy=search-box]").type("DTXCID502000009");
     cy.get("[data-cy=search-button]").click();
@@ -224,27 +225,25 @@ describe("The substance page's Synonym Table", () => {
       .first()
       .children()
       .first()
-      .type("Hello World\n")
+      .type("Hello World\n");
 
     // Save the cell edit
-    cy.get('#synonym-save-button')
-      .click()
+    cy.get("#synonym-save-button").click();
 
-    cy.get('body').should("contain.text", "Some synonyms could not be saved")
+    cy.get("body").should("contain.text", "Some synonyms could not be saved");
 
     // Relocate the first row and select
     cy.get("#substanceTable")
-      .should('not.contain.text', "Loading...")
+      .should("not.contain.text", "Loading...")
       .find("div.ag-center-cols-clipper")
       .find("div.ag-row[role=row]")
-      .should('have.class', "bg-danger")
+      .should("have.class", "bg-danger")
       .first()
       .children()
       .first()
-      .click()
+      .click();
 
-    cy.get('#synonym-error-table')
-      .should("contain.text", sampleErrorMessage)
+    cy.get("#synonym-error-table").should("contain.text", sampleErrorMessage);
   });
 
   it("should be able to reset", () => {
@@ -258,11 +257,10 @@ describe("The substance page's Synonym Table", () => {
       .first()
       .children()
       .first()
-      .type("Hello World\n")
+      .type("Hello World\n");
 
     // Save the cell edit
-    cy.get('#synonym-reset-button')
-      .click()
+    cy.get("#synonym-reset-button").click();
 
     // Find the first row's first cell and type
     cy.get("#substanceTable")
@@ -271,6 +269,6 @@ describe("The substance page's Synonym Table", () => {
       .first()
       .children()
       .first()
-      .should('contain.text', 'Synonym 1')
+      .should("contain.text", "Synonym 1");
   });
 });

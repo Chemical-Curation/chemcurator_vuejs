@@ -270,14 +270,14 @@ export default {
      * work well here.
      */
     save: async function() {
-      if(!this.isAuthenticated){
+      if (!this.isAuthenticated) {
         this.alert({
           message: "Unauthenticated",
           color: "warning",
           dismissCountDown: 15
         });
         window.scrollTo(0, 0);
-        return
+        return;
       }
 
       // Stop editing (if a dropdown is selected but has not blurred,

@@ -56,25 +56,24 @@ export default {
     };
   },
   computed: {
-    ...mapState("compound/definedcompound", { defAttr: "attributes" }),
-    ...mapState("compound/illdefinedcompound", { illDefAttr: "attributes" }),
+    ...mapState("compound/definedcompound", {
+      defAttr: "attributes",
+      defRels: "relationships"
+    }),
+    ...mapState("compound/illdefinedcompound", {
+      illDefAttr: "attributes",
+      illDefRels: "relationships"
+    }),
     cid: function() {
       if (this.type === "definedCompound")
         return this.$store.state.compound.definedcompound.attributes.cid;
       else return this.$store.state.compound.illdefinedcompound.attributes.cid;
     },
     substanceId: function() {
-      if (
-        this.type === "definedCompound" &&
-        this.$store.state.compound.definedcompound.relationships.substance
-      )
-        return this.$store.state.compound.definedcompound.relationships
-          .substance.data.id;
-      else if (
-        this.$store.state.compound.illdefinedcompound.relationships.substance
-      )
-        return this.$store.state.compound.illdefinedcompound.relationships
-          .substance.data.id;
+      if (this.type === "definedCompound" && this.defRels.substance)
+        return this.defRels.substance.data.id;
+      else if (this.illDefRels.substance)
+        return this.illDefRels.substance.data.id;
       return "";
     }
   },
