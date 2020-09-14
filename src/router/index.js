@@ -31,10 +31,7 @@ const routes = [
   {
     path: "/lists",
     name: "lists",
-    component: () => import("../views/Lists"),
-    meta: {
-      requiresAuth: true
-    }
+    component: () => import("../views/Lists")
   },
   {
     path: "/unauthorized",
