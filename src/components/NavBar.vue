@@ -10,10 +10,12 @@
       <b-navbar-nav>
         <b-nav-item
           :to="{ name: 'controlled-vocabularies' }"
-          v-if="isAuthenticated"
+          v-if="isAuthenticated && isSuperuser"
           >Vocabularies</b-nav-item
         >
-        <b-nav-item :to="{ name: 'substance' }" v-if="isAuthenticated"
+        <b-nav-item
+          :to="{ name: 'substance' }"
+          v-if="isAuthenticated && isSuperuser"
           >Substances</b-nav-item
         >
         <b-nav-item :to="{ name: 'lists' }" v-if="isAuthenticated"
@@ -75,7 +77,8 @@ export default {
   },
   computed: {
     ...mapState("auth", ["username"]),
-    ...mapGetters("auth", ["isAuthenticated"])
+    ...mapGetters("auth", ["isAuthenticated"]),
+    ...mapGetters("auth", ["isSuperuser"])
   },
   methods: {
     logout: function() {
