@@ -52,6 +52,11 @@ router.beforeEach(async (to, from, next) => {
     await store.dispatch("auth/fetchUser");
     if (!store.getters["auth/isAuthenticated"]) {
       next({
+        name: "home"
+      });
+      return;
+    } else if (!store.getters["auth/isSuperuser"]) {
+      next({
         name: "unauthorized"
       });
       return;

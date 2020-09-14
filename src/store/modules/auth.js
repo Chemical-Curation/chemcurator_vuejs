@@ -10,7 +10,8 @@ const state = {
 
 // getters
 const getters = {
-  isAuthenticated: state => !(state.username === "")
+  isAuthenticated: state => !(state.username === ""),
+  isSuperuser: state => state.is_superuser === true
 };
 
 // actions
