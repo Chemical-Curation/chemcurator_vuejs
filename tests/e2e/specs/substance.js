@@ -131,7 +131,7 @@ describe("The substance page", () => {
       .find("#atom")
       .find("button")
       .eq(3)
-      .click()
+      .click();
 
     // Select a point. create a H2O there, click and drag to make H2O2
     cy.get("iframe[id=ketcher]")
@@ -144,20 +144,18 @@ describe("The substance page", () => {
       .find("text")
       .first()
       // select first node
-      .trigger('mousedown', {button: 0})
+      .trigger("mousedown", { button: 0 })
       // back up to canvas
       .parent()
       // drag to create compound
-      .trigger('mousemove', 500, 500, )
-      .trigger('mouseup', {force: true});
+      .trigger("mousemove", 500, 500)
+      .trigger("mouseup", { force: true });
 
     // Check compound loaded
-    cy.get('#recordCompoundID')
-      .should('have.value', 'DTXCID502000024')
+    cy.get("#recordCompoundID").should("have.value", "DTXCID502000024");
 
     // Check substance loaded
-    cy.get('#substanceID')
-      .should('have.value', 'DTXSID202000002')
+    cy.get("#substanceID").should("have.value", "DTXSID202000002");
   });
   it("should load the substance form", () => {
     // Search
