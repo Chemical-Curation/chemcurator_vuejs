@@ -15,8 +15,14 @@ module.exports = (on, config) => {
   // }))
 
   config.env.VUE_APP_API_URL = process.env.VUE_APP_API_URL;
+
+  // ADMIN USER
   config.env.VUE_APP_TEST_ADMIN_USER = process.env.VUE_APP_TEST_ADMIN_USER;
   config.env.VUE_APP_TEST_ADMIN_PASS = process.env.VUE_APP_TEST_ADMIN_PASS;
+
+  // NON ADMIN USER
+  config.env.VUE_APP_TEST_USER = process.env.VUE_APP_TEST_USER;
+  config.env.VUE_APP_TEST_PASS = process.env.VUE_APP_TEST_PASS;
 
   return Object.assign({}, config, {
     fixturesFolder: "tests/e2e/fixtures",
