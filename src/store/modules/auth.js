@@ -15,8 +15,6 @@ const getters = {
   isSuperuser: state => state.is_superuser === true
 };
 
-console.log(state.is_superuser);
-
 // actions
 const actions = {
   fetchUser: async ({ commit, dispatch }) => {
