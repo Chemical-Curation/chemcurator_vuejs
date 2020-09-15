@@ -1,195 +1,79 @@
 <template>
-  <b-col id="list-details-form" class="pb-3">
-    <b-form-group
-      label="Name:"
-      label-align="left"
-      label-cols="3"
-      label-for="name"
-      class="pb-3"
-    >
-      <b-form-input id="name" v-model="form.name"></b-form-input>
-    </b-form-group>
-    <b-form-group
-      label="Label:"
-      label-align="left"
-      label-cols="3"
-      label-for="label"
-      class="pb-3"
-    >
-      <b-form-input id="label" v-model="form.label"></b-form-input>
-    </b-form-group>
-    <b-form-group
-      label="Short Description:"
-      label-align="left"
-      label-cols="3"
-      label-for="shortDescription"
-      class="pb-3"
-    >
-      <b-form-textarea
-        id="shortDescription"
-        v-model="form.shortDescription"
-      ></b-form-textarea>
-    </b-form-group>
-    <b-form-group
-      label="Long Description:"
-      label-align="left"
-      label-cols="3"
-      label-for="longDescription"
-      class="pb-3"
-    >
-      <b-form-textarea
-        id="longDescription"
-        v-model="form.longDescription"
-      ></b-form-textarea>
-    </b-form-group>
-    <b-form-group
-      label="List Accessibility:"
-      label-align="left"
-      label-cols="3"
-      label-for="listAccessibility"
-      class="pb-3"
-    >
-      <b-form-select
-        id="listAccessibility"
-        v-model="form.listAccessibility"
-        :options="accessibilityTypeOptions"
-      ></b-form-select>
-    </b-form-group>
-    <b-form-group
-      label="Owners:"
-      label-align="left"
-      label-cols="3"
-      label-for="owners"
-      class="pb-3"
-    >
-    </b-form-group>
-    <b-form-group
-      label="Source Url:"
-      label-align="left"
-      label-cols="3"
-      label-for="sourceUrl"
-      class="pb-3"
-    >
-      <b-form-textarea
-        id="sourceUrl"
-        v-model="form.sourceUrl"
-      ></b-form-textarea>
-    </b-form-group>
-    <b-form-group
-      label="Source Reference:"
-      label-align="left"
-      label-cols="3"
-      label-for="sourceReference"
-      class="pb-3"
-    >
-      <b-form-textarea
-        id="sourceReference"
-        v-model="form.sourceReference"
-      ></b-form-textarea>
-    </b-form-group>
-    <b-form-group
-      label="Source DOI:"
-      label-align="left"
-      label-cols="3"
-      label-for="sourceDoi"
-      class="pb-3"
-    >
-      <b-form-textarea
-        id="sourceDoi"
-        v-model="form.sourceDoi"
-      ></b-form-textarea>
-    </b-form-group>
-    <b-form-group
-      label="External Contact:"
-      label-align="left"
-      label-cols="3"
-      label-for="externalContact"
-      class="pb-3"
-    >
-      <div id="contacts" v-if="this.form.externalContact.data" class="form-row">
-        <b-button variant="outline-dark" class="m-2">Contact: {{ this.form.externalContact.data.id }}</b-button>
-      </div>
-      <div v-else class="form-row">
-        <b-button variant="outline-secondary" class="m-2" disabled>No Associated Types</b-button>
-      </div>
-    </b-form-group>
-    <b-form-group
-      label="Date of Source Collection:"
-      label-align="left"
-      label-cols="3"
-      label-for="dateOfSourceCollection"
-      class="pb-3"
-    >
-      <b-form-textarea
-        id="dateOfSourceCollection"
-        v-model="form.dateOfSourceCollection"
-      ></b-form-textarea>
-    </b-form-group>
-    <b-form-group
-      label="Types:"
-      label-align="left"
-      label-cols="3"
-      label-for="types"
-    >
-      <div id="types" v-if="this.form.types.length > 0" class="form-row">
-        <b-button variant="outline-dark" v-for="type in this.form.types" :key="type.id" class="m-2">Type: {{type.id}}</b-button>
-      </div>
-      <div v-else class="form-row">
-        <b-button variant="outline-secondary" class="m-2" disabled>No Associated Types</b-button>
-      </div>
-    </b-form-group>
-  </b-col>
+  <b-row>
+    <b-col class="col-lg-6">
+      <ControlledVocab :vocab="attributes" />
+    </b-col>
+    <b-col class="col-lg-6">
+      <dl>
+        <dt>SourceURL</dt>
+        <dd class="mx-4">
+          {{ this.attributes.sourceUrl }}
+        </dd>
+        <dt>Source Reference</dt>
+        <dd class="mx-4">
+          {{ this.attributes.sourceReference }}
+        </dd>
+        <dt>Source DOI</dt>
+        <dd class="mx-4">
+          {{ this.attributes.sourceDoi }}
+        </dd>
+        <dt>Date of Source Collection:</dt>
+        <dd class="mx-4">
+          {{ this.attributes.dateOfSourceCollection }}
+        </dd>
+      </dl>
+      <b-row class="d-block">
+        <div class="m-3">
+          <b>Accessibility Type:</b>
+          <b-button class="mx-4" pill variant="outline-secondary" v-b-modal.modal-1>
+            <b>{{ accessibilityType.attributes }}</b>
+          </b-button>
+          <b-modal id="modal-1" title="Accessibility Type">
+            <ControlledVocab :vocab="accessibilityType.attributes" />
+          </b-modal>
+        </div>
+        <div class="m-3">
+          <b>List Types:</b>
+          <div class="d-inline" v-for="type in listTypes" :key="type.id">
+            <b-button class="mx-4" pill variant="outline-secondary" v-b-modal="type.id">
+              <b>{{ type.attributes.name }}</b>
+            </b-button>
+            <b-modal :id="type.id" title="List Type">
+              <ControlledVocab :vocab="type.attributes" />
+            </b-modal>
+          </div>
+        </div>
+      </b-row>
+    </b-col>
+  </b-row>
 </template>
-
 <script>
-import { mapGetters, mapState } from "vuex";
+import { mapGetters } from "vuex";
+import ControlledVocab from "@/components/ControlledVocab";
 
 export default {
   name: "ListDetailsForm",
+  components: {
+    ControlledVocab
+  },
   computed: {
-    ...mapGetters("list", { form: "getListDetailsForm" }),
-    ...mapState("accessibilityType", { accessibilityTypeList: "list" }),
-    ...mapState("externalContact", { externalContactList: "list" }),
-    ...mapState("listType", { listTypeList: "list" }),
-    ...mapState("user", { userList: "list" }),
+    ...mapGetters("list", [ "getIncluded" ]),
     id: function() {
       return this.$route.params.id;
     },
-    attribute: function() {
+    attributes: function() {
       return this.$store.state.list.attributes ?? {};
     },
-    relationship: function() {
-      return this.$store.state.list.relationships ?? {};
+    listTypes: function() {
+      return this.getIncluded("types");
     },
-    accessibilityTypeOptions: function() {
-      return this.buildOptions(this.accessibilityTypeList);
+    accessibilityType: function() {
+      return this.getIncluded("listAccessibility");
     },
-    userOptions: function() {
-      return this.buildOptions(this.userList);
-    },
-    externalContactOptions: function() {
-      return this.buildOptions(this.externalContactList);
-    },
-    listTypeOptions: function() {
-      return this.buildOptions(this.listTypeList);
-    }
-  },
-  methods: {
-    buildOptions: function(list) {
-      let item;
-      let options = [];
-      for (item of list)
-        options.push({ value: item.id, text: item.attributes.name });
-      return options;
-    }
   },
   mounted() {
     // TODO: Once CRUD for ExternalContact and User is completed, add additional text areas for both relationships
     this.$store.dispatch("list/getObject", this.id);
-    this.$store.dispatch("accessibilityType/getList", "accessibilityTypes");
-    this.$store.dispatch("externalContact/getList", "externalContacts");
-    this.$store.dispatch("listType/getList", "listTypes");
-    this.$store.dispatch("user/getList", "users");
   }
 };
 </script>

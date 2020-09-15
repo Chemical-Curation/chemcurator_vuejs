@@ -1,11 +1,14 @@
 import rootActions from "../actions.js";
 import rootMutations from "../mutations.js";
+import rootGetters from "../getters.js";
+
 import { HTTP } from "@/store/http-common";
 
 const defaultState = () => {
   return {
     attributes: {},
     relationships: {},
+    included: {},
     loaded: false,
     count: 0,
     list: []
@@ -17,8 +20,9 @@ const state = defaultState();
 let actions = {
   ...rootActions,
   async getObject(context, id) {
-    await HTTP.get(`/lists/${id}`).then(response => {
+    await HTTP.get(`/lists/${id}?include=listAccessibility,types`).then(response => {
       context.commit("setAttributes", response.data.data);
+      context.commit("storeIncluded", response.data.included);
     });
   },
   getResourceURI: () => {
@@ -27,46 +31,7 @@ let actions = {
 };
 
 const getters = {
-  getListDetailsForm: state => {
-    if (
-      state.attributes === {} ||
-      !state.relationships.listAccessibility ||
-      !state.relationships.types
-    ) {
-      return {
-        name: "",
-        label: "",
-        shortDescription: "",
-        longDescription: "",
-        listAccessibility: "",
-        owners: "",
-        sourceUrl: "",
-        sourceReference: "",
-        sourceDoi: "",
-        externalContact: "",
-        dateOfSourceCollection: "",
-        types: ""
-      };
-    }
-
-    let attributes = state.attributes;
-    let relationships = state.relationships;
-
-    return {
-      name: attributes.name,
-      label: attributes.label,
-      shortDescription: attributes.shortDescription,
-      longDescription: attributes.longDescription,
-      listAccessibility: relationships.listAccessibility.data.id,
-      owners: relationships.owners,
-      sourceUrl: attributes.sourceUrl,
-      sourceReference: attributes.sourceReference,
-      sourceDoi: attributes.sourceDoi,
-      externalContact: relationships.externalContact,
-      dateOfSourceCollection: attributes.dateOfSourceCollection,
-      types: relationships.types.data
-    };
-  }
+  ...rootGetters
 };
 
 const mutations = {

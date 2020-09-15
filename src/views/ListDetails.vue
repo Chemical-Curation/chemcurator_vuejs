@@ -1,6 +1,7 @@
 <template>
   <b-container>
     <Title :msg="message" />
+      <hr>
     <ListDetailsForm />
   </b-container>
 </template>

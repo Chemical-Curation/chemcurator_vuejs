@@ -66,11 +66,11 @@ describe("The lists detail page", () => {
     cy.adminLogin();
     cy.server();
 
-    cy.route(LIST.value + "/" + LIST.response.data.id, LIST.response);
-    cy.route(ACCESSIBILITY_TYPE.value, ACCESSIBILITY_TYPE.response);
-    cy.route(LIST_TYPE.value, LIST_TYPE.response);
-    console.log(ACCESSIBILITY_TYPE.response);
-    console.log(LIST_TYPE.response);
+    cy.route(LIST.value + "/" + LIST.response.data.id + "?include=listAccessibility,types", LIST.response);
+    //cy.route(ACCESSIBILITY_TYPE.value, ACCESSIBILITY_TYPE.response);
+    //cy.route(LIST_TYPE.value, LIST_TYPE.response);
+    //console.log(ACCESSIBILITY_TYPE.response);
+    //console.log(LIST_TYPE.response);
 
     cy.visit("/lists/" + LIST.response.data.id);
   });
