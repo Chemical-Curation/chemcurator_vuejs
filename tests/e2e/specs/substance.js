@@ -112,32 +112,52 @@ describe("The substance page", () => {
           .should("not.equal", "<cml><MDocument></MDocument></cml>");
       });
   });
-  // This test verifies functionality that no longer exists works.
-  //   It should be updated and readded when something uses these messages.
-  it.skip("should update the {import textarea} when ketcher changes", () => {
-    cy.get("iframe[id=ketcher]")
-      .its("0.contentDocument.body")
-      .should("not.be.empty");
-    cy.get("#ketcher-import-textarea")
-      .invoke("val")
-      .should("be.empty");
-    cy.get("iframe[id=ketcher]")
-      .its("0.contentDocument.body")
-      .should("not.be.empty")
-      .then(cy.wrap)
-      .find("#atom")
-      .find("button", "Hydrogen (H)")
-      .first()
-      .click();
+  it("should fetch from server when ketcher changes", () => {
+    cy.get("#compound-type-dropdown").select("Defined Compound");
     cy.get("iframe[id=ketcher]")
       .its("0.contentDocument.body")
       .should("not.be.empty")
       .then(cy.wrap)
       .find("#canvas")
-      .click();
-    cy.get("#ketcher-import-textarea")
-      .invoke("val")
-      .should("not.be.empty");
+      .children()
+      .find("text")
+      .should("not.exist");
+
+    // Find the oxygen button
+    cy.get("iframe[id=ketcher]")
+      .its("0.contentDocument.body")
+      .should("not.be.empty")
+      .then(cy.wrap)
+      .find("#atom")
+      .find("button")
+      .eq(3)
+      .click()
+
+    // Select a point. create a H2O there, click and drag to make H2O2
+    cy.get("iframe[id=ketcher]")
+      .its("0.contentDocument.body")
+      .should("not.be.empty")
+      .then(cy.wrap)
+      .find("#canvas")
+      // create first node
+      .click()
+      .find("text")
+      .first()
+      // select first node
+      .trigger('mousedown', {button: 0})
+      // back up to canvas
+      .parent()
+      // drag to create compound
+      .trigger('mousemove', 500, 500, )
+      .trigger('mouseup', {force: true});
+
+    // Check compound loaded
+    cy.get('#recordCompoundID')
+      .should('have.value', 'DTXCID502000024')
+
+    // Check substance loaded
+    cy.get('#substanceID')
+      .should('have.value', 'DTXSID202000002')
   });
   it("should load the substance form", () => {
     // Search
