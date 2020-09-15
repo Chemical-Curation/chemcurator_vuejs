@@ -5,7 +5,8 @@ const state = {
   email: "",
   firstName: "",
   lastName: "",
-  username: ""
+  username: "",
+  is_superuser: ""
 };
 
 // getters
@@ -13,6 +14,8 @@ const getters = {
   isAuthenticated: state => !(state.username === ""),
   isSuperuser: state => state.is_superuser === true
 };
+
+console.log(state.is_superuser);
 
 // actions
 const actions = {
@@ -86,6 +89,7 @@ const mutations = {
     state.firstName = user.first_name || "";
     state.lastName = user.last_name || "";
     state.username = user.username || "";
+    state.is_superuser = user.is_superuser || "";
   }
 };
 
