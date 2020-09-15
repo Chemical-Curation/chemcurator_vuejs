@@ -24,7 +24,6 @@ const routes = [
     name: "controlled-vocabularies",
     component: () => import("../views/Vocabularies"),
     meta: {
-      // todo: Admin Only
       requiresAuth: true
     }
   },

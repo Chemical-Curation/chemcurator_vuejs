@@ -2,7 +2,7 @@ describe("Unauthorized User Page", () => {
   beforeEach(() => {
     cy.nonAdminLogin();
     cy.server();
-    cy.visit("/substance");
+    cy.visit("/vocabularies");
   });
   it("It should redirect to the Unauthorized User Page", () => {
     cy.contains("h1", "Unauthorized User");

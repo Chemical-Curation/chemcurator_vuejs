@@ -13,14 +13,8 @@
           v-if="isAuthenticated && isSuperuser"
           >Vocabularies</b-nav-item
         >
-        <b-nav-item
-          :to="{ name: 'substance' }"
-          v-if="isAuthenticated && isSuperuser"
-          >Substances</b-nav-item
-        >
-        <b-nav-item :to="{ name: 'lists' }" v-if="isAuthenticated"
-          >Lists</b-nav-item
-        >
+        <b-nav-item :to="{ name: 'substance' }">Substances</b-nav-item>
+        <b-nav-item :to="{ name: 'lists' }">Lists</b-nav-item>
       </b-navbar-nav>
       <b-navbar-nav class="ml-auto">
         <b-form-input
