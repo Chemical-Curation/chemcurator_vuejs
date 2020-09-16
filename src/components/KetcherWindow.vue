@@ -12,21 +12,11 @@
         >ketcher</iframe
       >
     </div>
-    <!--    <b-form-textarea-->
-    <!--      id="ketcher-import-textarea"-->
-    <!--      v-model="molfile"-->
-    <!--      rows="3"-->
-    <!--      max-rows="6"-->
-    <!--      placeholder="Edit the above window to generate a Molfile..."-->
-    <!--      class="mx-auto mt-5"-->
-    <!--      style="width:800px"-->
-    <!--      disabled-->
-    <!--    ></b-form-textarea>-->
   </div>
 </template>
 
 <script>
-import { mapState } from "vuex";
+import { mapActions, mapState } from "vuex";
 
 export default {
   name: "KetcherWindow",
@@ -37,6 +27,7 @@ export default {
     };
   },
   methods: {
+    ...mapActions("compound/definedcompound", ["fetchByMolfile"]),
     loadMolfile: function() {
       if (this.attributes.molfileV3000) {
         this.ketcherFrame.contentWindow.postMessage(
@@ -72,9 +63,10 @@ export default {
     attributes: function() {
       if (this.attributes.molfileV3000) {
         this.loadMolfile();
-      } else {
-        this.clearMolfile();
       }
+    },
+    molfile: function() {
+      this.fetchByMolfile(this.molfile);
     }
   },
   mounted() {
