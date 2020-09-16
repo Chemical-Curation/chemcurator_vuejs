@@ -24,8 +24,8 @@ const routes = [
     name: "controlled-vocabularies",
     component: () => import("../views/Vocabularies"),
     meta: {
-      // todo: Admin Only
-      requiresAuth: true
+      requiresAuth: true,
+      requiresSuperuser: true
     }
   },
   {
@@ -37,6 +37,11 @@ const routes = [
     path: "/lists/:id",
     name: "list-details",
     component: () => import("../views/ListDetails")
+  },
+  {
+    path: "/unauthorized",
+    name: "unauthorized",
+    component: () => import("../views/Unauthorized")
   }
 ];
 
@@ -50,6 +55,12 @@ const router = new VueRouter({
 router.beforeEach(async (to, from, next) => {
   if (to.meta.requiresAuth) {
     await store.dispatch("auth/fetchUser");
+    if (to.meta.requiresSuperuser && !store.getters["auth/isSuperuser"]) {
+      next({
+        name: "unauthorized"
+      });
+      return;
+    }
     if (!store.getters["auth/isAuthenticated"]) {
       next({
         name: "home"
