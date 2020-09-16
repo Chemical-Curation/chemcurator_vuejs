@@ -21,6 +21,9 @@ const wrapper = shallowMount(NavBar, {
     isAuthenticated() {
       return true;
     },
+    isSuperuser() {
+      return true;
+    },
     username() {
       return "karyn";
     }
