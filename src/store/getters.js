@@ -2,8 +2,8 @@ export default {
   getIncluded: (state) => (type) => {
     let these = [];
     let obj;
-    if (state.relationships[type]){
-      obj = state.relationships[type].data;
+    if (state.data.relationships[type]){
+      obj = state.data.relationships[type].data;
     } else {
       obj = [];
     }

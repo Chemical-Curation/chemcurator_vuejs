@@ -25,39 +25,31 @@ const LIST = {
           ]
         }
       }
-    }
-  }
-};
-
-const ACCESSIBILITY_TYPE = {
-  value: "accessibilityTypes",
-  response: {
-    data: [
-      {
-        id: "1",
-        type: "accessibilityType",
-        attributes: {
-          label: "Sample Accesibility Type Label",
-          name: "Sample Accesibility Type Name"
+    },
+    included: [
+        {
+            type: "accessibilityType",
+            id: "1",
+            attributes: {
+                name: "new-name",
+                label: "acc type",
+                shortDescription: "this is one of many",
+                longDescription: "",
+                deprecated: true
+            }
+        },
+        {
+            type: "listType",
+            id: "1",
+            attributes: {
+                name: "list-type1",
+                label: "list type1",
+                shortDescription: "this is the first",
+                longDescription: "this will always be the first",
+                deprecated: true
+            }
         }
-      }
-    ]
-  }
-};
-
-const LIST_TYPE = {
-  value: "listTypes",
-  response: {
-    data: [
-      {
-        id: "1",
-        type: "listType",
-        attributes: {
-          label: "Sample List Type Label",
-          name: "Sample List Type Name"
-        }
-      }
-    ]
+    ],
   }
 };
 
@@ -67,10 +59,6 @@ describe("The lists detail page", () => {
     cy.server();
 
     cy.route(LIST.value + "/" + LIST.response.data.id + "?include=listAccessibility,types", LIST.response);
-    //cy.route(ACCESSIBILITY_TYPE.value, ACCESSIBILITY_TYPE.response);
-    //cy.route(LIST_TYPE.value, LIST_TYPE.response);
-    //console.log(ACCESSIBILITY_TYPE.response);
-    //console.log(LIST_TYPE.response);
 
     cy.visit("/lists/" + LIST.response.data.id);
   });
@@ -78,22 +66,16 @@ describe("The lists detail page", () => {
     cy.contains("h1", "Sample List Name Details");
   });
   it("should load the list details form", () => {
-    cy.get("#name").should("have.value", LIST.response.data.attributes.name);
-    cy.get("#label").should("have.value", LIST.response.data.attributes.label);
-    cy.get("#shortDescription").should(
-      "have.value",
-      LIST.response.data.attributes.shortDescription
-    );
-    cy.get("#listAccessibility").should(
-      "have.value",
-      LIST.response.data.relationships.listAccessibility.data.id
-    );
-    // WIP
+    cy.get("#list-name-1").should("have.id", "list-name-" + LIST.response.data.id);
+    cy.get("#list-name-1").contains(LIST.response.data.attributes.name);
+    cy.get("#list-label-1").contains(LIST.response.data.attributes.label);
+    cy.get("#list-short-1").contains(LIST.response.data.attributes.shortDescription);
+    cy.get("#listAccessibility").contains(LIST.response.included[0].attributes.name);
     cy.get("#types button")
       .first()
       .invoke("text")
       .should("deep.equal",
-        "Type: " + LIST.response.data.relationships.types.data[0].id
+        LIST.response.included[1].attributes.name
       );
   });
 });

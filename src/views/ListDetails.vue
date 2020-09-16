@@ -18,7 +18,8 @@ export default {
   },
   computed: {
     message: function() {
-      return this.$store.state.list.attributes.name + " Details";
+      let listName = this.$store.state.list.data.attributes?.name ?? "";
+      return  listName + " Details";
     }
   }
 };

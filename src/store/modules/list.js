@@ -6,8 +6,7 @@ import { HTTP } from "@/store/http-common";
 
 const defaultState = () => {
   return {
-    attributes: {},
-    relationships: {},
+    data: {},
     included: {},
     loaded: false,
     count: 0,
@@ -21,7 +20,7 @@ let actions = {
   ...rootActions,
   async getObject(context, id) {
     await HTTP.get(`/lists/${id}?include=listAccessibility,types`).then(response => {
-      context.commit("setAttributes", response.data.data);
+      context.commit("setAttributes", response.data);
       context.commit("storeIncluded", response.data.included);
     });
   },
@@ -39,9 +38,8 @@ const mutations = {
   clearState(state) {
     Object.assign(state, defaultState());
   },
-  setAttributes(state, { attributes, relationships }) {
-    state.attributes = attributes;
-    state.relationships = relationships;
+  setAttributes(state, { data }) {
+    state.data = data;
   }
 };
 
