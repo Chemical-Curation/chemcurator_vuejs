@@ -1,10 +1,10 @@
 <template>
   <div>
     <b-form>
-      <KetcherWindow v-show="type === 'definedCompound'" />
-      <MarvinWindow v-show="type !== 'definedCompound'" />
+      <KetcherWindow v-show="type === 'definedCompound'" ref="ketcher "/>
+      <MarvinWindow v-show="type !== 'definedCompound'" ref="marvin" />
       <div class="my-3">
-        <b-button type="submit" variant="primary">Save Compound</b-button>
+        <b-button @click="save" variant="primary">Save Compound</b-button>
       </div>
     </b-form>
   </div>
@@ -22,6 +22,17 @@ export default {
   },
   props: {
     type: String
+  },
+  methods: {
+    save: function() {
+      if (this.type === 'definedCompound'){
+        //todo: this is not going to be implemented on this ticket
+        // this.$refs['ketcher'].save()
+      }
+      else {
+        this.$refs['marvin'].save()
+      }
+    }
   }
 };
 </script>

@@ -5,8 +5,7 @@ import { HTTP } from "@/store/http-common";
 
 const defaultState = () => {
   return {
-    attributes: {},
-    relationships: {},
+    data: {},
     included: {}
   };
 };

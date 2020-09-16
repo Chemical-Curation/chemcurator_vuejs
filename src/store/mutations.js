@@ -11,15 +11,11 @@ export default {
       for (let resource of payload) {
         if (state.included[resource.type] === undefined)
           state.included[resource.type] = {};
-        state.included[resource.type][resource.id] = {
-          attributes: resource.attributes,
-          relationships: resource.relationships
-        };
+        state.included[resource.type][resource.id] = resource;
       }
     }
   },
-  storeFetch(state, { attributes, relationships }) {
-    state.attributes = attributes;
-    state.relationships = relationships;
+  storeFetch(state, data) {
+    state.data = data;
   }
 };

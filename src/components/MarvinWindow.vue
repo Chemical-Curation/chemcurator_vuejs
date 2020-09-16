@@ -66,7 +66,7 @@ export default {
       this.marvinFrame.contentWindow.postMessage(
         {
           type: "importMrvfile",
-          mrvfile: this.attributes.mrvfile
+          mrvfile: this.data.attributes.mrvfile
         },
         "*"
       );
@@ -80,17 +80,20 @@ export default {
     },
     clearMarvin: function() {
       this.marvinFrame.contentWindow.postMessage({ type: "clearMrvfile" }, "*");
+    },
+    save: function() {
+
     }
   },
   computed: {
-    ...mapState("compound/illdefinedcompound", ["attributes"]),
+    ...mapState("compound/illdefinedcompound", ["data"]),
     marvinFrame: function() {
       return this.$refs.marvin;
     }
   },
   watch: {
-    attributes: function() {
-      if (this.attributes.mrvfile) {
+    data: function() {
+      if (this.data?.attributes?.mrvfile) {
         this.loadMrvfile();
       } else {
         this.clearMarvin();
@@ -102,7 +105,7 @@ export default {
     window.addEventListener(
       "message",
       event => {
-        if (event.data === "marvinLoaded" && this.attributes.mrvfile) {
+        if (event.data === "marvinLoaded" && this.data?.attributes?.mrvfile) {
           this.loadMrvfile();
         }
         if (event.data.type === "returnMrvfile") {

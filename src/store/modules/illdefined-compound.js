@@ -4,8 +4,7 @@ import { substanceFormFromRelationship } from "../getters";
 
 const defaultState = () => {
   return {
-    attributes: {},
-    relationships: {},
+    data: {},
     included: {}
   };
 };
