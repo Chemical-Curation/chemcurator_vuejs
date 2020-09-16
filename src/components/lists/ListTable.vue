@@ -7,11 +7,14 @@
       hover
       :items="list"
       :fields="fields"
+      @row-clicked="showRow"
     />
   </div>
 </template>
 
 <script>
+import router from "@/router";
+
 export default {
   name: "List",
   props: {},
@@ -35,7 +38,10 @@ export default {
   },
   methods: {
     getList: function() {
-      this.$store.dispatch("list/getList");
+      this.$store.dispatch("list/getList", "lists");
+    },
+    showRow: function(row) {
+      router.push({ path: `/lists/${row.id}` });
     }
   },
   computed: {

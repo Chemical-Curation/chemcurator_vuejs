@@ -1,5 +1,5 @@
 <template>
-  <b-row class="about">
+  <b-row class="about text-center">
     <b-col cols="3">
       <HelloWorld msg="Welcome to ChemReg" />
       <p v-if="username"></p>

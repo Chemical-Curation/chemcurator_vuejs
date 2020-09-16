@@ -34,6 +34,11 @@ const routes = [
     component: () => import("../views/Lists")
   },
   {
+    path: "/lists/:id",
+    name: "list-details",
+    component: () => import("../views/ListDetails")
+  },
+  {
     path: "/unauthorized",
     name: "unauthorized",
     component: () => import("../views/Unauthorized")
