@@ -300,10 +300,10 @@ describe("The substance page's Synonym Table", () => {
       .first()
       .type("Hello World\n");
 
-    // Save the cell edit
+    // Roll back the cell edit
     cy.get("#synonym-reset-button").click();
 
-    // Find the first row's first cell and type
+    // Find the first row's first cell and confirm the rollback
     cy.get("#substanceTable")
       .find("div.ag-center-cols-clipper")
       .find("div.ag-row[role=row]")
