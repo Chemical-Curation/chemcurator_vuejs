@@ -3,6 +3,7 @@ import rootMutations from "../mutations.js";
 import { HTTP } from "@/store/http-common";
 
 const state = {
+  loading: false,
   count: 0,
   list: []
 };

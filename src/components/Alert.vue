@@ -7,8 +7,11 @@
     v-on:dismissed="clearState"
     @dismiss-count-down="countDownChanged"
     data-cy="alert-box"
-    >{{ message }}</b-alert
   >
+    <h4 class="alert-heading">{{ header }}</h4>
+    <hr v-show="header" />
+    <span v-html="message"></span>
+  </b-alert>
 </template>
 
 <script>
@@ -33,7 +36,7 @@ export default {
         this.$store.commit("alert/setCountdown", value);
       }
     },
-    ...mapState("alert", ["message", "color"])
+    ...mapState("alert", ["message", "color", "header"])
   }
 };
 </script>

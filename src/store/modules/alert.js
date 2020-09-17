@@ -1,4 +1,5 @@
 const state = {
+  header: "",
   message: "",
   color: "",
   dismissCountDown: 0
@@ -17,6 +18,7 @@ const actions = {
 // mutations
 const mutations = {
   addAlert(state, alert) {
+    state.header = alert.header ?? "";
     state.message = alert.message;
     state.color = alert.color;
     state.dismissCountDown = alert.dismissCountDown;

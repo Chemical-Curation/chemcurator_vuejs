@@ -9,6 +9,7 @@ import illdefinedcompound from "./illdefined-compound";
 
 const defaultState = () => {
   return {
+    loading: false,
     count: 0,
     type: "none",
     list: []

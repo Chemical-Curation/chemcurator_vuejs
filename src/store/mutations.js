@@ -17,5 +17,11 @@ export default {
   },
   storeFetch(state, data) {
     state.data = data;
+  },
+  loading(state) {
+    state.loading = true;
+  },
+  loaded(state) {
+    state.loading = false;
   }
 };

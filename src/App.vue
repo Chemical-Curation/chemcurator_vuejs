@@ -22,6 +22,9 @@ export default {
 </script>
 
 <style>
+@import "../node_modules/ag-grid-community/dist/styles/ag-grid.css";
+@import "../node_modules/ag-grid-community/dist/styles/ag-theme-alpine.css";
+
 body {
   background-color: #f0f0f0;
 }
