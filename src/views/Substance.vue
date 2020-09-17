@@ -69,7 +69,10 @@ export default {
       return this.buildOptions(this.qstList);
     },
     substanceId: function() {
-      if (this.type === "definedCompound" && this.definedCompoundData.relationships?.substance)
+      if (
+        this.type === "definedCompound" &&
+        this.definedCompoundData.relationships?.substance
+      )
         return this.definedCompoundData.relationships?.substance?.data?.id;
       else if (this.illDefinedCompoundData.relationships?.substance)
         return this.illDefinedCompoundData.relationships?.substance?.data?.id;

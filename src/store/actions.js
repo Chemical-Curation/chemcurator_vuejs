@@ -28,5 +28,12 @@ export default {
       console.exception("Did you define getResourceURI action on your module?");
 
     return HTTP.patch(`/${resource}/${id}`, { data: { ...body } });
+  },
+  post: async (context, body) => {
+    let resource = await context.dispatch("getResourceURI");
+    if (!resource)
+      console.error("Did you define getResourceURI action on your module?");
+
+    return HTTP.post(`/${resource}`, { data: { ...body } });
   }
 };

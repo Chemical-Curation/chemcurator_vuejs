@@ -80,9 +80,6 @@ export default {
     },
     clearMarvin: function() {
       this.marvinFrame.contentWindow.postMessage({ type: "clearMrvfile" }, "*");
-    },
-    save: function() {
-
     }
   },
   computed: {
