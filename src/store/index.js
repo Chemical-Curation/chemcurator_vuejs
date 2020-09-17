@@ -27,7 +27,6 @@ const store = new Vuex.Store({
     alert,
     vocabularies,
     substance,
-    list,
     accessibilityType,
     user,
     externalContact,
