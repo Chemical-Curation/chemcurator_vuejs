@@ -25,7 +25,13 @@
       <b-row class="d-block">
         <div class="m-3">
           <b>Accessibility Type:</b>
-          <b-button id="listAccessibility" class="mx-4" pill variant="outline-secondary" v-b-modal.accessibilityType-modal>
+          <b-button
+            id="listAccessibility"
+            class="mx-4"
+            pill
+            variant="outline-secondary"
+            v-b-modal.accessibilityType-modal
+          >
             <b>{{ accessibilityType.attributes.name }}</b>
           </b-button>
           <b-modal id="accessibilityType-modal" title="Accessibility Type">
@@ -35,7 +41,12 @@
         <div id="types" class="m-3">
           <b>List Types:</b>
           <div class="d-inline" v-for="type in listTypes" :key="type.id">
-            <b-button class="mx-4" pill variant="outline-secondary" v-b-modal="type.id">
+            <b-button
+              class="mx-4"
+              pill
+              variant="outline-secondary"
+              v-b-modal="type.id"
+            >
               <b>{{ type.attributes.name }}</b>
             </b-button>
             <b-modal :id="type.id" title="List Type">
@@ -57,12 +68,12 @@ export default {
     ControlledVocab
   },
   computed: {
-    ...mapGetters("list", [ "getIncluded" ]),
+    ...mapGetters("list", ["getIncluded"]),
     id: function() {
       return this.$route.params.id;
     },
     data: function() {
-      return  this.$store.state.list.data ?? {};
+      return this.$store.state.list.data ?? {};
     },
     listTypes: function() {
       return this.getIncluded("types");

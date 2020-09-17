@@ -1,7 +1,7 @@
 <template>
   <b-container>
     <Title :msg="message" />
-      <hr>
+    <hr />
     <ListDetailsForm />
   </b-container>
 </template>
@@ -19,7 +19,7 @@ export default {
   computed: {
     message: function() {
       let listName = this.$store.state.list.data.attributes?.name ?? "";
-      return  listName + " Details";
+      return listName + " Details";
     }
   }
 };

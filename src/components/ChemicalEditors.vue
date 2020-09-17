@@ -1,7 +1,7 @@
 <template>
   <div>
     <b-form>
-      <KetcherWindow v-show="type === 'definedCompound'" ref="ketcher "/>
+      <KetcherWindow v-show="type === 'definedCompound'" ref="ketcher " />
       <MarvinWindow v-show="type !== 'definedCompound'" ref="marvin" />
       <div class="my-3">
         <b-button @click="save" variant="primary">Save Compound</b-button>
@@ -25,12 +25,11 @@ export default {
   },
   methods: {
     save: function() {
-      if (this.type === 'definedCompound'){
+      if (this.type === "definedCompound") {
         //todo: this is not going to be implemented on this ticket
         // this.$refs['ketcher'].save()
-      }
-      else {
-        this.$refs['marvin'].save()
+      } else {
+        this.$refs["marvin"].save();
       }
     }
   }
