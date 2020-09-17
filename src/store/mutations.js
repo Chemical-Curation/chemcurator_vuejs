@@ -21,5 +21,11 @@ export default {
   storeFetch(state, { attributes, relationships }) {
     state.attributes = attributes;
     state.relationships = relationships;
+  },
+  loading(state) {
+    state.loading = true;
+  },
+  loaded(state) {
+    state.loading = false;
   }
 };

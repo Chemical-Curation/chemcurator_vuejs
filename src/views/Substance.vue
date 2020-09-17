@@ -33,6 +33,7 @@
         <ChemicalEditors v-show="type !== 'none'" :type="type" />
       </b-col>
     </b-row>
+    <SynonymTable :substance-id="substanceId" />
   </b-container>
 </template>
 
@@ -40,6 +41,7 @@
 import HelloWorld from "@/components/HelloWorld";
 import ChemicalEditors from "@/components/ChemicalEditors";
 import SubstanceForm from "@/components/SubstanceForm";
+import SynonymTable from "@/components/synonyms/SynonymTable";
 import { mapState } from "vuex";
 
 export default {
@@ -51,9 +53,13 @@ export default {
   },
   computed: {
     ...mapState("compound", { compoundType: "type" }),
-    ...mapState("compound/definedcompound", { defAttr: "attributes" }),
+    ...mapState("compound/definedcompound", {
+      defAttr: "attributes",
+      defRels: "relationships"
+    }),
     ...mapState("compound/illdefinedcompound", {
-      illDefAttr: "attributes"
+      illDefAttr: "attributes",
+      illDefRels: "relationships"
     }),
     ...mapState("queryStructureType", { qstList: "list" }),
 
@@ -64,6 +70,13 @@ export default {
     },
     options: function() {
       return this.buildOptions(this.qstList);
+    },
+    substanceId: function() {
+      if (this.type === "definedCompound" && this.defRels.substance)
+        return this.defRels.substance.data.id;
+      else if (this.illDefRels.substance)
+        return this.illDefRels.substance.data.id;
+      return "";
     }
   },
   watch: {
@@ -86,7 +99,8 @@ export default {
   components: {
     HelloWorld,
     ChemicalEditors,
-    SubstanceForm
+    SubstanceForm,
+    SynonymTable
   },
   mounted() {
     this.$store.dispatch("queryStructureType/getList");
