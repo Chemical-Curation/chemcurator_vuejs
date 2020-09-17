@@ -12,6 +12,10 @@ import list from "./modules/list";
 import synonym from "./modules/synonym";
 import synonymQuality from "./modules/synonymQuality";
 import synonymType from "./modules/synonymType";
+import accessibilityType from "./modules/accessibility-type";
+import user from "./modules/user";
+import externalContact from "./modules/external-contact";
+import listType from "./modules/list-type";
 import queryStructureType from "./modules/query-structure-type";
 
 Vue.use(Vuex);
@@ -23,6 +27,11 @@ const store = new Vuex.Store({
     alert,
     vocabularies,
     substance,
+    list,
+    accessibilityType,
+    user,
+    externalContact,
+    listType,
     substanceType,
     source,
     qcLevel,

@@ -5,7 +5,7 @@ export default {
   getList: async (context, request_details) => {
     let resource = await context.dispatch("getResourceURI");
     if (!resource)
-      console.exception("Did you define getResourceURI action on your module?");
+      console.error("Did you define getResourceURI action on your module?");
 
     context.commit("loading");
     let params_string = "?";
