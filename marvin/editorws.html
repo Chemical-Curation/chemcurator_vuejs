@@ -51,14 +51,15 @@
         }
       }
       function exportStructure() {
-        marvin.sketcherInstance
-        .exportStructure("mrv")
-        .then(val =>
-          window.parent.postMessage(
-            { type: "returnMrvfile", mrvfile: val },
-            "*"
-          )
-        );
+        if (marvin)
+          marvin.sketcherInstance
+          .exportStructure("mrv")
+          .then(val =>
+            window.parent.postMessage(
+              { type: "returnMrvfile", mrvfile: val },
+              "*"
+            )
+          );
       }
     </script>
   </head>

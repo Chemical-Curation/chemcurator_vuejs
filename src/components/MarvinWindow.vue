@@ -74,6 +74,8 @@ export default {
       event => {
         if (event.data === "marvinLoaded" && this.data?.attributes?.mrvfile) {
           this.loadMrvfile();
+        } else {
+          this.exportMrvfile()
         }
         if (event.data.type === "returnMrvfile") {
           this.mrvfile = event.data.mrvfile;
