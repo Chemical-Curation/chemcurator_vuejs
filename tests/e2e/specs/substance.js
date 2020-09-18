@@ -61,56 +61,75 @@ describe("The substance page", () => {
       .find("text")
       .should("exist");
   });
-  it("should load illdefined compound into marvin window", () => {
-    // Marvin uses a custom "canvas" node with no children to render molecules
-    //  and uses tables instead of ids to render buttons.  I've opted to find nodes
-    //  by their classes.  Clicks are also obscured so I've had to force them.
+  it.only("should post not-loaded illdefined compounds", () => {
+    // Watch for patches
+    cy.route('POST', '/illDefinedCompounds').as('post')
 
-    // Verify no elements are in the iframe
+    // Select ill defined compound to access Marvin
+    cy.get("#compound-type-dropdown").select("Ill Defined");
+
+    // Verify marvin has loaded
     cy.get("iframe[id=marvin]")
       .its("0.contentDocument.body")
       .should("not.be.empty")
-      .then(cy.wrap)
-      .find("div[title='Export (Ctrl+S)']")
-      .click({ force: true })
-      .then(() => {
-        cy.get("iframe[id=marvin]")
-          .its("0.contentDocument.body")
-          .should("not.be.empty")
-          .then(cy.wrap)
-          .find("textarea")
-          .invoke("val")
-          .should("equal", "<cml><MDocument></MDocument></cml>");
+    // Click CycloHexane Button
+    cy.get("iframe[id=marvin]")
+      .its("0.contentDocument.body")
+      .find('[title=CycloHexane]')
+      .click()
+    // Add CycloHexane to the canvas
+    cy.get("iframe[id=marvin]")
+      .its("0.contentDocument.body")
+      .find('canvas#canvas')
+      .click()
 
-        // Close the window.  If the export window isn't closed, then the next compound won't load.
-        cy.get("iframe[id=marvin]")
-          .its("0.contentDocument.body")
-          .should("not.be.empty")
-          .then(cy.wrap)
-          .find("div.gwt-HTML.mjs-CloseButton")
-          .click({ force: true });
-      });
+    // Save
+    cy.get("button:contains('Save Compound')").click()
+
+    // Verify patch status and regex for structure
+    cy.get('@post')
+      .should('have.property', 'status', 201)
+    cy.get('@post')
+      .its('request.body.data.attributes.mrvfile')
+      // This regex accepts only a CycloHexane structure (metadata is excluded from cml tag)
+      .should('match', new RegExp([
+          /<cml.*><MDocument><MChemicalStruct><molecule molID="m1">/
+          ,/<atomArray><atom id="a1" elementType="C" x2="-0.020833333333333037" y2="1.53999998768"\/>/
+          ,/<atom id="a2" elementType="C" x2="-1.3545666559968" y2="0.76999999384"\/>/
+          ,/<atom id="a3" elementType="C" x2="-1.3545666559968" y2="-0.7701866605051737"\/>/
+          ,/<atom id="a4" elementType="C" x2="-0.020833333333333037" y2="-1.5399999876800003"\/>/
+          ,/<atom id="a5" elementType="C" x2="1.3128999893301336" y2="-0.7701866605051737"\/>/
+          ,/<atom id="a6" elementType="C" x2="1.3128999893301336" y2="0.76999999384"\/>/
+          ,/<\/atomArray><bondArray><bond id="b1" atomRefs2="a1 a2" order="1"\/>/
+          ,/<bond id="b2" atomRefs2="a1 a6" order="1"\/><bond id="b3" atomRefs2="a2 a3" order="1"\/>/
+          ,/<bond id="b4" atomRefs2="a3 a4" order="1"\/><bond id="b5" atomRefs2="a4 a5" order="1"\/>/
+          ,/<bond id="b6" atomRefs2="a5 a6" order="1"\/><\/bondArray><\/molecule><\/MChemicalStruct><\/MDocument><\/cml>/
+        ].map(r => { return r.source }).join('')))
+  });
+  it("should patch loaded illdefined compounds", () => {
+    // Watch for patches
+    cy.route('PATCH', '/illDefinedCompounds/**').as('patch')
+
+    // Verify marvin has loaded
+    cy.get("iframe[id=marvin]")
+      .its("0.contentDocument.body")
+      .should("not.be.empty")
 
     // Search
     cy.get("[data-cy=search-box]").type("DTXCID502000009");
     cy.get("[data-cy=search-button]").click();
 
-    // Verify elements in iframe
-    cy.get("iframe[id=marvin]")
-      .its("0.contentDocument.body")
-      .should("not.be.empty")
-      .then(cy.wrap)
-      .find("div[title='Export (Ctrl+S)']")
-      .click({ force: true })
-      .then(() => {
-        cy.get("iframe[id=marvin]")
-          .its("0.contentDocument.body")
-          .should("not.be.empty")
-          .then(cy.wrap)
-          .find("textarea")
-          .invoke("val")
-          .should("not.equal", "<cml><MDocument></MDocument></cml>");
-      });
+    // Save
+    cy.get("button:contains('Save Compound')").click()
+
+    // Verify patch status and regex for structure
+    cy.get('@patch')
+      .should('have.property', 'status', 200)
+    cy.get('@patch')
+      .its('request.body.data.attributes.mrvfile')
+      // This regex wont accept an empty structure but will accept anything else
+      // Verifying the exact structure would make this test brittle
+      .should('match', /(<cml).*(><MDocument>).+(<\/MDocument><\/cml>)/)
   });
   it("should fetch from server when ketcher changes", () => {
     cy.get("#compound-type-dropdown").select("Defined Compound");
