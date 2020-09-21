@@ -12,13 +12,15 @@ export default {
     if (request_details && request_details.params) {
       let param;
       for (param of request_details.params) {
-        params_string += `${param.key}=${param.value}`;
+        params_string += `${param.key}=${param.value}&`;
       }
     }
 
     await HTTP.get("/" + resource + params_string).then(response => {
       context.commit("storeList", response.data.data);
       context.commit("storeCount", response.data.meta.pagination.count);
+      if (response.data.included)
+        context.commit("storeIncluded", response.data.included);
     });
     await context.commit("loaded");
   },

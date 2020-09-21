@@ -17,6 +17,8 @@ import user from "./modules/user";
 import externalContact from "./modules/external-contact";
 import listType from "./modules/list-type";
 import queryStructureType from "./modules/query-structure-type";
+import relationshipType from "./modules/relationship-type";
+import substanceRelationship from "./modules/substance-relationship";
 
 Vue.use(Vuex);
 
@@ -38,7 +40,9 @@ const store = new Vuex.Store({
     synonym,
     synonymQuality,
     synonymType,
-    queryStructureType
+    queryStructureType,
+    relationshipType,
+    substanceRelationship
   }
 });
 
