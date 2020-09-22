@@ -24,29 +24,6 @@ import {
   SelectObjectCellEditor
 } from "@/ag-grid-components/custom-renderers";
 
-/**
- * Render the SID of a substance from a substance relationship
- * based on whether the provided substance id is in the "to" or "from" substance
- *
- * This cell Renderer is specific enough to not be reusable.
- */
-function SubstanceRelationshipSIDCellRenderer() {}
-SubstanceRelationshipSIDCellRenderer.prototype.init = function(params) {
-  this.eGui = document.createElement("span");
-  if (params.data.relationships.fromSubstance.data.id === params.substanceId) {
-    let substanceData = params.data.relationships.toSubstance.data;
-    this.eGui.innerHTML =
-      params.included[substanceData.type][substanceData.id].attributes.sid;
-  } else {
-    let substanceData = params.data.relationships.fromSubstance.data;
-    this.eGui.innerHTML =
-      params.included[substanceData.type][substanceData.id].attributes.sid;
-  }
-};
-SubstanceRelationshipSIDCellRenderer.prototype.getGui = function() {
-  return this.eGui;
-};
-
 export default {
   name: "SynonymTable",
   components: {
@@ -60,7 +37,7 @@ export default {
     return {
       rowData: null,
       defaultColDef: null,
-      gridOptions: null,
+      gridOptions: null
     };
   },
   computed: {
@@ -76,11 +53,10 @@ export default {
       return [
         {
           headerName: "SID",
-          cellRenderer: SubstanceRelationshipSIDCellRenderer,
-          cellRendererParams: {
-            substanceId: this.substanceId,
-            included: this.included
-          }
+          // Strips the checksum from the comparison
+          comparator: this.sidCompare,
+          // Fetches the sid value from this relationship that is currently loaded
+          valueGetter: this.sidGetter
         },
         {
           headerName: "Source",
@@ -113,7 +89,8 @@ export default {
      */
     substanceRelationshipListMap: function() {
       let map = {};
-      for (let substanceRelationship of this.list) map[substanceRelationship.id] = substanceRelationship;
+      for (let substanceRelationship of this.list)
+        map[substanceRelationship.id] = substanceRelationship;
       return map;
     },
 
@@ -136,6 +113,13 @@ export default {
     }
   },
   watch: {
+    /**
+     * Resets row data on Substance Relationship List updates
+     */
+    list: function() {
+      this.resetRowData();
+    },
+
     /**
      * Loads the substance relationships for the currently loaded substance
      */
@@ -160,13 +144,26 @@ export default {
      * Loads synonyms by substance id.
      */
     loadSubstanceRelationships: function() {
-      this.getList({
-        params: [
-          { key: "filter[substance.id]", value: this.substanceId },
-          { key: "include", value: "fromSubstance,toSubstance" }
-        ]
-      });
+      if (this.substanceId) {
+        this.getList({
+          params: [
+            { key: "filter[substance.id]", value: this.substanceId },
+            { key: "include", value: "fromSubstance,toSubstance" }
+          ]
+        });
+      }
+    },
+
+    /**
+     * Resets the row data to whatever is in the substance relationship store.
+     * (the store should never be updated by this table)
+     */
+    resetRowData: function() {
       this.rowData = _.cloneDeep(this.list);
+      this.gridOptions.api.refreshCells({
+        force: true,
+        suppressFlash: false
+      });
     },
 
     /**
@@ -184,7 +181,40 @@ export default {
     },
 
     /**
-     * Returns a boolean comparing the map.attribute.labels for two objects
+     * Returns a boolean comparing two objects
+     *
+     * @param params - Params object from aggrid.  Contains row data
+     * @returns {string} - SID of the substance that is not the currently loaded one,
+     *    or the currently SID if this relationship is self-referential.
+     */
+    sidGetter: function(params) {
+      if (
+        params.data.relationships.fromSubstance.data.id === this.substanceId
+      ) {
+        let substanceData = params.data.relationships.toSubstance.data;
+        return this.included[substanceData.type][substanceData.id].attributes
+          .sid;
+      } else {
+        let substanceData = params.data.relationships.fromSubstance.data;
+        return this.included[substanceData.type][substanceData.id].attributes
+          .sid;
+      }
+    },
+
+    /**
+     * Returns an int comparing two objects
+     *
+     * @param valueA - The id of object 1
+     * @param valueB - The id of object 2
+     * @returns {int} - 1 if object 1's label is first alphabetically otherwise -1
+     */
+    sidCompare: function(valueA, valueB) {
+      let comparison = valueA.substring(8) > valueB.substring(8);
+      return comparison ? 1 : -1;
+    },
+
+    /**
+     * Returns an int comparing the map.attribute.labels for two objects
      *
      * @param valueA - The id of object 1
      * @param valueB - The id of object 2
@@ -198,7 +228,7 @@ export default {
     },
 
     /**
-     * Returns a boolean comparing the map.attribute.labels for two objects
+     * Returns an int comparing the map.attribute.labels for two objects
      *
      * @param valueA - The id of object 1
      * @param valueB - The id of object 2
