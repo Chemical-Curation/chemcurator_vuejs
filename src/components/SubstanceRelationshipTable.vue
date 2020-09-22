@@ -11,7 +11,19 @@
       :defaultColDef="defaultColDef"
       :rowData="rowData"
       :gridOptions="gridOptions"
+      :rowClassRules="rowClassRules"
+      @selection-changed="getSelectedError"
+      rowSelection="single"
     />
+    <div v-show="selectedError" class="mt-3 text-left">
+      <b-table
+        id="relationship-error-table"
+        :items="selectedError"
+        :fields="errorFields"
+        borderless
+        table-variant="danger"
+      ></b-table>
+    </div>
   </div>
 </template>
 
@@ -58,9 +70,18 @@ export default {
   },
   data() {
     return {
+      originalData: null,
       rowData: null,
       defaultColDef: null,
       gridOptions: null,
+      // Whether the save / reset buttons are enabled
+      buttonsEnabled: false,
+      // Rows that returned errors on save
+      errorRows: {},
+      // Currently selected error row.  Null if no errors
+      selectedError: null,
+      // Display options for error table.
+      errorFields: [{ label: "Errors", key: "detail" }]
     };
   },
   computed: {
@@ -109,12 +130,33 @@ export default {
     },
 
     /**
+     * Row highlighting rules
+     */
+    rowClassRules: function() {
+      return {
+        // background danger any rows where the id is within the errorRows object
+        "bg-danger": params => {
+          return this.errorRows.hasOwnProperty(params.data.id);
+        }
+      };
+    },
+
+    /**
      * Synonym objects to be looked up by id.  (used to verify changes)
      */
-    substanceRelationshipListMap: function() {
+    synonymListMap: function() {
       let map = {};
-      for (let substanceRelationship of this.list) map[substanceRelationship.id] = substanceRelationship;
+      for (let synonym of this.list) map[synonym.id] = synonym;
       return map;
+    },
+
+    /**
+     * Source objects to be used in a select dropdown
+     */
+    sourceListOptions: function() {
+      return this.sourceList.map(i => {
+        return { value: i.id, text: i.attributes.label };
+      });
     },
 
     /**
@@ -124,6 +166,15 @@ export default {
       let map = {};
       for (let source of this.sourceList) map[source.id] = source;
       return map;
+    },
+
+    /**
+     * Relationship Type objects to be used in a select dropdown
+     */
+    typeListOptions: function() {
+      return this.relationshipTypeList.map(i => {
+        return { value: i.id, text: i.attributes.label };
+      });
     },
 
     /**
@@ -137,14 +188,14 @@ export default {
   },
   watch: {
     /**
-     * Loads the substance relationships for the currently loaded substance
+     * Loads the relationships for the currently loaded substance
      */
     substanceId: function() {
       if (this.substanceId) this.loadSubstanceRelationships();
     },
 
     /**
-     * Handles the AG-Grid loading overlays when substance relationship loading starts and stops
+     * Handles the AG-Grid loading overlays when synonym loading starts and stops
      */
     loading: function() {
       this.manageOverlay();
@@ -176,11 +227,22 @@ export default {
     manageOverlay: function() {
       if (this.loading) {
         this.gridOptions.api.showLoadingOverlay();
+        this.buttonsEnabled = false;
       } else if (!this.loading && _.isEqual(this.list, [])) {
         this.gridOptions.api.showNoRowsOverlay();
+        this.buttonsEnabled = false;
       } else {
         this.gridOptions.api.hideOverlay();
+        this.buttonsEnabled = true;
       }
+    },
+
+    /**
+     * Sets the selected error to the selected row's error.  Otherwise returns null
+     */
+    getSelectedError: function() {
+      this.selectedError =
+        this.errorRows[this.gridOptions?.api.getSelectedRows()[0].id] ?? null;
     },
 
     /**
@@ -194,6 +256,20 @@ export default {
       let comparison =
         this.sourceListMap[valueA].attributes.label.toLowerCase() >
         this.sourceListMap[valueB].attributes.label.toLowerCase();
+      return comparison ? 1 : -1;
+    },
+
+    /**
+     * Returns a boolean comparing the map.attribute.labels for two objects
+     *
+     * @param valueA - The id of object 1
+     * @param valueB - The id of object 2
+     * @returns {int} - 1 if object 1's label is first alphabetically otherwise -1
+     */
+    qualityMapCompare: function(valueA, valueB) {
+      let comparison =
+        this.qualityListMap[valueA].attributes.label.toLowerCase() >
+        this.qualityListMap[valueB].attributes.label.toLowerCase();
       return comparison ? 1 : -1;
     },
 
@@ -223,6 +299,7 @@ export default {
     // Load grid styling
     this.defaultColDef = {
       flex: 1,
+      editable: this.isAuthenticated,
       resizable: true,
       sortable: true
     };
