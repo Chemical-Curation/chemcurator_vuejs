@@ -19,12 +19,10 @@ const state = defaultState();
 let actions = {
   ...rootActions,
   async getObject(context, id) {
-    await HTTP.get(`/lists/${id}?include=listAccessibility,types`).then(
-      response => {
-        context.commit("setAttributes", response.data);
-        context.commit("storeIncluded", response.data.included);
-      }
-    );
+    await HTTP.get(`/lists/${id}?include=listAccessibility,types`).then(response => {
+      context.commit("setAttributes", response.data);
+      context.commit("storeIncluded", response.data.included);
+    });
   },
   getResourceURI: () => {
     return "lists";

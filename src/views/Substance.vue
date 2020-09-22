@@ -34,7 +34,6 @@
       </b-col>
     </b-row>
     <SynonymTable :substance-id="substanceId" />
-    <SubstanceRelationshipTable :substance-id="substanceId" />
   </b-container>
 </template>
 
@@ -43,7 +42,6 @@ import HelloWorld from "@/components/HelloWorld";
 import ChemicalEditors from "@/components/ChemicalEditors";
 import SubstanceForm from "@/components/SubstanceForm";
 import SynonymTable from "@/components/synonyms/SynonymTable";
-import SubstanceRelationshipTable from "@/components/SubstanceRelationshipTable";
 import { mapState } from "vuex";
 
 export default {
@@ -102,8 +100,7 @@ export default {
     HelloWorld,
     ChemicalEditors,
     SubstanceForm,
-    SynonymTable,
-    SubstanceRelationshipTable
+    SynonymTable
   },
   mounted() {
     this.$store.dispatch("queryStructureType/getList");
