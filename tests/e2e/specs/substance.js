@@ -314,7 +314,7 @@ describe("The substance page's Synonym Table", () => {
   });
 });
 
-describe.only("The substance page's Relationships Table", () => {
+describe("The substance page's Relationships Table", () => {
   beforeEach(() => {
     cy.adminLogin();
     cy.visit("/substance");
