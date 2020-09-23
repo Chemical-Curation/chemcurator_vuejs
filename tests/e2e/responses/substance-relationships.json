@@ -1,0 +1,350 @@
+{
+  "links": {
+    "first": "http://localhost:8000/substanceRelationships?filter%5Bsubstance.id%5D=2&include=fromSubstance%2CtoSubstance&page%5Bnumber%5D=1",
+    "last": "http://localhost:8000/substanceRelationships?filter%5Bsubstance.id%5D=2&include=fromSubstance%2CtoSubstance&page%5Bnumber%5D=1",
+    "next": null,
+    "prev": null
+  },
+  "data": [
+    {
+      "type": "substanceRelationship",
+      "id": "1",
+      "attributes": {
+        "qcNotes": "Houston, we have a problem!"
+      },
+      "relationships": {
+        "fromSubstance": {
+          "links": {
+            "self": "http://localhost:8000/substanceRelationships/1/relationships/fromSubstance",
+            "related": "http://localhost:8000/substanceRelationships/1/fromSubstance"
+          },
+          "data": {
+            "type": "substance",
+            "id": "2"
+          }
+        },
+        "toSubstance": {
+          "links": {
+            "self": "http://localhost:8000/substanceRelationships/1/relationships/toSubstance",
+            "related": "http://localhost:8000/substanceRelationships/1/toSubstance"
+          },
+          "data": {
+            "type": "substance",
+            "id": "3"
+          }
+        },
+        "source": {
+          "links": {
+            "self": "http://localhost:8000/substanceRelationships/1/relationships/source",
+            "related": "http://localhost:8000/substanceRelationships/1/source"
+          },
+          "data": {
+            "type": "source",
+            "id": "1"
+          }
+        },
+        "relationshipType": {
+          "links": {
+            "self": "http://localhost:8000/substanceRelationships/1/relationships/relationshipType",
+            "related": "http://localhost:8000/substanceRelationships/1/relationshipType"
+          },
+          "data": {
+            "type": "relationshipType",
+            "id": "1"
+          }
+        }
+      },
+      "links": {
+        "self": "http://localhost:8000/substanceRelationships/1"
+      }
+    },
+    {
+      "type": "substanceRelationship",
+      "id": "2",
+      "attributes": {
+        "qcNotes": "Houston, we have a problem!"
+      },
+      "relationships": {
+        "fromSubstance": {
+          "links": {
+            "self": "http://localhost:8000/substanceRelationships/2/relationships/fromSubstance",
+            "related": "http://localhost:8000/substanceRelationships/2/fromSubstance"
+          },
+          "data": {
+            "type": "substance",
+            "id": "2"
+          }
+        },
+        "toSubstance": {
+          "links": {
+            "self": "http://localhost:8000/substanceRelationships/2/relationships/toSubstance",
+            "related": "http://localhost:8000/substanceRelationships/2/toSubstance"
+          },
+          "data": {
+            "type": "substance",
+            "id": "2"
+          }
+        },
+        "source": {
+          "links": {
+            "self": "http://localhost:8000/substanceRelationships/2/relationships/source",
+            "related": "http://localhost:8000/substanceRelationships/2/source"
+          },
+          "data": {
+            "type": "source",
+            "id": "1"
+          }
+        },
+        "relationshipType": {
+          "links": {
+            "self": "http://localhost:8000/substanceRelationships/2/relationships/relationshipType",
+            "related": "http://localhost:8000/substanceRelationships/2/relationshipType"
+          },
+          "data": {
+            "type": "relationshipType",
+            "id": "1"
+          }
+        }
+      },
+      "links": {
+        "self": "http://localhost:8000/substanceRelationships/2"
+      }
+    },
+    {
+      "type": "substanceRelationship",
+      "id": "3",
+      "attributes": {
+        "qcNotes": "Foobar boobar"
+      },
+      "relationships": {
+        "fromSubstance": {
+          "links": {
+            "self": "http://localhost:8000/substanceRelationships/3/relationships/fromSubstance",
+            "related": "http://localhost:8000/substanceRelationships/3/fromSubstance"
+          },
+          "data": {
+            "type": "substance",
+            "id": "1"
+          }
+        },
+        "toSubstance": {
+          "links": {
+            "self": "http://localhost:8000/substanceRelationships/3/relationships/toSubstance",
+            "related": "http://localhost:8000/substanceRelationships/3/toSubstance"
+          },
+          "data": {
+            "type": "substance",
+            "id": "2"
+          }
+        },
+        "source": {
+          "links": {
+            "self": "http://localhost:8000/substanceRelationships/3/relationships/source",
+            "related": "http://localhost:8000/substanceRelationships/3/source"
+          },
+          "data": {
+            "type": "source",
+            "id": "1"
+          }
+        },
+        "relationshipType": {
+          "links": {
+            "self": "http://localhost:8000/substanceRelationships/3/relationships/relationshipType",
+            "related": "http://localhost:8000/substanceRelationships/3/relationshipType"
+          },
+          "data": {
+            "type": "relationshipType",
+            "id": "1"
+          }
+        }
+      },
+      "links": {
+        "self": "http://localhost:8000/substanceRelationships/3"
+      }
+    }
+  ],
+  "included": [
+    {
+      "type": "substance",
+      "id": "1",
+      "attributes": {
+        "sid": "DTXSID502000000",
+        "preferredName": "Sample Substance",
+        "displayName": "Display Sample Substance",
+        "description": "This is the description for the test substance",
+        "publicQcNote": "Public QC notes",
+        "privateQcNote": "Private QC notes",
+        "casrn": "1234567-89-5"
+      },
+      "relationships": {
+        "source": {
+          "links": {
+            "self": "http://localhost:8000/substanceRelationships/1/relationships/source",
+            "related": "http://localhost:8000/substanceRelationships/1/source"
+          },
+          "data": {
+            "type": "source",
+            "id": "1"
+          }
+        },
+        "substanceType": {
+          "links": {
+            "self": "http://localhost:8000/substanceRelationships/1/relationships/substanceType",
+            "related": "http://localhost:8000/substanceRelationships/1/substanceType"
+          },
+          "data": {
+            "type": "substanceType",
+            "id": "1"
+          }
+        },
+        "qcLevel": {
+          "links": {
+            "self": "http://localhost:8000/substanceRelationships/1/relationships/qcLevel",
+            "related": "http://localhost:8000/substanceRelationships/1/qcLevel"
+          },
+          "data": {
+            "type": "qcLevel",
+            "id": "1"
+          }
+        },
+        "associatedCompound": {
+          "links": {
+            "self": "http://localhost:8000/substanceRelationships/1/relationships/associatedCompound",
+            "related": "http://localhost:8000/substanceRelationships/1/associatedCompound"
+          },
+          "data": {
+            "type": "definedCompound",
+            "id": "4"
+          }
+        }
+      },
+      "links": {
+        "self": "http://localhost:8000/substances/1"
+      }
+    },
+    {
+      "type": "substance",
+      "id": "2",
+      "attributes": {
+        "sid": "DTXSID602000001",
+        "preferredName": "Sample Substance 2",
+        "displayName": "Display Sample Substance 2",
+        "description": "area professor home",
+        "publicQcNote": "this may be acceptable.",
+        "privateQcNote": "Houston, we have a problem!",
+        "casrn": "9876543-21-5"
+      },
+      "relationships": {
+        "source": {
+          "links": {
+            "self": "http://localhost:8000/substanceRelationships/2/relationships/source",
+            "related": "http://localhost:8000/substanceRelationships/2/source"
+          },
+          "data": {
+            "type": "source",
+            "id": "2"
+          }
+        },
+        "substanceType": {
+          "links": {
+            "self": "http://localhost:8000/substanceRelationships/2/relationships/substanceType",
+            "related": "http://localhost:8000/substanceRelationships/2/substanceType"
+          },
+          "data": {
+            "type": "substanceType",
+            "id": "2"
+          }
+        },
+        "qcLevel": {
+          "links": {
+            "self": "http://localhost:8000/substanceRelationships/2/relationships/qcLevel",
+            "related": "http://localhost:8000/substanceRelationships/2/qcLevel"
+          },
+          "data": {
+            "type": "qcLevel",
+            "id": "1"
+          }
+        },
+        "associatedCompound": {
+          "links": {
+            "self": "http://localhost:8000/substanceRelationships/2/relationships/associatedCompound",
+            "related": "http://localhost:8000/substanceRelationships/2/associatedCompound"
+          },
+          "data": {
+            "type": "illDefinedCompound",
+            "id": "10"
+          }
+        }
+      },
+      "links": {
+        "self": "http://localhost:8000/substances/2"
+      }
+    },
+    {
+      "type": "substance",
+      "id": "3",
+      "attributes": {
+        "sid": "DTXSID202000002",
+        "preferredName": "Hydrogen Peroxide",
+        "displayName": "Hydrogen Peroxide",
+        "description": "Hydrogen peroxide is a mild antiseptic used on the skin to prevent infection of minor cuts, scrapes, and burns.",
+        "publicQcNote": "Public QC",
+        "privateQcNote": "Private QC",
+        "casrn": "7722-84-1"
+      },
+      "relationships": {
+        "source": {
+          "links": {
+            "self": "http://localhost:8000/substanceRelationships/3/relationships/source",
+            "related": "http://localhost:8000/substanceRelationships/3/source"
+          },
+          "data": {
+            "type": "source",
+            "id": "2"
+          }
+        },
+        "substanceType": {
+          "links": {
+            "self": "http://localhost:8000/substanceRelationships/3/relationships/substanceType",
+            "related": "http://localhost:8000/substanceRelationships/3/substanceType"
+          },
+          "data": {
+            "type": "substanceType",
+            "id": "1"
+          }
+        },
+        "qcLevel": {
+          "links": {
+            "self": "http://localhost:8000/substanceRelationships/3/relationships/qcLevel",
+            "related": "http://localhost:8000/substanceRelationships/3/qcLevel"
+          },
+          "data": {
+            "type": "qcLevel",
+            "id": "1"
+          }
+        },
+        "associatedCompound": {
+          "links": {
+            "self": "http://localhost:8000/substanceRelationships/3/relationships/associatedCompound",
+            "related": "http://localhost:8000/substanceRelationships/3/associatedCompound"
+          },
+          "data": {
+            "type": "definedCompound",
+            "id": "25"
+          }
+        }
+      },
+      "links": {
+        "self": "http://localhost:8000/substances/3"
+      }
+    }
+  ],
+  "meta": {
+    "pagination": {
+      "page": 1,
+      "pages": 1,
+      "count": 3
+    },
+    "apiVersion": "1.0.0-beta"
+  }
+}

@@ -313,3 +313,40 @@ describe("The substance page's Synonym Table", () => {
       .should("contain.text", "Synonym 1");
   });
 });
+
+describe.only("The substance page's Relationships Table", () => {
+  beforeEach(() => {
+    cy.adminLogin();
+    cy.visit("/substance");
+    cy.server();
+
+    // fixture loading the synonyms
+    cy.route(
+      "GET",
+      "/substanceRelationships?*",
+      "fx:../responses/substance-relationships.json"
+    );
+  });
+
+  it("should show the relationships table", () => {
+    cy.get("#substanceRelationshipTable").should(
+      "contain.text",
+      "No Rows To Show"
+    );
+  });
+
+  it("should load relationships", () => {
+    // Navigate to substance with relationships
+    cy.get("[data-cy=search-box]").type("DTXCID502000009");
+    cy.get("[data-cy=search-button]").click();
+
+    // Verify response contains sids as required.
+    cy.get("#substanceRelationshipTable")
+      .find("div.ag-center-cols-clipper")
+      .find("div.ag-row[role=row]")
+      .should("have.length", 3)
+      .should("contain", "DTXSID502000000")
+      .should("contain", "DTXSID602000001")
+      .should("contain", "DTXSID202000002");
+  });
+});

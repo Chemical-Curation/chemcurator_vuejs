@@ -34,7 +34,7 @@
       </b-col>
     </b-row>
     <SynonymTable :substance-id="substanceId" />
-    <SubstanceRelationshipTable :substance-id="substanceId" />
+    <SubstanceRelationshipTable class="mb-5" :substance-id="substanceId" />
   </b-container>
 </template>
 
