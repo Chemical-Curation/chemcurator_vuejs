@@ -56,6 +56,8 @@ describe("test includes mutate properly", () => {
     expect(state.included).toStrictEqual({
       type1: {
         1: {
+          type: "type1",
+          id: 1,
           attributes: {
             attr: "1"
           },
@@ -69,6 +71,8 @@ describe("test includes mutate properly", () => {
           }
         },
         2: {
+          type: "type1",
+          id: 2,
           attributes: {
             attr: "1"
           },
@@ -84,6 +88,8 @@ describe("test includes mutate properly", () => {
       },
       type2: {
         1: {
+          type: "type2",
+          id: 1,
           attributes: {
             attr: "1"
           },
