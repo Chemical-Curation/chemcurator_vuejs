@@ -2,13 +2,13 @@
   <div>
     <KetcherWindow v-show="type === 'definedCompound'" ref="ketcher " />
     <div v-show="type !== 'definedCompound'">
-      <MarvinWindow
-        ref="marvin"
-        @mrvfileChanged="mrvfileChanged = $event"
-      />
+      <MarvinWindow ref="marvin" @mrvfileChanged="mrvfileChanged = $event" />
       <div class="my-3">
-        <b-button @click="saveIllDefinedCompound" variant="primary" :disabled="!mrvfileChanged"
-        >Save Compound</b-button
+        <b-button
+          @click="saveIllDefinedCompound"
+          variant="primary"
+          :disabled="!mrvfileChanged"
+          >Save Compound</b-button
         >
       </div>
     </div>

@@ -63,7 +63,12 @@ describe("The substance page", () => {
   });
   it("should post not-loaded illdefined compounds", () => {
     // Watch for patches
-    cy.route("POST", "/illDefinedCompounds").as("post");
+    cy.route({
+      method: "POST",
+      url: "/illDefinedCompounds",
+      status: 201,
+      response: {}
+    }).as("post");
 
     // Select ill defined compound to access Marvin
     cy.get("#compound-type-dropdown").select("Ill Defined");
@@ -85,7 +90,7 @@ describe("The substance page", () => {
 
     // Save
     cy.get("button:contains('Save Compound')")
-      .should('not.be.disabled')
+      .should("not.be.disabled")
       .click();
 
     // Verify patch status and regex for structure
@@ -118,7 +123,12 @@ describe("The substance page", () => {
   });
   it("should patch loaded illdefined compounds", () => {
     // Watch for patches
-    cy.route("PATCH", "/illDefinedCompounds/**").as("patch");
+    cy.route({
+      method: "PATCH",
+      url: "/illDefinedCompounds/*",
+      status: 200,
+      response: {}
+    }).as("patch");
 
     // Verify marvin has loaded
     cy.get("iframe[id=marvin]")
@@ -131,7 +141,7 @@ describe("The substance page", () => {
 
     // Save
     cy.get("button:contains('Save Compound')")
-      .should('not.be.disabled')
+      .should("not.be.disabled")
       .click();
 
     // Verify patch status and regex for structure
