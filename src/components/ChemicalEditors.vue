@@ -27,7 +27,7 @@ export default {
     save: function() {
       // Determine which editor is being saved.
       if (this.type === "definedCompound") {
-        //todo: this is not going to be implemented on this ticket
+        //todo: this needs to be implemented
       } else {
         this.saveIllDefinedCompound();
       }

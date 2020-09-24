@@ -50,6 +50,14 @@ export default {
     },
     clearMarvin: function() {
       this.marvinFrame.contentWindow.postMessage({ type: "clearMrvfile" }, "*");
+    },
+    marvinMessageListeners: function(event) {
+      if (event.data === "marvinLoaded" && this.data?.attributes?.mrvfile) {
+        this.loadMrvfile();
+      }
+      if (event.data.type === "returnMrvfile") {
+        this.mrvfile = event.data.mrvfile;
+      }
     }
   },
   computed: {
@@ -68,21 +76,10 @@ export default {
     }
   },
   mounted() {
-    // let self = this;
-    window.addEventListener(
-      "message",
-      event => {
-        if (event.data === "marvinLoaded" && this.data?.attributes?.mrvfile) {
-          this.loadMrvfile();
-        } else {
-          this.exportMrvfile();
-        }
-        if (event.data.type === "returnMrvfile") {
-          this.mrvfile = event.data.mrvfile;
-        }
-      },
-      false
-    );
+    window.addEventListener("message", this.marvinMessageListeners, false);
+  },
+  destroyed() {
+    window.removeEventListener("message", this.marvinMessageListeners);
   }
 };
 </script>
