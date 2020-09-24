@@ -84,7 +84,9 @@ describe("The substance page", () => {
       .click();
 
     // Save
-    cy.get("button:contains('Save Compound')").click();
+    cy.get("button:contains('Save Compound')")
+      .should('not.be.disabled')
+      .click();
 
     // Verify patch status and regex for structure
     cy.get("@post").should("have.property", "status", 201);
@@ -128,7 +130,9 @@ describe("The substance page", () => {
     cy.get("[data-cy=search-button]").click();
 
     // Save
-    cy.get("button:contains('Save Compound')").click();
+    cy.get("button:contains('Save Compound')")
+      .should('not.be.disabled')
+      .click();
 
     // Verify patch status and regex for structure
     cy.get("@patch").should("have.property", "status", 200);
