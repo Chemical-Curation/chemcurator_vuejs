@@ -29,11 +29,11 @@ export default {
   methods: {
     ...mapActions("compound/definedcompound", ["fetchByMolfile"]),
     loadMolfile: function() {
-      if (this.attributes.molfileV3000) {
+      if (this.data?.attributes?.molfileV3000) {
         this.ketcherFrame.contentWindow.postMessage(
           {
             type: "importMolfile",
-            molfile: this.attributes.molfileV3000
+            molfile: this.data.attributes.molfileV3000
           },
           "*"
         );
@@ -54,14 +54,14 @@ export default {
     }
   },
   computed: {
-    ...mapState("compound/definedcompound", ["attributes"]),
+    ...mapState("compound/definedcompound", ["data"]),
     ketcherFrame: function() {
       return this.$refs.ketcher;
     }
   },
   watch: {
-    attributes: function() {
-      if (this.attributes.molfileV3000) {
+    data: function() {
+      if (this.data?.attributes?.molfileV3000) {
         this.loadMolfile();
       }
     },

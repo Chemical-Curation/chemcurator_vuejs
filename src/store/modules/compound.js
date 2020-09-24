@@ -44,10 +44,7 @@ let actions = {
           else commit("setType", obj.relationships.queryStructureType.data.id);
 
           let targetModule = obj.type.toLowerCase();
-          commit(`${targetModule}/storeFetch`, {
-            attributes: obj.attributes,
-            relationships: obj.relationships
-          });
+          commit(`${targetModule}/storeFetch`, obj);
           commit(`${targetModule}/storeIncluded`, data.included);
         } else {
           const alert = {

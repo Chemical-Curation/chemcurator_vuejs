@@ -83,11 +83,13 @@ describe("test get substance form from relationships", () => {
           }
         }
       },
-      relationships: {
-        substance: {
-          data: {
-            type: "substance",
-            id: "1"
+      data: {
+        relationships: {
+          substance: {
+            data: {
+              type: "substance",
+              id: "1"
+            }
           }
         }
       }

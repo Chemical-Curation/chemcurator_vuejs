@@ -29,14 +29,7 @@
               );
               break;
             case "exportMrvfile":
-              marvin.sketcherInstance
-                .exportStructure("mrv")
-                .then(val =>
-                  window.parent.postMessage(
-                    { type: "returnMrvfile", mrvfile: val },
-                    "*"
-                  )
-                );
+              exportStructure()
               break;
             case "clearMrvfile":
               marvin.sketcherInstance.clear()
@@ -49,12 +42,24 @@
         if (marvin.Sketch.isSupported()) {
           marvin.sketcherInstance = new marvin.Sketch("sketch");
           marvin.sketcherInstance.setServices(getDefaultServices());
+          marvin.sketcherInstance.on('molchange', () => exportStructure())
           parent.postMessage("marvinLoaded", "*");
         } else {
           alert(
             "Cannot initiate sketcher. Current browser may not support HTML canvas or may run in Compatibility Mode."
           );
         }
+      }
+      function exportStructure() {
+        if (marvin)
+          marvin.sketcherInstance
+          .exportStructure("mrv")
+          .then(val =>
+            window.parent.postMessage(
+              { type: "returnMrvfile", mrvfile: val },
+              "*"
+            )
+          );
       }
     </script>
   </head>

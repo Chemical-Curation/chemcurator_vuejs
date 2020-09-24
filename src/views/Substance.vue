@@ -55,29 +55,29 @@ export default {
   },
   computed: {
     ...mapState("compound", { compoundType: "type" }),
-    ...mapState("compound/definedcompound", {
-      defAttr: "attributes",
-      defRels: "relationships"
-    }),
+    ...mapState("compound/definedcompound", { definedCompoundData: "data" }),
     ...mapState("compound/illdefinedcompound", {
-      illDefAttr: "attributes",
-      illDefRels: "relationships"
+      illDefinedCompoundData: "data"
     }),
     ...mapState("queryStructureType", { qstList: "list" }),
 
     cid: function() {
-      if (this.type === "definedCompound") return this.defAttr.cid;
+      if (this.type === "definedCompound")
+        return this.definedCompoundData.attributes?.cid;
       else if (this.type === "none") return "";
-      return this.illDefAttr.cid;
+      return this.illDefinedCompoundData.attributes?.cid;
     },
     options: function() {
       return this.buildOptions(this.qstList);
     },
     substanceId: function() {
-      if (this.type === "definedCompound" && this.defRels.substance)
-        return this.defRels.substance.data.id;
-      else if (this.illDefRels.substance)
-        return this.illDefRels.substance.data.id;
+      if (
+        this.type === "definedCompound" &&
+        this.definedCompoundData.relationships?.substance
+      )
+        return this.definedCompoundData.relationships?.substance?.data?.id;
+      else if (this.illDefinedCompoundData.relationships?.substance)
+        return this.illDefinedCompoundData.relationships?.substance?.data?.id;
       return "";
     }
   },

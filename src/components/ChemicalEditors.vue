@@ -1,12 +1,17 @@
 <template>
   <div>
-    <b-form>
-      <KetcherWindow v-show="type === 'definedCompound'" />
-      <MarvinWindow v-show="type !== 'definedCompound'" />
+    <KetcherWindow v-show="type === 'definedCompound'" ref="ketcher " />
+    <div v-show="type !== 'definedCompound'">
+      <MarvinWindow ref="marvin" @mrvfileChanged="mrvfileChanged = $event" />
       <div class="my-3">
-        <b-button type="submit" variant="primary">Save Compound</b-button>
+        <b-button
+          @click="saveIllDefinedCompound"
+          variant="primary"
+          :disabled="!mrvfileChanged"
+          >Save Compound</b-button
+        >
       </div>
-    </b-form>
+    </div>
   </div>
 </template>
 
@@ -22,6 +27,66 @@ export default {
   },
   props: {
     type: String
+  },
+  data() {
+    return {
+      mrvfileChanged: false
+    };
+  },
+  methods: {
+    saveIllDefinedCompound() {
+      let compoundId = this.$store.state.compound.illdefinedcompound.data.id;
+      // Generic pot body
+      let requestBody = {
+        type: "illDefinedCompound",
+        attributes: {
+          mrvfile: this.$refs["marvin"].localMrvfile
+        },
+        relationships: {
+          queryStructureType: {
+            data: {
+              id: this.type,
+              type: "queryStructureType"
+            }
+          }
+        }
+      };
+      if (compoundId) {
+        // if there is an id, patch the currently loaded ill-defined compound.
+        this.$store
+          .dispatch("compound/illdefinedcompound/patch", {
+            id: compoundId,
+            body: { ...requestBody, id: compoundId }
+          })
+          // Handle the errors
+          .catch(err => this.handleError(err));
+      } else {
+        // If there is no id, save the new compound
+        this.$store
+          .dispatch("compound/illdefinedcompound/post", requestBody)
+          .then(response =>
+            // Load the newly created compound.  We could bypass this action by
+            // storing the response but this verifies the compound is the same and
+            // further searches will work
+            this.$store.dispatch("compound/fetchCompound", {
+              searchString: response.data.data.attributes.cid
+            })
+          )
+          // Handle the errors
+          .catch(err => this.handleError(err));
+      }
+    },
+    handleError: function(err) {
+      // Currently alert only can store a single alert.
+      // Only the last alert will be presented.
+      for (let error of err.response.data.errors) {
+        this.$store.dispatch("alert/alert", {
+          message: error.detail,
+          color: "danger",
+          dismissCountDown: 15
+        });
+      }
+    }
   }
 };
 </script>
