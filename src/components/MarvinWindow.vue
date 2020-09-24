@@ -22,13 +22,13 @@ export default {
   data() {
     return {
       marvinURL: process.env.VUE_APP_MARVIN_URL + "/editorws.html",
-      mrvfile: ""
+      localMrvfile: ""
     };
   },
   methods: {
     importMrvfile: function() {
       this.marvinFrame.contentWindow.postMessage(
-        { type: "importMrvfile", mrvfile: this.mrvfile },
+        { type: "importMrvfile", mrvfile: this.localMrvfile },
         "*"
       );
     },
@@ -40,7 +40,6 @@ export default {
         },
         "*"
       );
-      this.exportMrvfile();
     },
     exportMrvfile: function() {
       this.marvinFrame.contentWindow.postMessage(
@@ -56,8 +55,19 @@ export default {
         this.loadMrvfile();
       }
       if (event.data.type === "returnMrvfile") {
-        this.mrvfile = event.data.mrvfile;
+        this.updateLocalMrvfile(event.data.mrvfile);
       }
+    },
+    updateLocalMrvfile: function(mrvfile) {
+      // Save the external mrvfile to the local vue instance
+      this.localMrvfile = mrvfile;
+
+      // If the mrvfile is blank (as Marvin returns it)
+      // Todo: handle loaded but unchanged
+      if (this.localMrvfile === "<cml><MDocument></MDocument></cml>")
+        // Emit that there was no change
+        this.$emit("mrvfileChanged", false);
+      else this.$emit("mrvfileChanged", true); // Else emit that there was a change
     }
   },
   computed: {

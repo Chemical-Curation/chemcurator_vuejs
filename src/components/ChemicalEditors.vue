@@ -2,9 +2,15 @@
   <div>
     <b-form>
       <KetcherWindow v-show="type === 'definedCompound'" ref="ketcher " />
-      <MarvinWindow v-show="type !== 'definedCompound'" ref="marvin" />
+      <MarvinWindow
+        v-show="type !== 'definedCompound'"
+        ref="marvin"
+        @mrvfileChanged="mrvfileChanged = $event"
+      />
       <div class="my-3">
-        <b-button @click="save" variant="primary">Save Compound</b-button>
+        <b-button @click="save" variant="primary" :disabled="!structureChanged"
+          >Save Compound</b-button
+        >
       </div>
     </b-form>
   </div>
@@ -23,6 +29,19 @@ export default {
   props: {
     type: String
   },
+  data() {
+    return {
+      mrvfileChanged: false
+    };
+  },
+  computed: {
+    // the "structureChanged" computed function is meant to return whether
+    // either editor has been updated.  If we split the buttons up into two distinct saves
+    // this will be unnecessary.
+    structureChanged: function() {
+      return this.mrvfileChanged;
+    }
+  },
   methods: {
     save: function() {
       // Determine which editor is being saved.
@@ -38,7 +57,7 @@ export default {
       let requestBody = {
         type: "illDefinedCompound",
         attributes: {
-          mrvfile: this.$refs["marvin"].mrvfile
+          mrvfile: this.$refs["marvin"].localMrvfile
         },
         relationships: {
           queryStructureType: {
