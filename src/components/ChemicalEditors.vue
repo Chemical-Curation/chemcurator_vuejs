@@ -1,18 +1,17 @@
 <template>
   <div>
-    <b-form>
-      <KetcherWindow v-show="type === 'definedCompound'" ref="ketcher " />
+    <KetcherWindow v-show="type === 'definedCompound'" ref="ketcher " />
+    <div v-show="type !== 'definedCompound'">
       <MarvinWindow
-        v-show="type !== 'definedCompound'"
         ref="marvin"
         @mrvfileChanged="mrvfileChanged = $event"
       />
       <div class="my-3">
-        <b-button @click="save" variant="primary" :disabled="!structureChanged"
-          >Save Compound</b-button
+        <b-button @click="saveIllDefinedCompound" variant="primary" :disabled="!mrvfileChanged"
+        >Save Compound</b-button
         >
       </div>
-    </b-form>
+    </div>
   </div>
 </template>
 
@@ -34,23 +33,7 @@ export default {
       mrvfileChanged: false
     };
   },
-  computed: {
-    // the "structureChanged" computed function is meant to return whether
-    // either editor has been updated.  If we split the buttons up into two distinct saves
-    // this will be unnecessary.
-    structureChanged: function() {
-      return this.mrvfileChanged;
-    }
-  },
   methods: {
-    save: function() {
-      // Determine which editor is being saved.
-      if (this.type === "definedCompound") {
-        //todo: this needs to be implemented
-      } else {
-        this.saveIllDefinedCompound();
-      }
-    },
     saveIllDefinedCompound() {
       let compoundId = this.$store.state.compound.illdefinedcompound.data.id;
       // Generic pot body
