@@ -61,6 +61,79 @@ describe("The substance page", () => {
       .find("text")
       .should("exist");
   });
+  it("should post not-loaded defined compounds", () => {
+    // Watch for patches
+    cy.route({
+      method: "POST",
+      url: "/definedCompounds",
+      status: 201,
+      response: {}
+    }).as("post");
+
+    // Select ill defined compound to access Ketcher
+    cy.get("#compound-type-dropdown").select("Defined Compound");
+
+    // Verify ketcher has loaded
+    cy.get("iframe[id=ketcher]")
+      .its("0.contentDocument.body")
+      .should("not.be.empty");
+    // Click Oxygen Button
+    cy.get("iframe[id=ketcher]")
+      .its("0.contentDocument.body")
+      .should("not.be.empty")
+      .then(cy.wrap)
+      .find("#atom")
+      .find("button")
+      .eq(3)
+      .click();
+    // Add CycloHexane to the canvas
+//    cy.get("iframe[id=ketcher]")
+//      .its("0.contentDocument.body")
+//      .find("canvas#canvas")
+//      .click();
+
+    cy.get("iframe[id=ketcher]")
+      .its("0.contentDocument.body")
+      .should("not.be.empty")
+      .then(cy.wrap)
+      .find("#canvas")
+      // create first node
+      .click()
+    // Save
+    cy.get("button:contains('Save Defined Compound')")
+      .should("not.be.disabled")
+      .click();
+
+    // Verify patch status and regex for structure
+    cy.get("@post").should("have.property", "status", 201);
+    cy.get("@post")
+      .its("request.body.data.attributes.molfileV3000")
+      // This regex accepts only a CycloHexane structure (metadata is excluded from cml tag)
+      .should(
+        "match",
+        //the string to be matched
+        //"\n  Ketcher 10 120 1312D 1   1.00000     0.00000     0\n\n  1  0  0     0  0            999 V2000\n    7.4750   -5.2250    0.0000 O   0  0  0  0  0  0  0  0  0  0  0  0\nM  END\n"
+        new RegExp(
+          [
+            /<cml.*><MDocument><MChemicalStruct><molecule molID="m1">/,
+            /<atomArray><atom id="a1" elementType="C" x2="-0.020833333333333037" y2="1.53999998768"\/>/,
+            /<atom id="a2" elementType="C" x2="-1.3545666559968" y2="0.76999999384"\/>/,
+            /<atom id="a3" elementType="C" x2="-1.3545666559968" y2="-0.7701866605051737"\/>/,
+            /<atom id="a4" elementType="C" x2="-0.020833333333333037" y2="-1.5399999876800003"\/>/,
+            /<atom id="a5" elementType="C" x2="1.3128999893301336" y2="-0.7701866605051737"\/>/,
+            /<atom id="a6" elementType="C" x2="1.3128999893301336" y2="0.76999999384"\/>/,
+            /<\/atomArray><bondArray><bond id="b1" atomRefs2="a1 a2" order="1"\/>/,
+            /<bond id="b2" atomRefs2="a1 a6" order="1"\/><bond id="b3" atomRefs2="a2 a3" order="1"\/>/,
+            /<bond id="b4" atomRefs2="a3 a4" order="1"\/><bond id="b5" atomRefs2="a4 a5" order="1"\/>/,
+            /<bond id="b6" atomRefs2="a5 a6" order="1"\/><\/bondArray><\/molecule><\/MChemicalStruct><\/MDocument><\/cml>/
+          ]
+            .map(r => {
+              return r.source;
+            })
+            .join("")
+        )
+      );
+  });
   it("should post not-loaded illdefined compounds", () => {
     // Watch for patches
     cy.route({
@@ -89,7 +162,7 @@ describe("The substance page", () => {
       .click();
 
     // Save
-    cy.get("button:contains('Save Compound')")
+    cy.get("button:contains('Save Ill Defined Compound')")
       .should("not.be.disabled")
       .click();
 
@@ -140,7 +213,7 @@ describe("The substance page", () => {
     cy.get("[data-cy=search-button]").click();
 
     // Save
-    cy.get("button:contains('Save Compound')")
+    cy.get("button:contains('Save Ill Defined Compound')")
       .should("not.be.disabled")
       .click();
 
