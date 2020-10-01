@@ -6,7 +6,8 @@ import { HTTP } from "@/store/http-common";
 const defaultState = () => {
   return {
     data: {},
-    included: {}
+    included: {},
+    blank: "  0  0  0     0  0            999 V2000\nM  END"
   };
 };
 
@@ -15,7 +16,7 @@ const state = defaultState();
 // actions
 const actions = {
   ...rootActions,
-  resourceURI: () => {
+  getResourceURI: () => {
     return "definedCompounds";
   },
   fetchByMolfile: async ({ commit }, searchString) => {
@@ -28,13 +29,11 @@ const actions = {
       if (data.data.length > 0) {
         const obj = data.data.shift();
 
-        commit(`storeFetch`, {
-          attributes: obj.attributes,
-          relationships: obj.relationships
-        });
+        commit(`storeFetch`, obj);
         commit(`storeIncluded`, data.included);
       } else {
-        commit("clearState");
+        console.log("doin nuthin in fetchByMolfile");
+        // commit("clearState");
       }
     });
   }
