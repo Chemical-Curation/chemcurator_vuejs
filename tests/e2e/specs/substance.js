@@ -65,7 +65,7 @@ describe("The substance page", () => {
       .should("contain", "355.4457497596741")
       .should("contain", "C22 H26 F N O2")
       .should("contain", "O=C(CCCN1CCC(C2C=CC(C)=CC=2)(O)CC1)C1C=CC(F)=CC=1")
-      .should("contain", "AGAHNABIDCTLHW-UHFFFAOYSA-N")
+      .should("contain", "AGAHNABIDCTLHW-UHFFFAOYSA-N");
   });
   it("should post not-loaded illdefined compounds", () => {
     // Watch for patches

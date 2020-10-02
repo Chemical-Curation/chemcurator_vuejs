@@ -25,7 +25,7 @@ describe("KetcherWindow.vue", () => {
 
   beforeEach(() => {
     state = {
-      "compound": {}
+      compound: {}
     };
 
     let dcState = {
@@ -74,7 +74,9 @@ describe("KetcherWindow.vue", () => {
   });
 
   it("requests Molfile from iframe when exportMolfile is called", async () => {
-    expect(wrapper.vm.$store.state.compound.definedcompound.data.attributes.molfile).toBe("");
+    expect(
+      wrapper.vm.$store.state.compound.definedcompound.data.attributes.molfile
+    ).toBe("");
     const spy = jest.fn();
     iframe.contentWindow.addEventListener(
       "message",
