@@ -61,18 +61,22 @@ const actions = {
     await HTTP.delete("/login/")
       .then(() => {
         commit("setUser", {});
-        router.push({
-          name: "home"
-        }).catch(() => {});
+        router
+          .push({
+            name: "home"
+          })
+          .catch(() => {});
         dispatch("alert/alert", alert, {
           root: true
         });
       })
       .catch(() => {
         commit("setUser", {});
-        router.push({
-          name: "home"
-        }).catch(() => {});
+        router
+          .push({
+            name: "home"
+          })
+          .catch(() => {});
         dispatch("alert/alert", alert, {
           root: true
         });

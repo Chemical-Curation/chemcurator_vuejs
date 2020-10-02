@@ -87,10 +87,10 @@ describe("The substance page", () => {
       .eq(3)
       .click();
     // Add CycloHexane to the canvas
-//    cy.get("iframe[id=ketcher]")
-//      .its("0.contentDocument.body")
-//      .find("canvas#canvas")
-//      .click();
+    //    cy.get("iframe[id=ketcher]")
+    //      .its("0.contentDocument.body")
+    //      .find("canvas#canvas")
+    //      .click();
 
     cy.get("iframe[id=ketcher]")
       .its("0.contentDocument.body")
@@ -98,7 +98,7 @@ describe("The substance page", () => {
       .then(cy.wrap)
       .find("#canvas")
       // create first node
-      .click()
+      .click();
     // Save
     cy.get("button:contains('Save Defined Compound')")
       .should("not.be.disabled")
@@ -114,11 +114,11 @@ describe("The substance page", () => {
         new RegExp(
           [
             "",
-            /  Ketcher.*1.00000     0.00000     0/,
+            / {2}Ketcher.*1.00000 {5}0.00000 {5}0/,
             "",
-            /  1  0  0     0  0            999 V2000/,
-            /    6.5000  -13.4000    0.0000 O   0  0  0  0  0  0  0  0  0  0  0  0/,
-            /M  END/,
+            / {2}1 {2}0 {2}0 {5}0 {2}0 {12}999 V2000/,
+            / {4}6.5000 {2}-13.4000 {4}0.0000 O {3}0 {2}0 {2}0 {2}0 {2}0 {2}0 {2}0 {2}0 {2}0 {2}0 {2}0 {2}0/,
+            /M {2}END/,
             ""
           ]
             .map(r => {
