@@ -22,6 +22,13 @@ export default {
     });
     await context.commit("loaded");
   },
+  getFetch: async (context, id) => {
+    let resource = await context.dispatch("getResourceURI");
+
+    await HTTP.get(`/${resource}/${id}`).then(response => {
+      context.commit("storeFetch", response.data.data);
+    });
+  },
   patch: async (context, { id, body }) => {
     let resource = await context.dispatch("getResourceURI");
 
