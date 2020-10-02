@@ -107,30 +107,24 @@ describe("The substance page", () => {
     // Verify patch status and regex for structure
     cy.get("@post").should("have.property", "status", 201);
     cy.get("@post")
-      .its("request.body.data.attributes.molfileV3000")
+      .its("request.body.data.attributes.molfileV2000")
       // This regex accepts only a CycloHexane structure (metadata is excluded from cml tag)
       .should(
         "match",
-        //the string to be matched
-        //"\n  Ketcher 10 120 1312D 1   1.00000     0.00000     0\n\n  1  0  0     0  0            999 V2000\n    7.4750   -5.2250    0.0000 O   0  0  0  0  0  0  0  0  0  0  0  0\nM  END\n"
         new RegExp(
           [
-            /<cml.*><MDocument><MChemicalStruct><molecule molID="m1">/,
-            /<atomArray><atom id="a1" elementType="C" x2="-0.020833333333333037" y2="1.53999998768"\/>/,
-            /<atom id="a2" elementType="C" x2="-1.3545666559968" y2="0.76999999384"\/>/,
-            /<atom id="a3" elementType="C" x2="-1.3545666559968" y2="-0.7701866605051737"\/>/,
-            /<atom id="a4" elementType="C" x2="-0.020833333333333037" y2="-1.5399999876800003"\/>/,
-            /<atom id="a5" elementType="C" x2="1.3128999893301336" y2="-0.7701866605051737"\/>/,
-            /<atom id="a6" elementType="C" x2="1.3128999893301336" y2="0.76999999384"\/>/,
-            /<\/atomArray><bondArray><bond id="b1" atomRefs2="a1 a2" order="1"\/>/,
-            /<bond id="b2" atomRefs2="a1 a6" order="1"\/><bond id="b3" atomRefs2="a2 a3" order="1"\/>/,
-            /<bond id="b4" atomRefs2="a3 a4" order="1"\/><bond id="b5" atomRefs2="a4 a5" order="1"\/>/,
-            /<bond id="b6" atomRefs2="a5 a6" order="1"\/><\/bondArray><\/molecule><\/MChemicalStruct><\/MDocument><\/cml>/
+            "",
+            /  Ketcher.*1.00000     0.00000     0/,
+            "",
+            /  1  0  0     0  0            999 V2000/,
+            /    6.5000  -13.4000    0.0000 O   0  0  0  0  0  0  0  0  0  0  0  0/,
+            /M  END/,
+            ""
           ]
             .map(r => {
               return r.source;
             })
-            .join("")
+            .join("\n")
         )
       );
   });

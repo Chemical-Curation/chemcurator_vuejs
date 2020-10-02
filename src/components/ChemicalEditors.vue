@@ -54,7 +54,6 @@ export default {
           molfileV2000: this.$refs["ketcher"].molfile.replace(/\\/g, "\\\\")
         }
       };
-      console.log(requestBody);
       if (compoundId) {
         // if there is an id, patch the currently loaded defined compound.
         this.$store

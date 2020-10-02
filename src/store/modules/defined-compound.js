@@ -32,7 +32,8 @@ const actions = {
         commit(`storeFetch`, obj);
         commit(`storeIncluded`, data.included);
       } else {
-        console.log("doin nuthin in fetchByMolfile");
+        // for now, if a compound is found we want to leave it in state to do
+        // a PATCH on it
         // commit("clearState");
       }
     });
