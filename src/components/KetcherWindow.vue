@@ -2,17 +2,17 @@
   <div>
     <div id="substanceInfoPanel" class="border rounded mb-3">
       <dl class="row my-1 p-2">
-        <dt class="col-2">Molecular Weight</dt>
-        <dd class="col-4">{{ molecularWeight }}</dd>
+        <dt class="col-lg-2">Molecular Weight</dt>
+        <dd class="col-lg-4 overflow-auto">{{ molecularWeight }}</dd>
 
-        <dt class="col-2">Molecular Formula</dt>
-        <dd class="col-4">{{ molecularFormula }}</dd>
+        <dt class="col-lg-2">Molecular Formula</dt>
+        <dd class="col-lg-4 overflow-auto">{{ molecularFormula }}</dd>
 
-        <dt class="col-2">SMILEs</dt>
-        <dd class="col-4">{{ smiles }}</dd>
+        <dt class="col-lg-2">SMILES</dt>
+        <dd class="col-lg-4 overflow-auto">{{ smiles }}</dd>
 
-        <dt class="col-2">Inchikey</dt>
-        <dd class="col-4">{{ inchikey }}</dd>
+        <dt class="col-lg-2">Inchikey</dt>
+        <dd class="col-lg-4 overflow-auto">{{ inchikey }}</dd>
       </dl>
     </div>
     <div class="d-flex">
