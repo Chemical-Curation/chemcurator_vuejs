@@ -25,13 +25,30 @@ describe("KetcherWindow.vue", () => {
 
   beforeEach(() => {
     state = {
-      compound: {
-        molfile: ""
+      "compound": {}
+    };
+
+    let dcState = {
+      data: {
+        attributes: {
+          molfile: ""
+        }
       }
     };
 
     store = new Vuex.Store({
-      state
+      modules: {
+        compound: {
+          namespaced: true,
+          state,
+          modules: {
+            definedcompound: {
+              namespaced: true,
+              state: dcState
+            }
+          }
+        }
+      }
     });
 
     iframe = document.createElement("iframe");
@@ -57,7 +74,7 @@ describe("KetcherWindow.vue", () => {
   });
 
   it("requests Molfile from iframe when exportMolfile is called", async () => {
-    expect(wrapper.vm.$store.state.compound.molfile).toBe("");
+    expect(wrapper.vm.$store.state.compound.definedcompound.data.attributes.molfile).toBe("");
     const spy = jest.fn();
     iframe.contentWindow.addEventListener(
       "message",

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="border rounded mb-3">
+    <div id="substanceInfoPanel" class="border rounded mb-3">
       <dl class="row my-1 p-2">
         <dt class="col-2">Molecular Weight</dt>
         <dd class="col-4">{{ molecularWeight }}</dd>
