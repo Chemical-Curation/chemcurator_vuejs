@@ -6,8 +6,7 @@ import { HTTP } from "@/store/http-common";
 const defaultState = () => {
   return {
     data: {},
-    included: {},
-    blank: "  0  0  0     0  0            999 V2000\nM  END"
+    included: {}
   };
 };
 

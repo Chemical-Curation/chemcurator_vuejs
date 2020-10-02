@@ -24,6 +24,7 @@ export default {
     return {
       ketcherURL: process.env.VUE_APP_KETCHER_URL,
       initial_molfile: "  0  0  0     0  0            999 V2000\nM  END",
+      blank: "  0  0  0     0  0            999 V2000\nM  END",
       molfile: ""
     };
   },
@@ -61,7 +62,7 @@ export default {
     }
   },
   computed: {
-    ...mapState("compound/definedcompound", ["data", "blank"]),
+    ...mapState("compound/definedcompound", ["data"]),
     ketcherFrame: function() {
       return this.$refs.ketcher;
     }
