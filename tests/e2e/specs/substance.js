@@ -104,7 +104,7 @@ describe("The substance page", () => {
       .should("not.be.disabled")
       .click();
 
-    // Verify patch status and regex for structure
+    // Verify post status and regex for structure
     cy.get("@post").should("have.property", "status", 201);
     cy.get("@post")
       .its("request.body.data.attributes.molfileV2000")
