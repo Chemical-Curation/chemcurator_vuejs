@@ -50,7 +50,7 @@ const actions = {
       }
     );
     commit("setUser", response.data);
-    router.push("/");
+    router.push("/").catch(() => {});
   },
   logout: async ({ commit, dispatch }) => {
     const alert = {
@@ -61,18 +61,22 @@ const actions = {
     await HTTP.delete("/login/")
       .then(() => {
         commit("setUser", {});
-        router.push({
-          name: "home"
-        });
+        router
+          .push({
+            name: "home"
+          })
+          .catch(() => {});
         dispatch("alert/alert", alert, {
           root: true
         });
       })
       .catch(() => {
         commit("setUser", {});
-        router.push({
-          name: "home"
-        });
+        router
+          .push({
+            name: "home"
+          })
+          .catch(() => {});
         dispatch("alert/alert", alert, {
           root: true
         });

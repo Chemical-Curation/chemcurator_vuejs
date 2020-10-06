@@ -15,7 +15,7 @@ const state = defaultState();
 // actions
 const actions = {
   ...rootActions,
-  resourceURI: () => {
+  getResourceURI: () => {
     return "definedCompounds";
   },
   fetchByMolfile: async ({ commit }, searchString) => {
@@ -28,13 +28,12 @@ const actions = {
       if (data.data.length > 0) {
         const obj = data.data.shift();
 
-        commit(`storeFetch`, {
-          attributes: obj.attributes,
-          relationships: obj.relationships
-        });
+        commit(`storeFetch`, obj);
         commit(`storeIncluded`, data.included);
       } else {
-        commit("clearState");
+        // for now, if a compound is found we want to leave it in state to do
+        // a PATCH on it
+        // commit("clearState");
       }
     });
   }
