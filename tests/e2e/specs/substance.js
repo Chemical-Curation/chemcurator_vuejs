@@ -129,6 +129,68 @@ describe("The substance page", () => {
         )
       );
   });
+  it("should post not-loaded defined compounds", () => {
+    // Watch for posts
+    cy.route({
+      method: "POST",
+      url: "/definedCompounds",
+      status: 201,
+      response: {}
+    }).as("post");
+
+    // Select ill defined compound to access Ketcher
+    cy.get("#compound-type-dropdown").select("Defined Compound");
+
+    // Verify ketcher has loaded
+    cy.get("iframe[id=ketcher]")
+      .its("0.contentDocument.body")
+      .should("not.be.empty");
+    // Click Oxygen Button
+    cy.get("iframe[id=ketcher]")
+      .its("0.contentDocument.body")
+      .should("not.be.empty")
+      .then(cy.wrap)
+      .find("#atom")
+      .find("button")
+      .eq(3)
+      .click();
+
+    cy.get("iframe[id=ketcher]")
+      .its("0.contentDocument.body")
+      .should("not.be.empty")
+      .then(cy.wrap)
+      .find("#canvas")
+      // create first node
+      .click();
+    // Save
+    cy.get("button:contains('Save Defined Compound')")
+      .should("not.be.disabled")
+      .click();
+
+    // Verify post status and regex for structure
+    cy.get("@post").should("have.property", "status", 201);
+    cy.get("@post")
+      .its("request.body.data.attributes.molfileV2000")
+      // This regex accepts only an Oxygen structure
+      .should(
+        "match",
+        new RegExp(
+          [
+            "",
+            / {2}Ketcher.*1.00000 {5}0.00000 {5}0/,
+            "",
+            / {2}1 {2}0 {2}0 {5}0 {2}0 {12}999 V2000/,
+            / {4}6.5000 {2}-15.0500 {4}0.0000 O {3}0 {2}0 {2}0 {2}0 {2}0 {2}0 {2}0 {2}0 {2}0 {2}0 {2}0 {2}0/,
+            /M {2}END/,
+            ""
+          ]
+            .map(r => {
+              return r.source;
+            })
+            .join("\n")
+        )
+      );
+  });
   it("should post not-loaded illdefined compounds", () => {
     // Watch for patches
     cy.route({
