@@ -38,14 +38,23 @@ let actions = {
       .then(response => {
         const data = response.data;
         if (data.data.length > 0) {
-          const obj = data.data.shift();
+          const obj = data.data[0];
 
-          if (obj.type === "definedCompound") commit("setType", obj.type);
-          else commit("setType", obj.relationships.queryStructureType.data.id);
+          if (obj.type === "definedCompound") {
+            commit("setType", obj.type);
+            commit(`definedcompound/storeIncluded`, data.included);
 
-          let targetModule = obj.type.toLowerCase();
-          commit(`${targetModule}/storeFetch`, obj);
-          commit(`${targetModule}/storeIncluded`, data.included);
+            // TODO: The following action is because of the difference in what is returned
+            //       by the list and detail serializers.  If the compound is a defined compound
+            //       in order to load the additional data this response has to be thrown out
+            //       and the GET needs to be repeated.  There may be ways around this with resolution
+            //       or if the json:api id is the same as the cid being passed in.
+            dispatch("definedcompound/getFetch", obj.id);
+          } else {
+            commit("setType", obj.relationships.queryStructureType.data.id);
+            commit("illdefinedcompound/storeFetch", obj);
+            commit("illdefinedcompound/storeIncluded", data.included);
+          }
         } else {
           const alert = {
             message: `${searchString} not valid`,

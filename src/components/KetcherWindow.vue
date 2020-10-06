@@ -1,5 +1,20 @@
 <template>
   <div>
+    <div id="substanceInfoPanel" class="border rounded mb-3">
+      <dl class="row my-1 p-2">
+        <dt class="col-lg-2">Molecular Weight</dt>
+        <dd class="col-lg-4 overflow-auto">{{ molecularWeight }}</dd>
+
+        <dt class="col-lg-2">Molecular Formula</dt>
+        <dd class="col-lg-4 overflow-auto">{{ molecularFormula }}</dd>
+
+        <dt class="col-lg-2">SMILES</dt>
+        <dd class="col-lg-4 overflow-auto">{{ smiles }}</dd>
+
+        <dt class="col-lg-2">Inchikey</dt>
+        <dd class="col-lg-4 overflow-auto">{{ inchikey }}</dd>
+      </dl>
+    </div>
     <div class="d-flex">
       <iframe
         id="ketcher"
@@ -65,6 +80,18 @@ export default {
     ...mapState("compound/definedcompound", ["data"]),
     ketcherFrame: function() {
       return this.$refs.ketcher;
+    },
+    molecularWeight: function() {
+      return this.data.attributes?.molecularWeight ?? "-";
+    },
+    molecularFormula: function() {
+      return this.data.attributes?.molecularFormula ?? "-";
+    },
+    smiles: function() {
+      return this.data.attributes?.smiles ?? "-";
+    },
+    inchikey: function() {
+      return this.data.attributes?.inchikey ?? "-";
     }
   },
   watch: {
