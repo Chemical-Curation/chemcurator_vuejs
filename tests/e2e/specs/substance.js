@@ -62,7 +62,7 @@ describe("The substance page", () => {
       .should("exist");
   });
   it("should post not-loaded defined compounds", () => {
-    // Watch for patches
+    // Watch for posts
     cy.route({
       method: "POST",
       url: "/definedCompounds",
