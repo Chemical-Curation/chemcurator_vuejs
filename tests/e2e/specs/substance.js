@@ -108,7 +108,7 @@ describe("The substance page", () => {
     cy.get("@post").should("have.property", "status", 201);
     cy.get("@post")
       .its("request.body.data.attributes.molfileV2000")
-      // This regex accepts only a CycloHexane structure (metadata is excluded from cml tag)
+      // This regex accepts only an Oxygen structure
       .should(
         "match",
         new RegExp(
