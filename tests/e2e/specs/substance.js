@@ -86,11 +86,6 @@ describe("The substance page", () => {
       .find("button")
       .eq(3)
       .click();
-    // Add CycloHexane to the canvas
-    //    cy.get("iframe[id=ketcher]")
-    //      .its("0.contentDocument.body")
-    //      .find("canvas#canvas")
-    //      .click();
 
     cy.get("iframe[id=ketcher]")
       .its("0.contentDocument.body")
