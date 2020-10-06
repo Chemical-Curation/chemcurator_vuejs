@@ -38,6 +38,8 @@ export default {
   data() {
     return {
       ketcherURL: process.env.VUE_APP_KETCHER_URL,
+      initial_molfile: "  0  0  0     0  0            999 V2000\nM  END",
+      blank: "  0  0  0     0  0            999 V2000\nM  END",
       molfile: ""
     };
   },
@@ -66,6 +68,12 @@ export default {
         { type: "clearMolfile" },
         "*"
       );
+    },
+    removeHeader: function(str) {
+      return str
+        .split("\n")
+        .slice(3, -1)
+        .join("\n");
     }
   },
   computed: {
@@ -94,6 +102,12 @@ export default {
     },
     molfile: function() {
       this.fetchByMolfile(this.molfile);
+      let temp = this.removeHeader(this.molfile);
+      if (temp !== this.initial_molfile) {
+        this.$emit("molfileChanged", true);
+      } else {
+        this.$emit("molfileChanged", false);
+      }
     }
   },
   mounted() {
@@ -102,6 +116,18 @@ export default {
       event => {
         if (event.data.type === "returnMolfile") {
           this.molfile = event.data.molfile;
+          let init = this.removeHeader(event.data.molfile);
+          if (
+            this.data?.attributes?.molfileV3000 &&
+            this.initial_molfile === this.blank
+          ) {
+            // update for search
+            this.initial_molfile = init;
+          }
+          if (init === this.blank) {
+            // update if cleared while editing
+            this.initial_molfile = init;
+          }
         }
       },
       false

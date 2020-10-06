@@ -1,6 +1,16 @@
 <template>
   <div>
-    <KetcherWindow v-show="type === 'definedCompound'" ref="ketcher " />
+    <div v-show="type === 'definedCompound'">
+      <KetcherWindow ref="ketcher" @molfileChanged="molfileChanged = $event" />
+      <div class="my-3">
+        <b-button
+          @click="saveDefinedCompound"
+          variant="primary"
+          :disabled="!molfileChanged"
+          >Save Defined Compound</b-button
+        >
+      </div>
+    </div>
     <div v-show="type !== 'definedCompound'">
       <MarvinWindow ref="marvin" @mrvfileChanged="mrvfileChanged = $event" />
       <div class="my-3">
@@ -8,7 +18,7 @@
           @click="saveIllDefinedCompound"
           variant="primary"
           :disabled="!mrvfileChanged"
-          >Save Compound</b-button
+          >Save Ill Defined Compound</b-button
         >
       </div>
     </div>
@@ -30,10 +40,45 @@ export default {
   },
   data() {
     return {
+      molfileChanged: false,
       mrvfileChanged: false
     };
   },
   methods: {
+    saveDefinedCompound() {
+      let compoundId = this.$store.state.compound.definedcompound.data.id;
+      // replace is used to escape "\" so that the JSON is parsable
+      let requestBody = {
+        type: "definedCompound",
+        attributes: {
+          molfileV2000: this.$refs["ketcher"].molfile.replace(/\\/g, "\\\\")
+        }
+      };
+      if (compoundId) {
+        // if there is an id, patch the currently loaded defined compound.
+        this.$store
+          .dispatch("compound/definedcompound/patch", {
+            id: compoundId,
+            body: { ...requestBody, id: compoundId }
+          })
+          // Handle the errors
+          .catch(err => this.handleError(err));
+      } else {
+        // If there is no id, save the new compound
+        this.$store
+          .dispatch("compound/definedcompound/post", requestBody)
+          .then(response =>
+            // Load the newly created compound.  We could bypass this action by
+            // storing the response but this verifies the compound is the same and
+            // further searches will work
+            this.$store.dispatch("compound/fetchCompound", {
+              searchString: response.data.data.attributes.cid
+            })
+          )
+          // Handle the errors
+          .catch(err => this.handleError(err));
+      }
+    },
     saveIllDefinedCompound() {
       let compoundId = this.$store.state.compound.illdefinedcompound.data.id;
       // Generic pot body
