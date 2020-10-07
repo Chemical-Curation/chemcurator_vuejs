@@ -19,6 +19,7 @@ import listType from "./modules/list-type";
 import queryStructureType from "./modules/query-structure-type";
 import relationshipType from "./modules/relationship-type";
 import substanceRelationship from "./modules/substance-relationship";
+import record from "./modules/record";
 
 Vue.use(Vuex);
 
@@ -42,7 +43,8 @@ const store = new Vuex.Store({
     synonymType,
     queryStructureType,
     relationshipType,
-    substanceRelationship
+    substanceRelationship,
+    record
   }
 });
 
