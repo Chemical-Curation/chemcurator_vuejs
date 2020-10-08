@@ -22,16 +22,11 @@ export default {
   data() {
     return {
       marvinURL: process.env.VUE_APP_MARVIN_URL + "/editorws.html",
-      localMrvfile: ""
+      localMrvfile: "",
+      initialMrvfile: "<MDocument/>"
     };
   },
   methods: {
-    importMrvfile: function() {
-      this.marvinFrame.contentWindow.postMessage(
-        { type: "importMrvfile", mrvfile: this.localMrvfile },
-        "*"
-      );
-    },
     loadMrvfile: function() {
       this.marvinFrame.contentWindow.postMessage(
         {
@@ -55,6 +50,9 @@ export default {
         this.loadMrvfile();
       }
       if (event.data.type === "returnMrvfile") {
+        if (this.initialMrvfile === "<MDocument/>" && this.data?.attributes?.mrvfile){
+          this.initialMrvfile = this.removeTags(event.data.mrvfile);
+        }
         this.updateLocalMrvfile(event.data.mrvfile);
       }
     },
@@ -64,10 +62,18 @@ export default {
 
       // If the mrvfile is blank (as Marvin returns it)
       // Todo: handle loaded but unchanged
-      if (this.localMrvfile === "<cml><MDocument></MDocument></cml>")
+      let plow = this.removeTags(mrvfile);
+      console.log(plow);
+      if (plow === this.initialMrvfile)
         // Emit that there was no change
-        this.$emit("mrvfileChanged", false);
-      else this.$emit("mrvfileChanged", true); // Else emit that there was a change
+        this.$emit("editorChanged", false);
+      else this.$emit("editorChanged", true); // Else emit that there was a change
+    },
+    removeTags: function(str) {
+      let serializer = new XMLSerializer();
+      let tree =  new window.DOMParser().parseFromString(str, "text/xml")
+      let node = tree.getElementsByTagName("MDocument")[0]
+      return serializer.serializeToString(node)
     }
   },
   computed: {

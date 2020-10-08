@@ -46,7 +46,7 @@ export default {
   },
   methods: {
     saveCompound(type) {
-      if (type === "definedcompound") {
+      if (type === "definedCompound") {
         this.saveDefinedCompound();
       } else {
         this.saveIllDefinedCompound();

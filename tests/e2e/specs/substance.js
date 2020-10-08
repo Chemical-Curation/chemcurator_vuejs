@@ -541,4 +541,40 @@ describe("The substance page's Relationships Table", () => {
       .should("contain", "DTXSID602000001")
       .should("contain", "DTXSID202000002");
   });
+  it("confirm navigation away from editor changes", () => {
+    cy.get("iframe[id=marvin]")
+      .its("0.contentDocument.body")
+      .should("not.be.empty");
+
+    // Search
+    cy.get("[data-cy=search-box]").type("DTXCID502000009");
+    cy.get("[data-cy=search-button]").click();
+    // Click CycloHexane Button
+    cy.get("iframe[id=marvin]")
+      .its("0.contentDocument.body")
+      .find("[title=CycloHexane]")
+      .click();
+    // Add CycloHexane to the canvas
+    cy.get("iframe[id=marvin]")
+      .its("0.contentDocument.body")
+      .find("canvas#canvas")
+      .click();
+
+    // Save button enabled
+    cy.get("button:contains('Save Compound')")
+      .should("not.be.disabled")
+
+    cy.get("div.navbar-brand").click()
+    cy.get("div.modal-dialog").contains("Unsaved changes exist")
+    cy.get("button:contains('NO')").click()
+
+    // Save button still enabled
+    cy.get("button:contains('Save Compound')")
+      .should("not.be.disabled")
+
+    cy.get("a:contains('Lists')").click()
+    cy.get("button:contains('YES')").click()
+    cy.url().should('contain', '/lists')
+
+  });
 });

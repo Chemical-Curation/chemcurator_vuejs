@@ -82,6 +82,9 @@ export default {
   watch: {
     compoundType: function() {
       this.type = this.compoundType;
+    },
+    type: function() {
+      this.$store.dispatch("compound/updateChanged", false);
     }
   },
   methods: {
@@ -104,6 +107,26 @@ export default {
   },
   mounted() {
     this.$store.dispatch("queryStructureType/getList");
+  },
+  beforeRouteLeave(to, from, next) {
+    console.log(this.$store.state.compound.changed);
+    if (this.$store.state.compound.changed) {
+      this.$bvModal.msgBoxConfirm('Unsaved changes exist on the compound in the editor, are you okay with losing the changes?', {
+        okTitle: "YES",
+        cancelTitle: "NO"
+      })
+        .then(value => {
+          console.log("value", value)
+          if (value) {
+            this.$store.dispatch("compound/updateChanged", false);
+            next();
+          } else {
+            next(false);
+          }
+        })
+    } else {
+      next();
+    }
   }
 };
 </script>
