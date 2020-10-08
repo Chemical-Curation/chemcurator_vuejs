@@ -104,9 +104,9 @@ export default {
       this.fetchByMolfile(this.molfile);
       let temp = this.removeHeader(this.molfile);
       if (temp !== this.initial_molfile) {
-        this.$emit("molfileChanged", true);
+        this.$emit("editorChanged", true);
       } else {
-        this.$emit("molfileChanged", false);
+        this.$emit("editorChanged", false);
       }
     }
   },

@@ -1,26 +1,18 @@
 <template>
   <div>
     <div v-show="type === 'definedCompound'">
-      <KetcherWindow ref="ketcher" @molfileChanged="molfileChanged = $event" />
-      <div class="my-3">
-        <b-button
-          @click="saveDefinedCompound"
-          variant="primary"
-          :disabled="!molfileChanged"
-          >Save Defined Compound</b-button
-        >
-      </div>
+      <KetcherWindow ref="ketcher" @editorChanged="editorChanged = $event" />
     </div>
     <div v-show="type !== 'definedCompound'">
-      <MarvinWindow ref="marvin" @mrvfileChanged="mrvfileChanged = $event" />
-      <div class="my-3">
-        <b-button
-          @click="saveIllDefinedCompound"
-          variant="primary"
-          :disabled="!mrvfileChanged"
-          >Save Ill Defined Compound</b-button
-        >
-      </div>
+      <MarvinWindow ref="marvin" @editorChanged="editorChanged = $event" />
+    </div>
+    <div class="my-3">
+      <b-button
+        @click="saveCompound(type)"
+        variant="primary"
+        :disabled="!editorChanged"
+        >Save Compound</b-button
+      >
     </div>
   </div>
 </template>
@@ -40,11 +32,26 @@ export default {
   },
   data() {
     return {
-      molfileChanged: false,
-      mrvfileChanged: false
+      editorChanged: false
     };
   },
+  watch: {
+    editorChanged: function() {
+      if (this.editorChanged) {
+        this.$store.dispatch("compound/updateChanged", true);
+      } else {
+        this.$store.dispatch("compound/updateChanged", false);
+      }
+    }
+  },
   methods: {
+    saveCompound(type) {
+      if (type === "definedcompound") {
+        this.saveDefinedCompound();
+      } else {
+        this.saveIllDefinedCompound();
+      }
+    },
     saveDefinedCompound() {
       let compoundId = this.$store.state.compound.definedcompound.data.id;
       // replace is used to escape "\" so that the JSON is parsable
