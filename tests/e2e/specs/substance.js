@@ -101,7 +101,7 @@ describe("The substance page", () => {
       // create first node
       .click();
     // Save
-    cy.get("button:contains('Save Defined Compound')")
+    cy.get("button:contains('Save Compound')")
       .should("not.be.disabled")
       .click();
 
@@ -163,7 +163,7 @@ describe("The substance page", () => {
       // create first node
       .click();
     // Save
-    cy.get("button:contains('Save Defined Compound')")
+    cy.get("button:contains('Save Compound')")
       .should("not.be.disabled")
       .click();
 
@@ -219,7 +219,7 @@ describe("The substance page", () => {
       .click();
 
     // Save
-    cy.get("button:contains('Save Ill Defined Compound')")
+    cy.get("button:contains('Save Compound')")
       .should("not.be.disabled")
       .click();
 
@@ -268,9 +268,31 @@ describe("The substance page", () => {
     // Search
     cy.get("[data-cy=search-box]").type("DTXCID502000009");
     cy.get("[data-cy=search-button]").click();
+    // Click CycloHexane Button
+    cy.get("iframe[id=marvin]")
+      .its("0.contentDocument.body")
+      .find("[title=CycloHexane]")
+      .click();
+    // Add CycloHexane to the canvas
+    cy.get("iframe[id=marvin]")
+      .its("0.contentDocument.body")
+      .find("canvas#canvas")
+      .click();
+
+    // const getIframeDocument = () => {
+    //   return cy
+    //   .get('iframe[id=marvin]')
+    //   .its('0.contentDocument').should('exist')
+    // }
+    // const getIframeBody = () => {
+    //   return getIframeDocument()
+    //   .its('body').should('not.be.undefined')
+    //   .then(cy.wrap)
+    // }
+    // getIframeBody().find('div[title="Clean"]').click({force: true})
 
     // Save
-    cy.get("button:contains('Save Ill Defined Compound')")
+    cy.get("button:contains('Save Compound')")
       .should("not.be.disabled")
       .click();
 
