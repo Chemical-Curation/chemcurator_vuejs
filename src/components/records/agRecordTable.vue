@@ -23,7 +23,7 @@ import {
 } from "@/ag-grid-components/custom-renderers";
 
 export default {
-  name: "SynonymTable",
+  name: "agListTable",
   components: {
     AgGridVue
   },
@@ -138,8 +138,10 @@ export default {
     },
 
     /**
+     * Returns the list's label from the included data
      *
-     *
+     * @param params - row data
+     * @returns {string} - the list label for the selected row
      */
     listLabelGetter: function(params) {
       let relationship = params.data.relationships.list.data;
@@ -148,8 +150,10 @@ export default {
     },
 
     /**
+     * Returns an array of record identifiers from the included data
      *
-     *
+     * @param params - row data
+     * @returns {array} - array of identifiers for the selected row
      */
     identifierGetter: function(params) {
       let relationships = params.data.relationships.identifiers.data;

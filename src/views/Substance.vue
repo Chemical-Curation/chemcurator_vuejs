@@ -40,10 +40,10 @@
 
 <script>
 import ChemicalEditors from "@/components/ChemicalEditors";
-import SubstanceForm from "@/components/SubstanceForm";
-import SynonymTable from "@/components/synonyms/SynonymTable";
-import SubstanceRelationshipTable from "@/components/SubstanceRelationshipTable";
-import ListTable from "@/components/lists/ListAGGridTable";
+import SubstanceForm from "@/components/substance/SubstanceForm";
+import SynonymTable from "@/components/synonyms/agSynonymTable";
+import SubstanceRelationshipTable from "@/components/substance/agSubstanceRelationshipTable";
+import ListTable from "@/components/records/agRecordTable";
 import { mapState } from "vuex";
 
 export default {
