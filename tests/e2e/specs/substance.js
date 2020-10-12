@@ -108,19 +108,25 @@ describe("The substance page", () => {
     // Verify post status and regex for structure
     cy.get("@post").should("have.property", "status", 201);
     cy.get("@post")
-      .its("request.body.data.attributes.molfileV2000")
+      .its("request.body.data.attributes.molfileV3000")
       // This regex accepts only an Oxygen structure
       .should(
         "match",
         new RegExp(
           [
             "",
-            / {2}Ketcher.*1.00000 {5}0.00000 {5}0/,
+            / {2}Ketcher.*/,
             "",
-            / {2}1 {2}0 {2}0 {5}0 {2}0 {12}999 V2000/,
-            / {4}6.5000 {2}-15.0500 {4}0.0000 O {3}0 {2}0 {2}0 {2}0 {2}0 {2}0 {2}0 {2}0 {2}0 {2}0 {2}0 {2}0/,
-            /M {2}END/,
-            ""
+            / {2}0 {2}0 {2}0 {5}0 {2}0 {12}999 V3000/,
+            /M {2}V30 BEGIN CTAB/,
+            /M {2}V30 COUNTS 1 0 0 0 0/,
+            /M {2}V30 BEGIN ATOM/,
+            /M {2}V30 1 O 6.5000 -15.05 0.0000 0/,
+            /M {2}V30 END ATOM/,
+            /M {2}V30 BEGIN BOND/,
+            /M {2}V30 END BOND/,
+            /M {2}V30 END CTAB/,
+            /M {2}END/
           ]
             .map(r => {
               return r.source;
@@ -170,19 +176,25 @@ describe("The substance page", () => {
     // Verify post status and regex for structure
     cy.get("@post").should("have.property", "status", 201);
     cy.get("@post")
-      .its("request.body.data.attributes.molfileV2000")
+      .its("request.body.data.attributes.molfileV3000")
       // This regex accepts only an Oxygen structure
       .should(
         "match",
         new RegExp(
           [
             "",
-            / {2}Ketcher.*1.00000 {5}0.00000 {5}0/,
+            / {2}Ketcher.*/,
             "",
-            / {2}1 {2}0 {2}0 {5}0 {2}0 {12}999 V2000/,
-            / {4}6.5000 {2}-15.0500 {4}0.0000 O {3}0 {2}0 {2}0 {2}0 {2}0 {2}0 {2}0 {2}0 {2}0 {2}0 {2}0 {2}0/,
-            /M {2}END/,
-            ""
+            / {2}0 {2}0 {2}0 {5}0 {2}0 {12}999 V3000/,
+            /M {2}V30 BEGIN CTAB/,
+            /M {2}V30 COUNTS 1 0 0 0 0/,
+            /M {2}V30 BEGIN ATOM/,
+            /M {2}V30 1 O 6.5000 -15.05 0.0000 0/,
+            /M {2}V30 END ATOM/,
+            /M {2}V30 BEGIN BOND/,
+            /M {2}V30 END BOND/,
+            /M {2}V30 END CTAB/,
+            /M {2}END/
           ]
             .map(r => {
               return r.source;
