@@ -97,6 +97,12 @@ export default {
       for (item of list)
         options.push({ value: item.id, text: item.attributes.label });
       return options;
+    },
+    checkyoself: function(event) {
+      if (this.$store.state.compound.changed) {
+        // below only needs to eval to a truthy value
+        event.returnValue = "lose your changes?";
+      }
     }
   },
   components: {
@@ -104,6 +110,9 @@ export default {
     SubstanceForm,
     SynonymTable,
     SubstanceRelationshipTable
+  },
+  created() {
+    window.addEventListener("beforeunload", this.checkyoself)
   },
   mounted() {
     this.$store.dispatch("queryStructureType/getList");
