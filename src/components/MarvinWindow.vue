@@ -50,7 +50,10 @@ export default {
         this.loadMrvfile();
       }
       if (event.data.type === "returnMrvfile") {
-        if (this.initialMrvfile === "<MDocument/>" && this.data?.attributes?.mrvfile){
+        if (
+          this.initialMrvfile === "<MDocument/>" &&
+          this.data?.attributes?.mrvfile
+        ) {
           this.initialMrvfile = this.removeTags(event.data.mrvfile);
         }
         this.updateLocalMrvfile(event.data.mrvfile);
@@ -62,18 +65,17 @@ export default {
 
       // If the mrvfile is blank (as Marvin returns it)
       // Todo: handle loaded but unchanged
-      let plow = this.removeTags(mrvfile);
-      console.log(plow);
-      if (plow === this.initialMrvfile)
+      let strippedMrv = this.removeTags(mrvfile);
+      if (strippedMrv === this.initialMrvfile)
         // Emit that there was no change
         this.$emit("editorChanged", false);
       else this.$emit("editorChanged", true); // Else emit that there was a change
     },
     removeTags: function(str) {
       let serializer = new XMLSerializer();
-      let tree =  new window.DOMParser().parseFromString(str, "text/xml")
-      let node = tree.getElementsByTagName("MDocument")[0]
-      return serializer.serializeToString(node)
+      let tree = new window.DOMParser().parseFromString(str, "text/xml");
+      let node = tree.getElementsByTagName("MDocument")[0];
+      return serializer.serializeToString(node);
     }
   },
   computed: {

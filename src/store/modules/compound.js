@@ -82,7 +82,7 @@ let actions = {
   },
   updateChanged: ({ commit }, val) => {
     commit("setChanged", val);
-  },
+  }
 };
 
 // mutations

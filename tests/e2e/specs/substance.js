@@ -216,18 +216,6 @@ describe("The substance page", () => {
       .find("canvas#canvas")
       .click();
 
-    // const getIframeDocument = () => {
-    //   return cy
-    //   .get('iframe[id=marvin]')
-    //   .its('0.contentDocument').should('exist')
-    // }
-    // const getIframeBody = () => {
-    //   return getIframeDocument()
-    //   .its('body').should('not.be.undefined')
-    //   .then(cy.wrap)
-    // }
-    // getIframeBody().find('div[title="Clean"]').click({force: true})
-
     // Save
     cy.get("button:contains('Save Compound')")
       .should("not.be.disabled")
@@ -330,21 +318,18 @@ describe("The substance page", () => {
       .click();
 
     // Save button enabled
-    cy.get("button:contains('Save Compound')")
-      .should("not.be.disabled")
+    cy.get("button:contains('Save Compound')").should("not.be.disabled");
 
-    cy.get("div.navbar-brand").click()
-    cy.get("div.modal-dialog").contains("Unsaved changes exist")
-    cy.get("button:contains('NO')").click()
+    cy.get("div.navbar-brand").click();
+    cy.get("div.modal-dialog").contains("Unsaved changes exist");
+    cy.get("button:contains('NO')").click();
 
     // Save button still enabled
-    cy.get("button:contains('Save Compound')")
-      .should("not.be.disabled")
+    cy.get("button:contains('Save Compound')").should("not.be.disabled");
 
-    cy.get("a:contains('Lists')").click()
-    cy.get("button:contains('YES')").click()
-    cy.url().should('contain', '/lists')
-
+    cy.get("a:contains('Lists')").click();
+    cy.get("button:contains('YES')").click();
+    cy.url().should("contain", "/lists");
   });
   it("logout should provide message to user", () => {
     cy.get("[data-cy=user-dropdown]").click();

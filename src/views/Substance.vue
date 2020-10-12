@@ -98,7 +98,7 @@ export default {
         options.push({ value: item.id, text: item.attributes.label });
       return options;
     },
-    checkyoself: function(event) {
+    checkChanged: function(event) {
       if (this.$store.state.compound.changed) {
         // below only needs to eval to a truthy value
         event.returnValue = "lose your changes?";
@@ -112,27 +112,29 @@ export default {
     SubstanceRelationshipTable
   },
   created() {
-    window.addEventListener("beforeunload", this.checkyoself)
+    window.addEventListener("beforeunload", this.checkChanged);
   },
   mounted() {
     this.$store.dispatch("queryStructureType/getList");
   },
   beforeRouteLeave(to, from, next) {
-    console.log(this.$store.state.compound.changed);
     if (this.$store.state.compound.changed) {
-      this.$bvModal.msgBoxConfirm('Unsaved changes exist on the compound in the editor, are you okay with losing the changes?', {
-        okTitle: "YES",
-        cancelTitle: "NO"
-      })
+      this.$bvModal
+        .msgBoxConfirm(
+          "Unsaved changes exist on the compound in the editor, are you okay with losing the changes?",
+          {
+            okTitle: "YES",
+            cancelTitle: "NO"
+          }
+        )
         .then(value => {
-          console.log("value", value)
           if (value) {
             this.$store.dispatch("compound/updateChanged", false);
             next();
           } else {
             next(false);
           }
-        })
+        });
     } else {
       next();
     }
