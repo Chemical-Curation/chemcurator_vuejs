@@ -51,7 +51,7 @@ export default {
       let requestBody = {
         type: "definedCompound",
         attributes: {
-          molfileV3000: this.$refs["ketcher"].molfile.replace(/\\/g, "\\\\")
+          molfileV2000: this.$refs["ketcher"].molfile.replace(/\\/g, "\\\\")
         }
       };
       if (compoundId) {

@@ -20,7 +20,7 @@
 
   <script>
     var sendMolfile = function () {
-      window.parent.postMessage({type: "returnMolfile", molfile: ketcher.getMolfile(v3000=true)}, "*");
+      window.parent.postMessage({type: "returnMolfile", molfile: ketcher.getMolfile()}, "*");
     };
     window.addEventListener(
       "load",

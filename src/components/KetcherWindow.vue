@@ -38,8 +38,8 @@ export default {
   data() {
     return {
       ketcherURL: process.env.VUE_APP_KETCHER_URL,
-      initial_molfile: "  0  0  0     0  0            999 V3000\nM  END",
-      blank: "  0  0  0     0  0            999 V3000\nM  END",
+      initial_molfile: "  0  0  0     0  0            999 V2000\nM  END",
+      blank: "  0  0  0     0  0            999 V2000\nM  END",
       molfile: ""
     };
   },
