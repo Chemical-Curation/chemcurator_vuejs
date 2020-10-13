@@ -2,8 +2,6 @@ import rootActions from "../actions.js";
 import rootMutations from "../mutations.js";
 import rootGetters from "../getters.js";
 
-import { HTTP } from "@/store/http-common";
-
 const defaultState = () => {
   return {
     data: {},
@@ -18,16 +16,8 @@ const state = defaultState();
 
 let actions = {
   ...rootActions,
-  async getObject(context, id) {
-    await HTTP.get(`/lists/${id}?include=listAccessibility,types`).then(
-      response => {
-        context.commit("setAttributes", response.data);
-        context.commit("storeIncluded", response.data.included);
-      }
-    );
-  },
   getResourceURI: () => {
-    return "lists";
+    return "records";
   }
 };
 
@@ -36,13 +26,7 @@ const getters = {
 };
 
 const mutations = {
-  ...rootMutations,
-  clearState(state) {
-    Object.assign(state, defaultState());
-  },
-  setAttributes(state, { data }) {
-    state.data = data;
-  }
+  ...rootMutations
 };
 
 export default {

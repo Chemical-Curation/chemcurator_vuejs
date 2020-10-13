@@ -490,7 +490,7 @@ describe("The substance page's Relationships Table", () => {
     cy.visit("/substance");
     cy.server();
 
-    // fixture loading the synonyms
+    // fixture loading the substance relationships
     cy.route(
       "GET",
       "/substanceRelationships?*",
@@ -518,5 +518,38 @@ describe("The substance page's Relationships Table", () => {
       .should("contain", "DTXSID502000000")
       .should("contain", "DTXSID602000001")
       .should("contain", "DTXSID202000002");
+  });
+});
+
+describe("The substance page's List Table", () => {
+  beforeEach(() => {
+    cy.adminLogin();
+    cy.visit("/substance");
+    cy.server();
+
+    // fixture loading the records
+    cy.route("GET", "/records?*", "fx:../responses/records.json");
+  });
+
+  it("should show the relationships table", () => {
+    cy.get("#substanceRelationshipTable").should(
+      "contain.text",
+      "No Rows To Show"
+    );
+  });
+
+  it("should load records", () => {
+    // Navigate to substance with records
+    cy.get("[data-cy=search-box]").type("DTXCID502000009");
+    cy.get("[data-cy=search-button]").click();
+
+    // Verify response contains rids as required.
+    cy.get("#listTable")
+      .find("div.ag-center-cols-clipper")
+      .find("div.ag-row[role=row]")
+      .should("have.length", 3)
+      .should("contain", "DTXRID602000002")
+      .should("contain", "DTXRID002000004")
+      .should("contain", "DTXRID702000005");
   });
 });

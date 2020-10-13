@@ -1,0 +1,762 @@
+{
+	"links": {
+		"first": "http://localhost:8000/records?filter%5Bsubstance.id%5D=2&include=identifiers%2Clist&page%5Bnumber%5D=1",
+		"last": "http://localhost:8000/records?filter%5Bsubstance.id%5D=2&include=identifiers%2Clist&page%5Bnumber%5D=1",
+		"next": null,
+		"prev": null
+	},
+	"data": [
+		{
+			"type": "record",
+			"id": "35",
+			"attributes": {
+				"createdAt": "2020-08-25T21:15:09.544749",
+				"updatedAt": "2020-08-25T21:15:09.544791",
+				"rid": "DTXRID602000002",
+				"externalId": "48",
+				"message": "I made a record",
+				"score": 4.7,
+				"isValidated": false
+			},
+			"relationships": {
+				"createdBy": {
+					"links": {
+						"related": "http://localhost:8000/records/35/createdBy"
+					},
+					"data": {
+						"type": "user",
+						"id": "1"
+					}
+				},
+				"updatedBy": {
+					"links": {
+						"related": "http://localhost:8000/records/35/updatedBy"
+					},
+					"data": null
+				},
+				"list": {
+					"links": {
+						"self": "http://localhost:8000/records/35/relationships/list",
+						"related": "http://localhost:8000/records/35/list"
+					},
+					"data": {
+						"type": "list",
+						"id": "2"
+					}
+				},
+				"substance": {
+					"links": {
+						"self": "http://localhost:8000/records/35/relationships/substance",
+						"related": "http://localhost:8000/records/35/substance"
+					},
+					"data": {
+						"type": "substance",
+						"id": "2"
+					}
+				},
+				"identifiers": {
+					"meta": {
+						"count": 3
+					},
+					"data": [
+						{
+							"type": "recordIdentifier",
+							"id": "3"
+						},
+						{
+							"type": "recordIdentifier",
+							"id": "4"
+						},
+						{
+							"type": "recordIdentifier",
+							"id": "5"
+						}
+					],
+					"links": {
+						"self": "http://localhost:8000/records/35/relationships/identifiers",
+						"related": "http://localhost:8000/records/35/identifiers"
+					}
+				}
+			},
+			"links": {
+				"self": "http://localhost:8000/records/35"
+			}
+		},
+		{
+			"type": "record",
+			"id": "37",
+			"attributes": {
+				"createdAt": "2020-08-25T21:17:00.740984",
+				"updatedAt": "2020-08-25T21:17:00.741035",
+				"rid": "DTXRID002000004",
+				"externalId": "49",
+				"message": "I made a record",
+				"score": 4.7,
+				"isValidated": false
+			},
+			"relationships": {
+				"createdBy": {
+					"links": {
+						"related": "http://localhost:8000/records/37/createdBy"
+					},
+					"data": {
+						"type": "user",
+						"id": "1"
+					}
+				},
+				"updatedBy": {
+					"links": {
+						"related": "http://localhost:8000/records/37/updatedBy"
+					},
+					"data": null
+				},
+				"list": {
+					"links": {
+						"self": "http://localhost:8000/records/37/relationships/list",
+						"related": "http://localhost:8000/records/37/list"
+					},
+					"data": {
+						"type": "list",
+						"id": "2"
+					}
+				},
+				"substance": {
+					"links": {
+						"self": "http://localhost:8000/records/37/relationships/substance",
+						"related": "http://localhost:8000/records/37/substance"
+					},
+					"data": {
+						"type": "substance",
+						"id": "2"
+					}
+				},
+				"identifiers": {
+					"meta": {
+						"count": 0
+					},
+					"data": [],
+					"links": {
+						"self": "http://localhost:8000/records/37/relationships/identifiers",
+						"related": "http://localhost:8000/records/37/identifiers"
+					}
+				}
+			},
+			"links": {
+				"self": "http://localhost:8000/records/37"
+			}
+		},
+		{
+			"type": "record",
+			"id": "38",
+			"attributes": {
+				"createdAt": "2020-10-08T16:20:30.816631",
+				"updatedAt": "2020-10-08T16:20:30.816649",
+				"rid": "DTXRID702000005",
+				"externalId": "4",
+				"message": "Outside rich area physical hospital relate. Represent certain indeed record.\nPower happy ground detail unit relationship. Enter each young the decision. Word left some coach decide performance.\nMovement reality only project her save clear. Source kitchen spend beautiful watch each. Rich involve last maintain seven by whole born.\nReally total about sing cell. Share language material quite.\nInvolve meet lead appear least important.",
+				"score": 9266079926101.59,
+				"isValidated": true
+			},
+			"relationships": {
+				"createdBy": {
+					"links": {
+						"related": "http://localhost:8000/records/38/createdBy"
+					},
+					"data": null
+				},
+				"updatedBy": {
+					"links": {
+						"related": "http://localhost:8000/records/38/updatedBy"
+					},
+					"data": null
+				},
+				"list": {
+					"links": {
+						"self": "http://localhost:8000/records/38/relationships/list",
+						"related": "http://localhost:8000/records/38/list"
+					},
+					"data": {
+						"type": "list",
+						"id": "14"
+					}
+				},
+				"substance": {
+					"links": {
+						"self": "http://localhost:8000/records/38/relationships/substance",
+						"related": "http://localhost:8000/records/38/substance"
+					},
+					"data": {
+						"type": "substance",
+						"id": "2"
+					}
+				},
+				"identifiers": {
+					"meta": {
+						"count": 5
+					},
+					"data": [
+						{
+							"type": "recordIdentifier",
+							"id": "6"
+						},
+						{
+							"type": "recordIdentifier",
+							"id": "7"
+						},
+						{
+							"type": "recordIdentifier",
+							"id": "8"
+						},
+						{
+							"type": "recordIdentifier",
+							"id": "9"
+						},
+						{
+							"type": "recordIdentifier",
+							"id": "10"
+						}
+					],
+					"links": {
+						"self": "http://localhost:8000/records/38/relationships/identifiers",
+						"related": "http://localhost:8000/records/38/identifiers"
+					}
+				}
+			},
+			"links": {
+				"self": "http://localhost:8000/records/38"
+			}
+		}
+	],
+	"included": [
+		{
+			"type": "list",
+			"id": "14",
+			"attributes": {
+				"createdAt": "2020-10-08T16:16:50.449136",
+				"updatedAt": "2020-10-08T16:16:50.449147",
+				"name": "evidence-scene-room-4",
+				"label": "Medical member stay not foreign. Human wall issue offer impact since.\nOutside money nation no day station recognize. Bar court country laugh so indeed.",
+				"shortDescription": "Around thank Democrat social environment compare.",
+				"longDescription": "From wife onto kind middle then.",
+				"sourceUrl": "Decade when western politics what.\nCost fight store town because. Race phone idea shake get out.\nMajority after something against see. Authority charge at wait time next personal. Authority light according particularly sometimes head.\nPerformance series perform attack political professor. Ability ahead institution role material. Husband form exactly girl.\nClass usually blood loss. Food skill me reflect sister create.\nWay color my place moment general environment.",
+				"sourceReference": "Stage sometimes discuss magazine bring indicate available. They positive itself which east seek.\nSing heart reduce at baby maintain. Drop her training occur three.\nAgreement certain present carry. Knowledge establish glass and else.\nExperience that boy total. Actually win shake level condition mean all.\nPicture race Republican south personal state clear newspaper. Deep single cut clearly what politics. Anything represent care prepare.",
+				"sourceDoi": "Animal tree lose box everyone. Age decision social sport consider TV. Gas alone I own.\nLeast technology care difference expert consider station. Eye maintain reach. Company mean husband movie girl key management. Enjoy dog goal many debate.\nCustomer traditional might pattern notice. When tough law enjoy time nothing.\nQuickly school into he evidence party debate. Of citizen her say our.",
+				"dateOfSourceCollection": "2020-10-08T16:15:23.500572"
+			},
+			"relationships": {
+				"createdBy": {
+					"links": {
+						"related": "http://localhost:8000/records/14/createdBy"
+					},
+					"data": null
+				},
+				"updatedBy": {
+					"links": {
+						"related": "http://localhost:8000/records/14/updatedBy"
+					},
+					"data": null
+				},
+				"listAccessibility": {
+					"links": {
+						"self": "http://localhost:8000/records/14/relationships/listAccessibility",
+						"related": "http://localhost:8000/records/14/listAccessibility"
+					},
+					"data": {
+						"type": "accessibilityType",
+						"id": "6"
+					}
+				},
+				"owners": {
+					"data": []
+				},
+				"externalContact": {
+					"links": {
+						"self": "http://localhost:8000/records/14/relationships/externalContact",
+						"related": "http://localhost:8000/records/14/externalContact"
+					},
+					"data": {
+						"type": "externalContact",
+						"id": "6"
+					}
+				},
+				"types": {
+					"meta": {
+						"count": 0
+					},
+					"data": [],
+					"links": {
+						"self": "http://localhost:8000/records/14/relationships/types",
+						"related": "http://localhost:8000/records/14/types"
+					}
+				}
+			},
+			"links": {
+				"self": "http://localhost:8000/lists/14"
+			}
+		},
+		{
+			"type": "list",
+			"id": "2",
+			"attributes": {
+				"createdAt": "2020-08-04T18:06:47.101194",
+				"updatedAt": "2020-08-20T19:43:33.021396",
+				"name": "Alist",
+				"label": "A list",
+				"shortDescription": "",
+				"longDescription": "Foobar<a href=\"https://www.google.com/\"></a>",
+				"sourceUrl": "www.factotum.com",
+				"sourceReference": "",
+				"sourceDoi": "",
+				"dateOfSourceCollection": "2015-10-09T23:55:59.342380"
+			},
+			"relationships": {
+				"createdBy": {
+					"links": {
+						"related": "http://localhost:8000/records/2/createdBy"
+					},
+					"data": null
+				},
+				"updatedBy": {
+					"links": {
+						"related": "http://localhost:8000/records/2/updatedBy"
+					},
+					"data": null
+				},
+				"listAccessibility": {
+					"links": {
+						"self": "http://localhost:8000/records/2/relationships/listAccessibility",
+						"related": "http://localhost:8000/records/2/listAccessibility"
+					},
+					"data": {
+						"type": "accessibilityType",
+						"id": "1"
+					}
+				},
+				"owners": {
+					"data": [
+						{
+							"type": "user",
+							"id": "1"
+						}
+					]
+				},
+				"externalContact": {
+					"links": {
+						"self": "http://localhost:8000/records/2/relationships/externalContact",
+						"related": "http://localhost:8000/records/2/externalContact"
+					},
+					"data": {
+						"type": "externalContact",
+						"id": "1"
+					}
+				},
+				"types": {
+					"meta": {
+						"count": 0
+					},
+					"data": [],
+					"links": {
+						"self": "http://localhost:8000/records/2/relationships/types",
+						"related": "http://localhost:8000/records/2/types"
+					}
+				}
+			},
+			"links": {
+				"self": "http://localhost:8000/lists/2"
+			}
+		},
+		{
+			"type": "recordIdentifier",
+			"id": "10",
+			"attributes": {
+				"createdAt": "2020-10-08T16:22:02.499118",
+				"updatedAt": "2020-10-08T16:22:02.499129",
+				"identifier": "Staff police charge education. Charge he pattern give position. Commercial TV agency very strategy just enter accept. Else lay development describe however the financial college.",
+				"identifierLabel": "Almost painting him detail vote guy. Eye break side fast adult investment form."
+			},
+			"relationships": {
+				"createdBy": {
+					"links": {
+						"related": "http://localhost:8000/records/10/createdBy"
+					},
+					"data": null
+				},
+				"updatedBy": {
+					"links": {
+						"related": "http://localhost:8000/records/10/updatedBy"
+					},
+					"data": null
+				},
+				"record": {
+					"links": {
+						"self": "http://localhost:8000/records/10/relationships/record",
+						"related": "http://localhost:8000/records/10/record"
+					},
+					"data": {
+						"type": "record",
+						"id": "38"
+					}
+				},
+				"identifierType": {
+					"links": {
+						"self": "http://localhost:8000/records/10/relationships/identifierType",
+						"related": "http://localhost:8000/records/10/identifierType"
+					},
+					"data": {
+						"type": "identifierType",
+						"id": "8"
+					}
+				}
+			},
+			"links": {
+				"self": "http://localhost:8000/recordIdentifiers/10"
+			}
+		},
+		{
+			"type": "recordIdentifier",
+			"id": "3",
+			"attributes": {
+				"createdAt": "2020-10-07T20:37:34.083897",
+				"updatedAt": "2020-10-07T20:37:34.083915",
+				"identifier": "Foobar",
+				"identifierLabel": "Foobar"
+			},
+			"relationships": {
+				"createdBy": {
+					"links": {
+						"related": "http://localhost:8000/records/3/createdBy"
+					},
+					"data": {
+						"type": "user",
+						"id": "1"
+					}
+				},
+				"updatedBy": {
+					"links": {
+						"related": "http://localhost:8000/records/3/updatedBy"
+					},
+					"data": {
+						"type": "user",
+						"id": "1"
+					}
+				},
+				"record": {
+					"links": {
+						"self": "http://localhost:8000/records/3/relationships/record",
+						"related": "http://localhost:8000/records/3/record"
+					},
+					"data": {
+						"type": "record",
+						"id": "35"
+					}
+				},
+				"identifierType": {
+					"links": {
+						"self": "http://localhost:8000/records/3/relationships/identifierType",
+						"related": "http://localhost:8000/records/3/identifierType"
+					},
+					"data": null
+				}
+			},
+			"links": {
+				"self": "http://localhost:8000/recordIdentifiers/3"
+			}
+		},
+		{
+			"type": "recordIdentifier",
+			"id": "4",
+			"attributes": {
+				"createdAt": "2020-10-07T20:37:38.164652",
+				"updatedAt": "2020-10-07T20:37:38.164671",
+				"identifier": "Foobar2",
+				"identifierLabel": "Foobar2"
+			},
+			"relationships": {
+				"createdBy": {
+					"links": {
+						"related": "http://localhost:8000/records/4/createdBy"
+					},
+					"data": {
+						"type": "user",
+						"id": "1"
+					}
+				},
+				"updatedBy": {
+					"links": {
+						"related": "http://localhost:8000/records/4/updatedBy"
+					},
+					"data": {
+						"type": "user",
+						"id": "1"
+					}
+				},
+				"record": {
+					"links": {
+						"self": "http://localhost:8000/records/4/relationships/record",
+						"related": "http://localhost:8000/records/4/record"
+					},
+					"data": {
+						"type": "record",
+						"id": "35"
+					}
+				},
+				"identifierType": {
+					"links": {
+						"self": "http://localhost:8000/records/4/relationships/identifierType",
+						"related": "http://localhost:8000/records/4/identifierType"
+					},
+					"data": null
+				}
+			},
+			"links": {
+				"self": "http://localhost:8000/recordIdentifiers/4"
+			}
+		},
+		{
+			"type": "recordIdentifier",
+			"id": "5",
+			"attributes": {
+				"createdAt": "2020-10-07T20:37:47.317909",
+				"updatedAt": "2020-10-07T20:37:47.317931",
+				"identifier": "Foobar23",
+				"identifierLabel": "Foobar23"
+			},
+			"relationships": {
+				"createdBy": {
+					"links": {
+						"related": "http://localhost:8000/records/5/createdBy"
+					},
+					"data": {
+						"type": "user",
+						"id": "1"
+					}
+				},
+				"updatedBy": {
+					"links": {
+						"related": "http://localhost:8000/records/5/updatedBy"
+					},
+					"data": {
+						"type": "user",
+						"id": "1"
+					}
+				},
+				"record": {
+					"links": {
+						"self": "http://localhost:8000/records/5/relationships/record",
+						"related": "http://localhost:8000/records/5/record"
+					},
+					"data": {
+						"type": "record",
+						"id": "35"
+					}
+				},
+				"identifierType": {
+					"links": {
+						"self": "http://localhost:8000/records/5/relationships/identifierType",
+						"related": "http://localhost:8000/records/5/identifierType"
+					},
+					"data": null
+				}
+			},
+			"links": {
+				"self": "http://localhost:8000/recordIdentifiers/5"
+			}
+		},
+		{
+			"type": "recordIdentifier",
+			"id": "6",
+			"attributes": {
+				"createdAt": "2020-10-08T16:22:02.466488",
+				"updatedAt": "2020-10-08T16:22:02.466501",
+				"identifier": "Trade finish these anyone free. Increase allow professional threat must husband prove.\nProfessional themselves thus decade against imagine.",
+				"identifierLabel": "Open front could."
+			},
+			"relationships": {
+				"createdBy": {
+					"links": {
+						"related": "http://localhost:8000/records/6/createdBy"
+					},
+					"data": null
+				},
+				"updatedBy": {
+					"links": {
+						"related": "http://localhost:8000/records/6/updatedBy"
+					},
+					"data": null
+				},
+				"record": {
+					"links": {
+						"self": "http://localhost:8000/records/6/relationships/record",
+						"related": "http://localhost:8000/records/6/record"
+					},
+					"data": {
+						"type": "record",
+						"id": "38"
+					}
+				},
+				"identifierType": {
+					"links": {
+						"self": "http://localhost:8000/records/6/relationships/identifierType",
+						"related": "http://localhost:8000/records/6/identifierType"
+					},
+					"data": {
+						"type": "identifierType",
+						"id": "4"
+					}
+				}
+			},
+			"links": {
+				"self": "http://localhost:8000/recordIdentifiers/6"
+			}
+		},
+		{
+			"type": "recordIdentifier",
+			"id": "7",
+			"attributes": {
+				"createdAt": "2020-10-08T16:22:02.474956",
+				"updatedAt": "2020-10-08T16:22:02.474967",
+				"identifier": "Structure executive bed trial plant glass draw.\nAddress allow market approach rock property avoid. Television recognize ground away during dream want.",
+				"identifierLabel": "Themselves chair lawyer player. Structure choose Mrs air candidate pick more."
+			},
+			"relationships": {
+				"createdBy": {
+					"links": {
+						"related": "http://localhost:8000/records/7/createdBy"
+					},
+					"data": null
+				},
+				"updatedBy": {
+					"links": {
+						"related": "http://localhost:8000/records/7/updatedBy"
+					},
+					"data": null
+				},
+				"record": {
+					"links": {
+						"self": "http://localhost:8000/records/7/relationships/record",
+						"related": "http://localhost:8000/records/7/record"
+					},
+					"data": {
+						"type": "record",
+						"id": "38"
+					}
+				},
+				"identifierType": {
+					"links": {
+						"self": "http://localhost:8000/records/7/relationships/identifierType",
+						"related": "http://localhost:8000/records/7/identifierType"
+					},
+					"data": {
+						"type": "identifierType",
+						"id": "5"
+					}
+				}
+			},
+			"links": {
+				"self": "http://localhost:8000/recordIdentifiers/7"
+			}
+		},
+		{
+			"type": "recordIdentifier",
+			"id": "8",
+			"attributes": {
+				"createdAt": "2020-10-08T16:22:02.483416",
+				"updatedAt": "2020-10-08T16:22:02.483429",
+				"identifier": "Society check treat speak hand party. Decide until seem teacher.\nPick light certain begin his social worker treatment. Offer call either.",
+				"identifierLabel": "Manage determine service house. None people reason usually dog at."
+			},
+			"relationships": {
+				"createdBy": {
+					"links": {
+						"related": "http://localhost:8000/records/8/createdBy"
+					},
+					"data": null
+				},
+				"updatedBy": {
+					"links": {
+						"related": "http://localhost:8000/records/8/updatedBy"
+					},
+					"data": null
+				},
+				"record": {
+					"links": {
+						"self": "http://localhost:8000/records/8/relationships/record",
+						"related": "http://localhost:8000/records/8/record"
+					},
+					"data": {
+						"type": "record",
+						"id": "38"
+					}
+				},
+				"identifierType": {
+					"links": {
+						"self": "http://localhost:8000/records/8/relationships/identifierType",
+						"related": "http://localhost:8000/records/8/identifierType"
+					},
+					"data": {
+						"type": "identifierType",
+						"id": "6"
+					}
+				}
+			},
+			"links": {
+				"self": "http://localhost:8000/recordIdentifiers/8"
+			}
+		},
+		{
+			"type": "recordIdentifier",
+			"id": "9",
+			"attributes": {
+				"createdAt": "2020-10-08T16:22:02.490997",
+				"updatedAt": "2020-10-08T16:22:02.491007",
+				"identifier": "Page child action kitchen really fall science note. Senior state continue try former stop. But course lose.",
+				"identifierLabel": "Himself hold toward.\nBed sense kid business laugh. Operation city alone east fact skin."
+			},
+			"relationships": {
+				"createdBy": {
+					"links": {
+						"related": "http://localhost:8000/records/9/createdBy"
+					},
+					"data": null
+				},
+				"updatedBy": {
+					"links": {
+						"related": "http://localhost:8000/records/9/updatedBy"
+					},
+					"data": null
+				},
+				"record": {
+					"links": {
+						"self": "http://localhost:8000/records/9/relationships/record",
+						"related": "http://localhost:8000/records/9/record"
+					},
+					"data": {
+						"type": "record",
+						"id": "38"
+					}
+				},
+				"identifierType": {
+					"links": {
+						"self": "http://localhost:8000/records/9/relationships/identifierType",
+						"related": "http://localhost:8000/records/9/identifierType"
+					},
+					"data": {
+						"type": "identifierType",
+						"id": "7"
+					}
+				}
+			},
+			"links": {
+				"self": "http://localhost:8000/recordIdentifiers/9"
+			}
+		}
+	],
+	"meta": {
+		"pagination": {
+			"page": 1,
+			"pages": 1,
+			"count": 3
+		},
+		"apiVersion": "1.0.0-beta"
+	}
+}

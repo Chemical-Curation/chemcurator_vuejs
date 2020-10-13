@@ -34,14 +34,16 @@
     </b-row>
     <SynonymTable :substance-id="substanceId" />
     <SubstanceRelationshipTable class="mb-5" :substance-id="substanceId" />
+    <ListTable class="mb-5" :substance-id="substanceId" />
   </b-container>
 </template>
 
 <script>
 import ChemicalEditors from "@/components/ChemicalEditors";
-import SubstanceForm from "@/components/SubstanceForm";
-import SynonymTable from "@/components/synonyms/SynonymTable";
-import SubstanceRelationshipTable from "@/components/SubstanceRelationshipTable";
+import SubstanceForm from "@/components/substance/SubstanceForm";
+import SynonymTable from "@/components/synonyms/agSynonymTable";
+import SubstanceRelationshipTable from "@/components/substance/agSubstanceRelationshipTable";
+import ListTable from "@/components/records/agRecordTable";
 import { mapState } from "vuex";
 
 export default {
@@ -100,7 +102,8 @@ export default {
     ChemicalEditors,
     SubstanceForm,
     SynonymTable,
-    SubstanceRelationshipTable
+    SubstanceRelationshipTable,
+    ListTable
   },
   mounted() {
     this.$store.dispatch("queryStructureType/getList");
