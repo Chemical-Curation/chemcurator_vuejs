@@ -26,5 +26,5 @@ export default {
   },
   setChanged(state, changed) {
     state.changed = changed;
-  },
+  }
 };

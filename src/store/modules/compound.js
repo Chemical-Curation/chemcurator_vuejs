@@ -78,7 +78,7 @@ let actions = {
     commit("clearState");
     commit("definedcompound/clearState");
     commit("illdefinedcompound/clearState");
-  },
+  }
 };
 
 // mutations

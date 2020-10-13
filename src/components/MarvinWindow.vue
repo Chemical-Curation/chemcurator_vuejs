@@ -64,8 +64,12 @@ export default {
       this.localMrvfile = mrvfile;
       let strippedMrv = this.removeTags(mrvfile);
       if (strippedMrv === this.initialMrvfile)
-        this.$store.dispatch("compound/illdefinedcompound/updateChanged", false);
-      else this.$store.dispatch("compound/illdefinedcompound/updateChanged", true);
+        this.$store.dispatch(
+          "compound/illdefinedcompound/updateChanged",
+          false
+        );
+      else
+        this.$store.dispatch("compound/illdefinedcompound/updateChanged", true);
     },
     removeTags: function(str) {
       let serializer = new XMLSerializer();

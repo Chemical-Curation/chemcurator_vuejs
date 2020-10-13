@@ -32,9 +32,11 @@ export default {
   },
   computed: {
     editorChanged: function() {
-      if(this.$store.state.compound.illdefinedcompound.changed ||
-          (this.$store.state.compound.definedcompound.changed &&
-          this.type === "definedCompound")){
+      if (
+        this.$store.state.compound.illdefinedcompound.changed ||
+        (this.$store.state.compound.definedcompound.changed &&
+          this.type === "definedCompound")
+      ) {
         return true;
       } else {
         return false;

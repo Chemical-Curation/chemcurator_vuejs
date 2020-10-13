@@ -96,8 +96,10 @@ export default {
       return options;
     },
     checkChanged: function(event) {
-      if (this.$store.state.compound.illdefinedcompound.changed ||
-          this.$store.state.compound.definedcompound.changed) {
+      if (
+        this.$store.state.compound.illdefinedcompound.changed ||
+        this.$store.state.compound.definedcompound.changed
+      ) {
         // below only needs to eval to a truthy value
         event.returnValue = "lose your changes?";
       }
@@ -116,8 +118,10 @@ export default {
     this.$store.dispatch("queryStructureType/getList");
   },
   beforeRouteLeave(to, from, next) {
-    if (this.$store.state.compound.illdefinedcompound.changed ||
-          this.$store.state.compound.definedcompound.changed) {
+    if (
+      this.$store.state.compound.illdefinedcompound.changed ||
+      this.$store.state.compound.definedcompound.changed
+    ) {
       this.$bvModal
         .msgBoxConfirm(
           "Unsaved changes exist on the compound in the editor, are you okay with losing the changes?",
@@ -128,8 +132,14 @@ export default {
         )
         .then(value => {
           if (value) {
-            this.$store.dispatch("compound/definedcompound/updateChanged", false);
-            this.$store.dispatch("compound/illdefinedcompound/updateChanged", false);
+            this.$store.dispatch(
+              "compound/definedcompound/updateChanged",
+              false
+            );
+            this.$store.dispatch(
+              "compound/illdefinedcompound/updateChanged",
+              false
+            );
             next();
           } else {
             next(false);
