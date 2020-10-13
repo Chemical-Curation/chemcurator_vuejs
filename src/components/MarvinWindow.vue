@@ -62,14 +62,10 @@ export default {
     updateLocalMrvfile: function(mrvfile) {
       // Save the external mrvfile to the local vue instance
       this.localMrvfile = mrvfile;
-
-      // If the mrvfile is blank (as Marvin returns it)
-      // Todo: handle loaded but unchanged
       let strippedMrv = this.removeTags(mrvfile);
       if (strippedMrv === this.initialMrvfile)
-        // Emit that there was no change
-        this.$emit("editorChanged", false);
-      else this.$emit("editorChanged", true); // Else emit that there was a change
+        this.$store.dispatch("compound/illdefinedcompound/updateChanged", false);
+      else this.$store.dispatch("compound/illdefinedcompound/updateChanged", true);
     },
     removeTags: function(str) {
       let serializer = new XMLSerializer();

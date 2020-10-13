@@ -23,5 +23,8 @@ export default {
   },
   loaded(state) {
     state.loading = false;
-  }
+  },
+  setChanged(state, changed) {
+    state.changed = changed;
+  },
 };

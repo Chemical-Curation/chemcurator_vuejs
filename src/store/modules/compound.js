@@ -12,8 +12,7 @@ const defaultState = () => {
     loading: false,
     count: 0,
     type: "none",
-    list: [],
-    changed: false
+    list: []
   };
 };
 
@@ -80,9 +79,6 @@ let actions = {
     commit("definedcompound/clearState");
     commit("illdefinedcompound/clearState");
   },
-  updateChanged: ({ commit }, val) => {
-    commit("setChanged", val);
-  }
 };
 
 // mutations
@@ -90,9 +86,6 @@ const mutations = {
   ...rootMutations,
   setType(state, type) {
     state.type = type;
-  },
-  setChanged(state, changed) {
-    state.changed = changed;
   },
   clearState(state) {
     Object.assign(state, defaultState());

@@ -30,17 +30,14 @@ export default {
   props: {
     type: String
   },
-  data() {
-    return {
-      editorChanged: false
-    };
-  },
-  watch: {
+  computed: {
     editorChanged: function() {
-      if (this.editorChanged) {
-        this.$store.dispatch("compound/updateChanged", true);
+      if(this.$store.state.compound.illdefinedcompound.changed ||
+          (this.$store.state.compound.definedcompound.changed &&
+          this.type === "definedCompound")){
+        return true;
       } else {
-        this.$store.dispatch("compound/updateChanged", false);
+        return false;
       }
     }
   },
