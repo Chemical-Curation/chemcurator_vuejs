@@ -1,10 +1,10 @@
 <template>
   <div>
     <div v-show="type === 'definedCompound'">
-      <KetcherWindow ref="ketcher" @editorChanged="editorChanged = $event" />
+      <KetcherWindow ref="ketcher" />
     </div>
     <div v-show="type !== 'definedCompound'">
-      <MarvinWindow ref="marvin" @editorChanged="editorChanged = $event" />
+      <MarvinWindow ref="marvin" />
     </div>
     <div class="my-3">
       <b-button
@@ -33,7 +33,8 @@ export default {
   computed: {
     editorChanged: function() {
       if (
-        this.$store.state.compound.illdefinedcompound.changed ||
+        (this.$store.state.compound.illdefinedcompound.changed &&
+          this.type !== "definedCompound") ||
         (this.$store.state.compound.definedcompound.changed &&
           this.type === "definedCompound")
       ) {
