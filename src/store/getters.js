@@ -57,3 +57,27 @@ export function substanceFormFromRelationship(state) {
     substanceTypeID: relationships.substanceType.data.id
   };
 }
+
+export function substanceTreeFromRelationship(state) {
+  let blankTree = {
+    updatedAt: "",
+    updatedByID: "",
+    sid: ""
+  };
+
+  if (!state.data?.relationships?.substance?.data) return blankTree;
+
+  let type = state.data.relationships.substance.data.type;
+  let id = state.data.relationships.substance.data.id;
+
+  // Resource not found in includes.  Return blank
+  if (!state.included?.[type]?.[id]) return blankTree;
+
+  let attributes = state.included[type][id].attributes;
+  let relationships = state.included[type][id].relationships;
+  return {
+    updatedAt: attributes.updatedAt,
+    updatedBy: relationships.updatedBy.data.id,
+    sid: attributes.sid
+  };
+}
