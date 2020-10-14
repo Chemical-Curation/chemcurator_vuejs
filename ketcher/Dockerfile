@@ -6,33 +6,33 @@ RUN \
 # Install Node.js
     apt-get update \
  && apt-get install -y curl \
+ && apt-get install -y git \
  && curl -sL http://deb.nodesource.com/setup_10.x | bash \
  && apt-get install -y \
     bzip2 \
     nodejs \
 # Download sources
- && curl -sL http://github.com/epam/ketcher/archive/2.0.0-RC.tar.gz -o /tmp/ketcher.tar.gz \
+ && git clone https://github.com/Chemical-Curation/ketcher.git \
  && curl -sL http://github.com/epam/miew/archive/v0.7.13.tar.gz -o /tmp/miew.tar.gz \
 # Build production Ketcher files
- && tar -xf /tmp/ketcher.tar.gz \
  && tar -xf /tmp/miew.tar.gz \
- && cd ketcher-2.0.0-RC \
+ && cd ketcher \
  && npm install \
- && npm run build -- --api-path=/v2/ --miew-path=/tmp/miew-0.7.13/dist \
- && mv /tmp/ketcher-2.0.0-RC/dist /srv/ketcher \
+ && npm run build --api-path=/v2/ --miew-path=/tmp/miew-0.7.13/dist \
+ && mv /tmp/ketcher/dist /srv/ketcher \
  && mv /tmp/miew-0.7.13/dist/Miew.min.* /srv/ketcher \
 # Cleanup
  && apt-get purge -y \
         apt-transport-https \
         bzip2 \
         curl \
+        git \
         gnupg \
         lsb-release \
         nodejs \
  && apt-get autoremove -y \
  && rm -rf \
-        /tmp/ketcher.tar.gz \
-        /tmp/ketcher-2.0.0-RC \
+        /tmp/ketcher \
         /tmp/miew.tar.gz \
         /tmp/miew-0.7.13 \
         /tmp/phantomjs \
