@@ -34,14 +34,16 @@
     </b-row>
     <SynonymTable :substance-id="substanceId" />
     <SubstanceRelationshipTable class="mb-5" :substance-id="substanceId" />
+    <ListTable class="mb-5" :substance-id="substanceId" />
   </b-container>
 </template>
 
 <script>
 import ChemicalEditors from "@/components/ChemicalEditors";
-import SubstanceForm from "@/components/SubstanceForm";
-import SynonymTable from "@/components/synonyms/SynonymTable";
-import SubstanceRelationshipTable from "@/components/SubstanceRelationshipTable";
+import SubstanceForm from "@/components/substance/SubstanceForm";
+import SynonymTable from "@/components/synonyms/agSynonymTable";
+import SubstanceRelationshipTable from "@/components/substance/agSubstanceRelationshipTable";
+import ListTable from "@/components/records/agRecordTable";
 import { mapState } from "vuex";
 
 export default {
@@ -94,16 +96,61 @@ export default {
       for (item of list)
         options.push({ value: item.id, text: item.attributes.label });
       return options;
+    },
+    checkChanged: function(event) {
+      if (
+        this.$store.state.compound.illdefinedcompound.changed ||
+        this.$store.state.compound.definedcompound.changed
+      ) {
+        // below only needs to eval to a truthy value
+        event.returnValue = "lose your changes?";
+      }
     }
   },
   components: {
     ChemicalEditors,
     SubstanceForm,
     SynonymTable,
-    SubstanceRelationshipTable
+    SubstanceRelationshipTable,
+    ListTable
+  },
+  created() {
+    window.addEventListener("beforeunload", this.checkChanged);
   },
   mounted() {
     this.$store.dispatch("queryStructureType/getList");
+  },
+  beforeRouteLeave(to, from, next) {
+    if (
+      this.$store.state.compound.illdefinedcompound.changed ||
+      this.$store.state.compound.definedcompound.changed
+    ) {
+      this.$bvModal
+        .msgBoxConfirm(
+          "Unsaved changes exist on the compound in the editor, are you okay with losing the changes?",
+          {
+            okTitle: "YES",
+            cancelTitle: "NO"
+          }
+        )
+        .then(value => {
+          if (value) {
+            this.$store.dispatch(
+              "compound/definedcompound/updateChanged",
+              false
+            );
+            this.$store.dispatch(
+              "compound/illdefinedcompound/updateChanged",
+              false
+            );
+            next();
+          } else {
+            next(false);
+          }
+        });
+    } else {
+      next();
+    }
   }
 };
 </script>

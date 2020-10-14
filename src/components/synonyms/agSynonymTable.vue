@@ -54,7 +54,7 @@ import {
 } from "@/ag-grid-components/custom-renderers";
 
 export default {
-  name: "SynonymTable",
+  name: "agSynonymTable",
   components: {
     AgGridVue
   },

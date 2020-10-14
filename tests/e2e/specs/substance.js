@@ -101,75 +101,7 @@ describe("The substance page", () => {
       // create first node
       .click();
     // Save
-    cy.get("button:contains('Save Defined Compound')")
-      .should("not.be.disabled")
-      .click();
-
-    // Verify post status and regex for structure
-    cy.get("@post").should("have.property", "status", 201);
-    cy.get("@post")
-      .its("request.body.data.attributes.molfileV3000")
-      // This regex accepts only an Oxygen structure
-      .should(
-        "match",
-        new RegExp(
-          [
-            "",
-            / {2}Ketcher.*/,
-            "",
-            / {2}0 {2}0 {2}0 {5}0 {2}0 {12}999 V3000/,
-            /M {2}V30 BEGIN CTAB/,
-            /M {2}V30 COUNTS 1 0 0 0 0/,
-            /M {2}V30 BEGIN ATOM/,
-            /M {2}V30 1 O 6.5000 -15.05 0.0000 0/,
-            /M {2}V30 END ATOM/,
-            /M {2}V30 BEGIN BOND/,
-            /M {2}V30 END BOND/,
-            /M {2}V30 END CTAB/,
-            /M {2}END/
-          ]
-            .map(r => {
-              return r.source;
-            })
-            .join("\n")
-        )
-      );
-  });
-  it("should post not-loaded defined compounds", () => {
-    // Watch for posts
-    cy.route({
-      method: "POST",
-      url: "/definedCompounds",
-      status: 201,
-      response: {}
-    }).as("post");
-
-    // Select ill defined compound to access Ketcher
-    cy.get("#compound-type-dropdown").select("Defined Compound");
-
-    // Verify ketcher has loaded
-    cy.get("iframe[id=ketcher]")
-      .its("0.contentDocument.body")
-      .should("not.be.empty");
-    // Click Oxygen Button
-    cy.get("iframe[id=ketcher]")
-      .its("0.contentDocument.body")
-      .should("not.be.empty")
-      .then(cy.wrap)
-      .find("#atom")
-      .find("button")
-      .eq(3)
-      .click();
-
-    cy.get("iframe[id=ketcher]")
-      .its("0.contentDocument.body")
-      .should("not.be.empty")
-      .then(cy.wrap)
-      .find("#canvas")
-      // create first node
-      .click();
-    // Save
-    cy.get("button:contains('Save Defined Compound')")
+    cy.get("button:contains('Save Compound')")
       .should("not.be.disabled")
       .click();
 
@@ -231,7 +163,7 @@ describe("The substance page", () => {
       .click();
 
     // Save
-    cy.get("button:contains('Save Ill Defined Compound')")
+    cy.get("button:contains('Save Compound')")
       .should("not.be.disabled")
       .click();
 
@@ -280,9 +212,19 @@ describe("The substance page", () => {
     // Search
     cy.get("[data-cy=search-box]").type("DTXCID502000009");
     cy.get("[data-cy=search-button]").click();
+    // Click CycloHexane Button
+    cy.get("iframe[id=marvin]")
+      .its("0.contentDocument.body")
+      .find("[title=CycloHexane]")
+      .click();
+    // Add CycloHexane to the canvas
+    cy.get("iframe[id=marvin]")
+      .its("0.contentDocument.body")
+      .find("canvas#canvas")
+      .click();
 
     // Save
-    cy.get("button:contains('Save Ill Defined Compound')")
+    cy.get("button:contains('Save Compound')")
       .should("not.be.disabled")
       .click();
 
@@ -362,6 +304,39 @@ describe("The substance page", () => {
     cy.get("[data-cy=search-box]").type("compound 47");
     cy.get("[data-cy=search-button]").click();
     cy.get("[data-cy=alert-box]").should("contain", "compound 47 not valid");
+  });
+  it("confirm navigation away from editor changes", () => {
+    cy.get("iframe[id=marvin]")
+      .its("0.contentDocument.body")
+      .should("not.be.empty");
+
+    // Search
+    cy.get("[data-cy=search-box]").type("DTXCID502000009");
+    cy.get("[data-cy=search-button]").click();
+    // Click CycloHexane Button
+    cy.get("iframe[id=marvin]")
+      .its("0.contentDocument.body")
+      .find("[title=CycloHexane]")
+      .click();
+    // Add CycloHexane to the canvas
+    cy.get("iframe[id=marvin]")
+      .its("0.contentDocument.body")
+      .find("canvas#canvas")
+      .click();
+
+    // Save button enabled
+    cy.get("button:contains('Save Compound')").should("not.be.disabled");
+
+    cy.get("div.navbar-brand").click();
+    cy.get("div.modal-dialog").contains("Unsaved changes exist");
+    cy.get("button:contains('NO')").click();
+
+    // Save button still enabled
+    cy.get("button:contains('Save Compound')").should("not.be.disabled");
+
+    cy.get("a:contains('Lists')").click();
+    cy.get("button:contains('YES')").click();
+    cy.url().should("contain", "/lists");
   });
   it("logout should provide message to user", () => {
     cy.get("[data-cy=user-dropdown]").click();
@@ -502,7 +477,7 @@ describe("The substance page's Relationships Table", () => {
     cy.visit("/substance");
     cy.server();
 
-    // fixture loading the synonyms
+    // fixture loading the substance relationships
     cy.route(
       "GET",
       "/substanceRelationships?*",
@@ -530,5 +505,38 @@ describe("The substance page's Relationships Table", () => {
       .should("contain", "DTXSID502000000")
       .should("contain", "DTXSID602000001")
       .should("contain", "DTXSID202000002");
+  });
+});
+
+describe("The substance page's List Table", () => {
+  beforeEach(() => {
+    cy.adminLogin();
+    cy.visit("/substance");
+    cy.server();
+
+    // fixture loading the records
+    cy.route("GET", "/records?*", "fx:../responses/records.json");
+  });
+
+  it("should show the relationships table", () => {
+    cy.get("#substanceRelationshipTable").should(
+      "contain.text",
+      "No Rows To Show"
+    );
+  });
+
+  it("should load records", () => {
+    // Navigate to substance with records
+    cy.get("[data-cy=search-box]").type("DTXCID502000009");
+    cy.get("[data-cy=search-button]").click();
+
+    // Verify response contains rids as required.
+    cy.get("#listTable")
+      .find("div.ag-center-cols-clipper")
+      .find("div.ag-row[role=row]")
+      .should("have.length", 3)
+      .should("contain", "DTXRID602000002")
+      .should("contain", "DTXRID002000004")
+      .should("contain", "DTXRID702000005");
   });
 });

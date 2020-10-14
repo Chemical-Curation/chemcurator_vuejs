@@ -38,5 +38,8 @@ export default {
     let resource = await context.dispatch("getResourceURI");
 
     return HTTP.post(`/${resource}`, { data: { ...body } });
+  },
+  updateChanged: ({ commit }, val) => {
+    commit("setChanged", val);
   }
 };
