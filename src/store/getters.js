@@ -58,7 +58,7 @@ export function substanceFormFromRelationship(state) {
   };
 }
 
-export function substanceTreeFromRelationship(state) {
+export function getSubstanceTreeRelationships(state) {
   let blankTree = {
     updatedAt: "",
     updatedByID: "",
