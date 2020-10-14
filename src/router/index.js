@@ -15,9 +15,6 @@ const routes = [
     path: "/substance",
     name: "substance",
     component: () => import("../views/Substance"),
-    meta: {
-      requiresAuth: true
-    }
   },
   {
     path: "/vocabularies",

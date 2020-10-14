@@ -29,7 +29,6 @@ let actions = {
       await router.push("substance");
     dispatch("clearAllStates");
 
-    dispatch("auth/fetchUser", null, { root: true });
     const endpoint =
       searchString.indexOf("-") > 0
         ? "/definedCompounds?include=substance&filter[inchikey]="
