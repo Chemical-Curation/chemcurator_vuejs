@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="mb-5">
     <div class="text-left">
       <h3>Synonyms</h3>
     </div>
@@ -24,11 +24,11 @@
         table-variant="danger"
       ></b-table>
     </div>
-    <div class="d-flex flex-row justify-content-end my-3">
+    <div class="d-flex flex-row justify-content-end my-3" v-if="editable">
       <b-button
         id="synonym-reset-button"
         @click="resetRowData"
-        :disabled="!buttonsEnabled || !isAuthenticated"
+        :disabled="!buttonsEnabled"
         >Reset</b-button
       >
       <b-button
@@ -36,7 +36,7 @@
         class="ml-1"
         variant="primary"
         @click="save"
-        :disabled="!buttonsEnabled || !isAuthenticated"
+        :disabled="!buttonsEnabled"
       >
         Save Synonyms
       </b-button>
@@ -60,7 +60,8 @@ export default {
   },
   props: {
     // Substance ID to which these synonyms will be related
-    substanceId: String
+    substanceId: String,
+    editable: Boolean
   },
   data() {
     return {
@@ -270,9 +271,9 @@ export default {
      * work well here.
      */
     save: async function() {
-      if (!this.isAuthenticated) {
+      if (!this.editable) {
         this.alert({
-          message: "Unauthenticated",
+          message: "This table cannot be edited",
           color: "warning",
           dismissCountDown: 15
         });
@@ -430,7 +431,7 @@ export default {
     // Load grid styling
     this.defaultColDef = {
       flex: 1,
-      editable: this.isAuthenticated,
+      editable: this.editable,
       resizable: true,
       sortable: true
     };

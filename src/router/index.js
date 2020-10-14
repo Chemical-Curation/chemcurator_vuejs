@@ -14,7 +14,7 @@ const routes = [
   {
     path: "/substance",
     name: "substance",
-    component: () => import("../views/Substance"),
+    component: () => import("../views/Substance")
   },
   {
     path: "/vocabularies",

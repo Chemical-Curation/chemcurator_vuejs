@@ -29,10 +29,14 @@
             />
           </b-form-group>
         </div>
-        <ChemicalEditors v-show="type !== 'none'" :type="type" />
+        <ChemicalEditors
+          v-show="type !== 'none'"
+          :type="type"
+          :editable="isAuthenticated"
+        />
       </b-col>
     </b-row>
-    <SynonymTable :substance-id="substanceId" />
+    <SynonymTable :substance-id="substanceId" :editable="isAuthenticated" />
     <SubstanceRelationshipTable class="mb-5" :substance-id="substanceId" />
     <ListTable class="mb-5" :substance-id="substanceId" />
   </b-container>
@@ -44,7 +48,7 @@ import SubstanceForm from "@/components/substance/SubstanceForm";
 import SynonymTable from "@/components/synonyms/agSynonymTable";
 import SubstanceRelationshipTable from "@/components/substance/agSubstanceRelationshipTable";
 import ListTable from "@/components/records/agRecordTable";
-import { mapState } from "vuex";
+import { mapGetters, mapState } from "vuex";
 
 export default {
   name: "home",
@@ -54,6 +58,7 @@ export default {
     };
   },
   computed: {
+    ...mapGetters("auth", ["isAuthenticated"]),
     ...mapState("compound", { compoundType: "type" }),
     ...mapState("compound/definedcompound", { definedCompoundData: "data" }),
     ...mapState("compound/illdefinedcompound", {

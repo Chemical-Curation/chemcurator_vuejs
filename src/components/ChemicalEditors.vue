@@ -11,6 +11,7 @@
         @click="saveCompound(type)"
         variant="primary"
         :disabled="!editorChanged"
+        v-if="editable"
         >Save Compound</b-button
       >
     </div>
@@ -28,7 +29,8 @@ export default {
     MarvinWindow
   },
   props: {
-    type: String
+    type: String,
+    editable: Boolean
   },
   computed: {
     editorChanged: function() {
