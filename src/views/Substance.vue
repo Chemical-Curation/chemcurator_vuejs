@@ -1,6 +1,6 @@
 <template>
   <b-container fluid="true" class="mx-5">
-    <SubstanceTree />
+    <SubstanceSidebar />
     <b-row>
       <b-col cols="12" order="1" lg="4" order-lg="0">
         <SubstanceForm :type="type" />
@@ -41,7 +41,7 @@
 
 <script>
 import ChemicalEditors from "@/components/ChemicalEditors";
-import SubstanceTree from "@/components/substance/SubstanceTree";
+import SubstanceSidebar from "@/components/substance/SubstanceSidebar";
 import SubstanceForm from "@/components/substance/SubstanceForm";
 import SynonymTable from "@/components/synonyms/agSynonymTable";
 import SubstanceRelationshipTable from "@/components/substance/agSubstanceRelationshipTable";
@@ -102,7 +102,7 @@ export default {
   },
   components: {
     ChemicalEditors,
-    SubstanceTree,
+    SubstanceSidebar,
     SubstanceForm,
     SynonymTable,
     SubstanceRelationshipTable,
