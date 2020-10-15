@@ -1,13 +1,10 @@
 <template>
   <div>
-  <ul>
-    <div v-for="item in items" :key="item.id">
-    <TreeItem
-      class="item"
-      :item="item"
-    ></TreeItem >
-    </div>
-  </ul>
+    <ul>
+      <div v-for="item in items" :key="item.id">
+        <TreeItem class="item" :item="item"></TreeItem>
+      </div>
+    </ul>
   </div>
 </template>
 
@@ -20,19 +17,18 @@ export default {
     TreeItem
   },
   props: {
-    items: Object
+    items: Array
   },
   data() {
-    return {
-    }
-    },
+    return {};
+  },
   methods: {
     addItem: function(item) {
       item.children.push({
         name: "new stuff"
       });
     }
-  },
+  }
 };
 </script>
 

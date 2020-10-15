@@ -23,34 +23,35 @@ export default {
       // organize to keys in an Object
       let obj = {};
       data.forEach(substance => {
-          let dt = new Date(substance.attributes.updatedAt).toISOString().split("T")[0];
-          let user = substance.relationships.createdBy.data.id;
-          if (!Object.keys(obj).includes(dt)) {
-              obj[dt] = {};
-          }
-          if (!Object.keys(obj[dt]).includes(user)) {
-              obj[dt][user] = [];
-          }
-          obj[dt][user].push(substance.attributes.sid);
-      })
-      let abuelas = [];  // array of objects to pass to tree
+        let dt = new Date(substance.attributes.updatedAt)
+          .toISOString()
+          .split("T")[0];
+        let user = substance.relationships.createdBy.data.id;
+        if (!Object.keys(obj).includes(dt)) {
+          obj[dt] = {};
+        }
+        if (!Object.keys(obj[dt]).includes(user)) {
+          obj[dt][user] = [];
+        }
+        obj[dt][user].push(substance.attributes.sid);
+      });
+      let abuelas = []; // array of objects to pass to tree
       Object.keys(obj).forEach(date => {
-          let mamas = [];
-          Object.keys(obj[date]).forEach(user => {
-              let hijas = [];
-              obj[date][user].forEach(substance => {
-                  hijas.push({"name": substance, "icon": "egg-fried"})
-              })
-              mamas.push({"name": user, "icon": "person-fill", children: hijas});
-          })
-          abuelas.push({"name": date, "icon": "calendar", "children": mamas});
-      })
+        let mamas = [];
+        Object.keys(obj[date]).forEach(user => {
+          let hijas = [];
+          obj[date][user].forEach(substance => {
+            hijas.push({ name: substance, icon: "egg-fried" });
+          });
+          mamas.push({ name: user, icon: "person-fill", children: hijas });
+        });
+        abuelas.push({ name: date, icon: "calendar", children: mamas });
+      });
       return abuelas;
     }
   },
   mounted() {
     this.$store.dispatch("substance/getList");
-    this.$store.dispatch("user/getList");
   }
 };
 </script>

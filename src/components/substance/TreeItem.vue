@@ -1,11 +1,9 @@
 <template>
   <li>
-    <div
-      :class="{bold: isFolder}"
-      @click="toggle">
+    <div :class="{ bold: isFolder }" @click="toggle">
       <b-icon :icon="item.icon"></b-icon>
       {{ item.name }}
-      <span v-if="isFolder">[{{ isOpen ? '-' : '+' }}]</span>
+      <span v-if="isFolder">[{{ isOpen ? "-" : "+" }}]</span>
     </div>
     <ul v-show="isOpen" v-if="isFolder">
       <TreeItem
@@ -43,7 +41,7 @@ export default {
       if (this.isFolder) {
         this.isOpen = !this.isOpen;
       }
-    },
+    }
   }
 };
 </script>
