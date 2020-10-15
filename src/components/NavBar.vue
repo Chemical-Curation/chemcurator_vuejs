@@ -38,7 +38,7 @@
         <b-nav-item-dropdown
           name="user-profile"
           right
-          v-if="username"
+          v-if="isAuthenticated"
           data-cy="user-dropdown"
         >
           <template v-slot:button-content>
