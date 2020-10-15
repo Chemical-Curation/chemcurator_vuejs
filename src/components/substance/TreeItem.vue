@@ -3,6 +3,7 @@
     <div
       :class="{bold: isFolder}"
       @click="toggle">
+      <b-icon :icon="item.icon"></b-icon>
       {{ item.name }}
       <span v-if="isFolder">[{{ isOpen ? '-' : '+' }}]</span>
     </div>
@@ -18,6 +19,9 @@
 </template>
 
 <script>
+//calendar
+//person-fill
+//egg-fried
 export default {
   name: "TreeItem",
   props: {
@@ -25,7 +29,8 @@ export default {
   },
   data: function() {
     return {
-      isOpen: false
+      isOpen: false,
+      icon: "egg-fried"
     };
   },
   computed: {
@@ -48,5 +53,8 @@ export default {
 }
 .bold {
   font-weight: bold;
+}
+ul {
+  list-style: none;
 }
 </style>
