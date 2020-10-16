@@ -98,6 +98,15 @@ export default {
       for (item of list)
         options.push({ value: item.id, text: item.attributes.label });
       return options;
+    },
+    checkChanged: function(event) {
+      if (
+        this.$store.state.compound.illdefinedcompound.changed ||
+        this.$store.state.compound.definedcompound.changed
+      ) {
+        // below only needs to eval to a truthy value
+        event.returnValue = "lose your changes?";
+      }
     }
   },
   components: {
@@ -108,8 +117,43 @@ export default {
     SubstanceRelationshipTable,
     ListTable
   },
+  created() {
+    window.addEventListener("beforeunload", this.checkChanged);
+  },
   mounted() {
     this.$store.dispatch("queryStructureType/getList");
+  },
+  beforeRouteLeave(to, from, next) {
+    if (
+      this.$store.state.compound.illdefinedcompound.changed ||
+      this.$store.state.compound.definedcompound.changed
+    ) {
+      this.$bvModal
+        .msgBoxConfirm(
+          "Unsaved changes exist on the compound in the editor, are you okay with losing the changes?",
+          {
+            okTitle: "YES",
+            cancelTitle: "NO"
+          }
+        )
+        .then(value => {
+          if (value) {
+            this.$store.dispatch(
+              "compound/definedcompound/updateChanged",
+              false
+            );
+            this.$store.dispatch(
+              "compound/illdefinedcompound/updateChanged",
+              false
+            );
+            next();
+          } else {
+            next(false);
+          }
+        });
+    } else {
+      next();
+    }
   }
 };
 </script>

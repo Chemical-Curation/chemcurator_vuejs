@@ -1,26 +1,18 @@
 <template>
   <div>
     <div v-show="type === 'definedCompound'">
-      <KetcherWindow ref="ketcher" @molfileChanged="molfileChanged = $event" />
-      <div class="my-3">
-        <b-button
-          @click="saveDefinedCompound"
-          variant="primary"
-          :disabled="!molfileChanged"
-          >Save Defined Compound</b-button
-        >
-      </div>
+      <KetcherWindow ref="ketcher" />
     </div>
     <div v-show="type !== 'definedCompound'">
-      <MarvinWindow ref="marvin" @mrvfileChanged="mrvfileChanged = $event" />
-      <div class="my-3">
-        <b-button
-          @click="saveIllDefinedCompound"
-          variant="primary"
-          :disabled="!mrvfileChanged"
-          >Save Ill Defined Compound</b-button
-        >
-      </div>
+      <MarvinWindow ref="marvin" />
+    </div>
+    <div class="my-3">
+      <b-button
+        @click="saveCompound(type)"
+        variant="primary"
+        :disabled="!editorChanged"
+        >Save Compound</b-button
+      >
     </div>
   </div>
 </template>
@@ -38,20 +30,35 @@ export default {
   props: {
     type: String
   },
-  data() {
-    return {
-      molfileChanged: false,
-      mrvfileChanged: false
-    };
+  computed: {
+    editorChanged: function() {
+      if (
+        (this.$store.state.compound.illdefinedcompound.changed &&
+          this.type !== "definedCompound") ||
+        (this.$store.state.compound.definedcompound.changed &&
+          this.type === "definedCompound")
+      ) {
+        return true;
+      } else {
+        return false;
+      }
+    }
   },
   methods: {
+    saveCompound(type) {
+      if (type === "definedCompound") {
+        this.saveDefinedCompound();
+      } else {
+        this.saveIllDefinedCompound();
+      }
+    },
     saveDefinedCompound() {
       let compoundId = this.$store.state.compound.definedcompound.data.id;
       // replace is used to escape "\" so that the JSON is parsable
       let requestBody = {
         type: "definedCompound",
         attributes: {
-          molfileV2000: this.$refs["ketcher"].molfile.replace(/\\/g, "\\\\")
+          molfileV3000: this.$refs["ketcher"].molfile.replace(/\\/g, "\\\\")
         }
       };
       if (compoundId) {

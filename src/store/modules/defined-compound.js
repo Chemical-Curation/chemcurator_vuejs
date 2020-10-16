@@ -6,7 +6,8 @@ import { HTTP } from "@/store/http-common";
 const defaultState = () => {
   return {
     data: {},
-    included: {}
+    included: {},
+    changed: false
   };
 };
 
@@ -20,7 +21,7 @@ const actions = {
   },
   fetchByMolfile: async ({ commit, dispatch }, searchString) => {
     await HTTP.get(
-      `/definedCompounds?include=substance&filter[molfileV2000]=${encodeURI(
+      `/definedCompounds?include=substance&filter[molfileV3000]=${encodeURI(
         searchString
       )}`
     )
