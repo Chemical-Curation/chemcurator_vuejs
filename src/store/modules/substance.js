@@ -27,9 +27,6 @@ let actions = {
       substanceTypeID: payload.relationships.substanceType.data.id
     };
     commit("loadForm", formLoad);
-  },
-  clearState({ commit }) {
-    commit("dearState");
   }
 };
 
@@ -37,7 +34,6 @@ let actions = {
 const mutations = {
   ...rootMutations,
   loadForm(state, obj) {
-    console.log(obj);
     state.form = obj;
   },
   clearForm(state) {
