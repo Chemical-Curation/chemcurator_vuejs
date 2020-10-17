@@ -1,6 +1,6 @@
 <template>
   <li>
-    <div :class="{ bold: isFolder }" @click="toggle">
+    <div :class="{ bold: isFolder }" @click="toggle(item.name)">
       <b-icon :icon="item.icon"></b-icon>
       {{ item.name }}
       <span v-if="isFolder">[{{ isOpen ? "-" : "+" }}]</span>
@@ -17,9 +17,8 @@
 </template>
 
 <script>
-//calendar
-//person-fill
-//egg-fried
+import { mapActions } from "vuex";
+
 export default {
   name: "TreeItem",
   props: {
@@ -37,9 +36,19 @@ export default {
     }
   },
   methods: {
-    toggle: function() {
+    ...mapActions({ loadForm: "substance/loadForm" }),
+    toggle: function(val) {
       if (this.isFolder) {
         this.isOpen = !this.isOpen;
+      } else {
+        this.$root.$emit("bv::toggle::collapse", "substance-sidebar");
+        let obj;
+        this.$store.state.substance.list.forEach(sub => {
+          if (sub.attributes.sid === val) {
+            obj = sub;
+          }
+        });
+        this.loadForm(obj);
       }
     }
   }

@@ -18,16 +18,6 @@ export default {
   },
   props: {
     items: Array
-  },
-  data() {
-    return {};
-  },
-  methods: {
-    addItem: function(item) {
-      item.children.push({
-        name: "new stuff"
-      });
-    }
   }
 };
 </script>
