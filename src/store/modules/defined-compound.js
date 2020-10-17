@@ -38,7 +38,7 @@ const actions = {
         //       or if the json:api id is the same as the cid being passed in.
         if (obj) {
           dispatch("getFetch", obj.id);
-          if(inc) dispatch("substance/loadForm", inc.shift());
+          if (inc) dispatch("substance/loadForm", inc.shift());
         }
       })
       .catch(err => {
@@ -71,6 +71,6 @@ export default {
   getters,
   mutations,
   modules: {
-    substance,
+    substance
   }
 };
