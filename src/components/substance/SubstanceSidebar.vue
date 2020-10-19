@@ -26,7 +26,7 @@ export default {
         let dt = new Date(substance.attributes.updatedAt)
           .toISOString()
           .split("T")[0];
-        let user = substance.relationships.createdBy.data.id;
+        let user = substance.relationships.updatedBy.data.id;
         if (!Object.keys(obj).includes(dt)) {
           obj[dt] = {};
         }
