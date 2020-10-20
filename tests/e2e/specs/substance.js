@@ -540,3 +540,11 @@ describe("The substance page's List Table", () => {
       .should("contain", "DTXRID702000005");
   });
 });
+
+describe("The substance page's Sidebar and Tree View", () => {
+  it("should have the sidebar button present", () => {
+    cy.get("button:contains('Toggle Sidebar')")
+      .should("not.be.disabled")
+      .click();
+  });
+});
