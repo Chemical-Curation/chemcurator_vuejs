@@ -35,20 +35,35 @@ export default {
         }
         obj[dt][user].push(substance.attributes.sid);
       });
-      let abuelas = []; // array of objects to pass to tree
-      let idCount = 0;
+      let dates = []; // array of dates to pass to tree
+      let idCount = 0; // increment an int for unique val in key binding
       Object.keys(obj).forEach(date => {
-        let mamas = [];
+        let users = []; // array of users for the children of date
         Object.keys(obj[date]).forEach(user => {
-          let hijas = [];
+          let substances = []; // array of substances for children of user
           obj[date][user].forEach(substance => {
-            hijas.push({ name: substance, icon: "egg-fried", id: idCount++ });
+            substances.push({
+              name: substance,
+              icon: "egg-fried",
+              children: [], // substances have no children
+              id: idCount++
+            });
           });
-          mamas.push({ name: user, icon: "person-fill", children: hijas, id: idCount++ });
+          users.push({
+            name: user,
+            icon: "person-fill",
+            children: substances,
+            id: idCount++
+          });
         });
-        abuelas.push({ name: date, icon: "calendar", children: mamas, id: idCount++});
+        dates.push({
+          name: date,
+          icon: "calendar",
+          children: users,
+          id: idCount++
+        });
       });
-      return abuelas;
+      return dates;
     }
   },
   mounted() {
