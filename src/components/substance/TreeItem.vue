@@ -8,8 +8,8 @@
     <ul v-show="isOpen" v-if="isFolder">
       <TreeItem
         class="item"
-        v-for="(child, index) in item.children"
-        :key="index"
+        v-for="child in item.children"
+        :key="child.id"
         :item="child"
       ></TreeItem>
     </ul>

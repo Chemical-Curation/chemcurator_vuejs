@@ -36,16 +36,17 @@ export default {
         obj[dt][user].push(substance.attributes.sid);
       });
       let abuelas = []; // array of objects to pass to tree
+      let idCount = 0;
       Object.keys(obj).forEach(date => {
         let mamas = [];
         Object.keys(obj[date]).forEach(user => {
           let hijas = [];
           obj[date][user].forEach(substance => {
-            hijas.push({ name: substance, icon: "egg-fried" });
+            hijas.push({ name: substance, icon: "egg-fried", id: idCount++ });
           });
-          mamas.push({ name: user, icon: "person-fill", children: hijas });
+          mamas.push({ name: user, icon: "person-fill", children: hijas, id: idCount++ });
         });
-        abuelas.push({ name: date, icon: "calendar", children: mamas });
+        abuelas.push({ name: date, icon: "calendar", children: mamas, id: idCount++});
       });
       return abuelas;
     }
