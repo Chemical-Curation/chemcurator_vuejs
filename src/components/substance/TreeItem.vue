@@ -1,9 +1,15 @@
 <template>
   <li>
-    <div :id="!isFolder ? item.name : false" :class="{ bold: isFolder }" @click="toggle(item.name)">
-      <b-icon :icon="item.icon"></b-icon>
+    <div
+      :id="!isFolder ? item.name : false"
+      :class="{ bold: isFolder }"
+      @click="toggle(item.name)"
+    >
+      <b-icon :icon="item.icon" />
       {{ item.name }}
-      <span v-if="isFolder">[{{ isOpen ? "-" : "+" }}]</span>
+      <span v-if="isFolder">
+        [{{ isOpen ? "-" : "+" }}]
+      </span>
     </div>
     <ul v-show="isOpen" v-if="isFolder">
       <TreeItem
@@ -11,7 +17,7 @@
         v-for="child in item.children"
         :key="child.id"
         :item="child"
-      ></TreeItem>
+      />
     </ul>
   </li>
 </template>
