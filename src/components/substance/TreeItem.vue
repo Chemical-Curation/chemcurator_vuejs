@@ -1,6 +1,6 @@
 <template>
   <li>
-    <div :class="{ bold: isFolder }" @click="toggle(item.name)">
+    <div :id="id" :class="{ bold: isFolder }" @click="toggle(item.name)">
       <b-icon :icon="item.icon"></b-icon>
       {{ item.name }}
       <span v-if="isFolder">[{{ isOpen ? "-" : "+" }}]</span>
@@ -26,13 +26,16 @@ export default {
   },
   data: function() {
     return {
-      isOpen: false,
-      icon: "egg-fried"
+      isOpen: false
     };
   },
   computed: {
     isFolder: function() {
       return this.item.children && this.item.children.length;
+    },
+    id: function() {
+      if (!this.isFolder) {return this.item.name}
+      else {return ""}
     }
   },
   methods: {
