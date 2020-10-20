@@ -1,9 +1,15 @@
 <template>
   <div>
-    <b-button v-b-toggle.substance-sidebar class="btn btn-primary btn-sm"
-      >Toggle Sidebar</b-button
+    <b-button
+      v-b-toggle.substance-sidebar
+      class="btn btn-primary btn-sm"
     >
-    <b-sidebar id="substance-sidebar" shadow>
+      Toggle Sidebar
+    </b-button>
+    <b-sidebar
+      id="substance-sidebar"
+      shadow
+    >
       <SubstanceTree :items="treeData" />
     </b-sidebar>
   </div>
