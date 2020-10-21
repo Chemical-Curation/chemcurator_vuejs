@@ -2,8 +2,7 @@
   <b-row class="about text-center">
     <b-col cols="3">
       <HelloWorld msg="Welcome to ChemReg" />
-      <p v-if="username"></p>
-      <LoginCard v-else />
+      <LoginCard v-if="!isAuthenticated" class="mx-auto" />
     </b-col>
     <b-col>
       <p class="lead text-justify">{{ aboutBlurb }}</p>

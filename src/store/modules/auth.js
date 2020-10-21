@@ -6,36 +6,26 @@ const state = {
   firstName: "",
   lastName: "",
   username: "",
-  is_superuser: ""
+  is_superuser: "",
+  authenticated: false
 };
 
 // getters
 const getters = {
-  isAuthenticated: state => !(state.username === ""),
+  isAuthenticated: state => state.authenticated,
   isSuperuser: state => state.is_superuser === true
 };
 
 // actions
 const actions = {
-  fetchUser: async ({ commit, dispatch }) => {
+  fetchUser: async ({ commit }) => {
     await HTTP.get("/login/")
-      .then(response => commit("setUser", response.data))
+      .then(response => {
+        commit("setUser", response.data);
+        commit("authenticate", true);
+      })
       .catch(() => {
-        const b = state.username.length === 0;
-        const alert = {
-          message: b
-            ? "Please log in..."
-            : `${state.username}, you are no longer logged in!`,
-          color: b ? "success" : "danger",
-          dismissCountDown: 4
-        };
-        commit("setUser", {});
-        router.push({
-          name: "home"
-        });
-        dispatch("alert/alert", alert, {
-          root: true
-        });
+        commit("authenticate", false);
       });
   },
   login: async ({ commit }, { username, password }) => {
@@ -50,6 +40,7 @@ const actions = {
       }
     );
     commit("setUser", response.data);
+    commit("authenticate", true);
     router.push("/").catch(() => {});
   },
   logout: async ({ commit, dispatch }) => {
@@ -61,6 +52,7 @@ const actions = {
     await HTTP.delete("/login/")
       .then(() => {
         commit("setUser", {});
+        commit("authenticate", false);
         router
           .push({
             name: "home"
@@ -72,6 +64,7 @@ const actions = {
       })
       .catch(() => {
         commit("setUser", {});
+        commit("authenticate", false);
         router
           .push({
             name: "home"
@@ -92,6 +85,9 @@ const mutations = {
     state.lastName = user.last_name || "";
     state.username = user.username || "";
     state.is_superuser = user.is_superuser || "";
+  },
+  authenticate(state, authenticated) {
+    state.authenticated = authenticated;
   }
 };
 

@@ -20,7 +20,6 @@
         <b-form-input
           class="mr-2 search"
           v-model="searchString"
-          v-if="username"
           placeholder="Search Compounds (cid or inchikey)"
           data-cy="search-box"
           @keyup.enter="searchCompound"
@@ -29,7 +28,6 @@
           class="mr-2"
           variant="dark"
           @click="searchCompound"
-          v-if="username"
           :disabled="searchString.length == 0"
           data-cy="search-button"
         >
@@ -40,7 +38,7 @@
         <b-nav-item-dropdown
           name="user-profile"
           right
-          v-if="username"
+          v-if="isAuthenticated"
           data-cy="user-dropdown"
         >
           <template v-slot:button-content>
