@@ -38,12 +38,31 @@ describe("The substance page anonymous access", () => {
     cy.get("iframe[id=marvin]");
   });
 
-  it("should load the substance form", () => {
+  it("should load the substance form from search", () => {
     // Search
     cy.get("[data-cy=search-box]").type("DTXCID302000003");
     cy.get("[data-cy=search-button]").click();
 
     cy.get("#recordCompoundID").should("have.value", "DTXCID302000003");
+    cy.get("#substanceID").should("have.value", "DTXSID502000000");
+    cy.get("#preferredName").should("have.value", "Sample Substance");
+    cy.get("#casrn").should("have.value", "1234567-89-5");
+    cy.get("#qcLevel").should("have.value", "1");
+    cy.get("#source").should("have.value", "1");
+    cy.get("#substanceType").should("have.value", "1");
+    cy.get("#substanceDescription").should(
+      "have.value",
+      "This is the description for the test substance"
+    );
+    cy.get("#privateQCNotes").should("have.value", "Private QC notes");
+    cy.get("#publicQCNotes").should("have.value", "Public QC notes");
+  });
+
+  it("should load the substance form from tree", () => {
+    // Search
+    cy.get("#DTXSID502000000").click({ force: true });
+    // below isn't implemented yet
+    // cy.get("#recordCompoundID").should("have.value", "DTXCID302000003");
     cy.get("#substanceID").should("have.value", "DTXSID502000000");
     cy.get("#preferredName").should("have.value", "Sample Substance");
     cy.get("#casrn").should("have.value", "1234567-89-5");
