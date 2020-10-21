@@ -15,6 +15,14 @@ let actions = {
     return "substances";
   },
   loadForm({ commit }, payload) {
+    // filtering here to accomodate the SubstanceSidebar component and
+    // the fetchByMolfile action on compound, if fetched we want to use
+    // includes and return the obj, but if clicked from the tree we need
+    // to use the ID, the object may not exist in the state.list when
+    // using fetchByMolfile once the list of substances get big enough
+    if (typeof(payload) === "string") {
+      payload = state.list.filter(sub => sub.id === payload).shift()
+    }
     let formLoad = {
       sid: payload.attributes.sid,
       preferredName: payload.attributes.preferredName,
@@ -27,6 +35,13 @@ let actions = {
       substanceTypeID: payload.relationships.substanceType.data.id
     };
     commit("loadForm", formLoad);
+  }
+};
+
+// getters
+const getters ={
+  getSubstance: (state, id) => {
+    return state.list.filter(sub => sub.id === id)
   }
 };
 
@@ -45,5 +60,6 @@ export default {
   namespaced: true,
   state,
   actions,
+  getters,
   mutations
 };

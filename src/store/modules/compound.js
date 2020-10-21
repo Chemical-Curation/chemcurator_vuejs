@@ -55,7 +55,7 @@ let actions = {
             commit("illdefinedcompound/storeIncluded", data.included);
           }
           if (data?.included) {
-            const substance = data.included[0];
+            const substance = data.included.shift();
             dispatch("substance/loadForm", substance, { root: true });
           } else {
             commit("substance/clearForm");

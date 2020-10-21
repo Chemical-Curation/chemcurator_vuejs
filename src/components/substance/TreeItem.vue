@@ -3,7 +3,7 @@
     <div
       :id="!isFolder ? item.name : false"
       :class="{ bold: isFolder }"
-      @click="toggle(item.name)"
+      @click="toggle(item.id)"
     >
       <b-icon :icon="item.icon" />
       {{ item.name }}
@@ -47,13 +47,7 @@ export default {
         this.isOpen = !this.isOpen;
       } else {
         this.$root.$emit("bv::toggle::collapse", "substance-sidebar");
-        let obj;
-        this.$store.state.substance.list.forEach(sub => {
-          if (sub.attributes.sid === val) {
-            obj = sub;
-          }
-        });
-        this.loadForm(obj);
+        this.loadForm(val);
       }
     }
   }

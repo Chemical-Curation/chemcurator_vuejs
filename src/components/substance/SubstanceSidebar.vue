@@ -39,8 +39,10 @@ export default {
         if (!Object.keys(obj[dt]).includes(user)) {
           obj[dt][user] = [];
         }
-        obj[dt][user].push(substance.attributes.sid);
+        obj[dt][user].push({id: substance.id,
+                            sid: substance.attributes.sid});
       });
+      // reformat obj to array of date objects for tree
       let dates = []; // array of dates to pass to tree
       let idCount = 0; // increment an int for unique val in key binding
       Object.keys(obj).forEach(date => {
@@ -49,10 +51,10 @@ export default {
           let substances = []; // array of substances for children of user
           obj[date][user].forEach(substance => {
             substances.push({
-              name: substance,
+              name: substance.sid,
               icon: "egg-fried",
               children: [], // substances have no children
-              id: idCount++
+              id: substance.id
             });
           });
           users.push({
