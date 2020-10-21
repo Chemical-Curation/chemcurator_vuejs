@@ -1,15 +1,9 @@
 <template>
   <div>
-    <b-button
-      v-b-toggle.substance-sidebar
-      class="btn btn-primary btn-sm"
-    >
+    <b-button v-b-toggle.substance-sidebar class="btn btn-primary btn-sm">
       Toggle Sidebar
     </b-button>
-    <b-sidebar
-      id="substance-sidebar"
-      shadow
-    >
+    <b-sidebar id="substance-sidebar" shadow>
       <SubstanceTree :items="treeData" />
     </b-sidebar>
   </div>
@@ -39,8 +33,7 @@ export default {
         if (!Object.keys(obj[dt]).includes(user)) {
           obj[dt][user] = [];
         }
-        obj[dt][user].push({id: substance.id,
-                            sid: substance.attributes.sid});
+        obj[dt][user].push({ id: substance.id, sid: substance.attributes.sid });
       });
       // reformat obj to array of date objects for tree
       let dates = []; // array of dates to pass to tree

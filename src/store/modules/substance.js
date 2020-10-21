@@ -20,8 +20,8 @@ let actions = {
     // includes and return the obj, but if clicked from the tree we need
     // to use the ID, the object may not exist in the state.list when
     // using fetchByMolfile once the list of substances get big enough
-    if (typeof(payload) === "string") {
-      payload = state.list.filter(sub => sub.id === payload).shift()
+    if (typeof payload === "string") {
+      payload = state.list.filter(sub => sub.id === payload).shift();
     }
     let formLoad = {
       sid: payload.attributes.sid,
@@ -39,9 +39,9 @@ let actions = {
 };
 
 // getters
-const getters ={
+const getters = {
   getSubstance: (state, id) => {
-    return state.list.filter(sub => sub.id === id)
+    return state.list.filter(sub => sub.id === id);
   }
 };
 

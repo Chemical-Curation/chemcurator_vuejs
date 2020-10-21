@@ -7,9 +7,7 @@
     >
       <b-icon :icon="item.icon" />
       {{ item.name }}
-      <span v-if="isFolder">
-        [{{ isOpen ? "-" : "+" }}]
-      </span>
+      <span v-if="isFolder"> [{{ isOpen ? "-" : "+" }}] </span>
     </div>
     <ul v-show="isOpen" v-if="isFolder">
       <TreeItem
