@@ -8,9 +8,6 @@ describe("The home page as seen by a visitor", () => {
   it("should display the login form to a non-authenticated user", () => {
     cy.get("#login-card");
   });
-  it("should not display the search bar form to a non-authenticated user", () => {
-    cy.get("[data-cy=search-box]").should("not.exist");
-  });
   it("refuses bad logins", function() {
     cy.get("input[name=username]").type("foo");
     cy.get("input[name=password]").type("bar{enter}");

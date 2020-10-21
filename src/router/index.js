@@ -2,6 +2,7 @@ import Vue from "vue";
 import VueRouter from "vue-router";
 import store from "@/store";
 import Home from "@/views/Home.vue";
+import auth from "@/store/modules/auth";
 
 Vue.use(VueRouter);
 
@@ -14,10 +15,7 @@ const routes = [
   {
     path: "/substance",
     name: "substance",
-    component: () => import("../views/Substance"),
-    meta: {
-      requiresAuth: true
-    }
+    component: () => import("../views/Substance")
   },
   {
     path: "/vocabularies",
@@ -53,8 +51,9 @@ const router = new VueRouter({
 });
 
 router.beforeEach(async (to, from, next) => {
+  // validate and wait for every navigation.  This should probably be done in the background
+  await store.dispatch("auth/fetchUser");
   if (to.meta.requiresAuth) {
-    await store.dispatch("auth/fetchUser");
     if (to.meta.requiresSuperuser && !store.getters["auth/isSuperuser"]) {
       next({
         name: "unauthorized"
@@ -62,6 +61,17 @@ router.beforeEach(async (to, from, next) => {
       return;
     }
     if (!store.getters["auth/isAuthenticated"]) {
+      const username = auth.state.username;
+      const alert = {
+        message: !username
+          ? "Please log in..."
+          : `${username}, you are no longer logged in!`,
+        color: !username ? "success" : "danger",
+        dismissCountDown: 4
+      };
+      store.dispatch("alert/alert", alert, {
+        root: true
+      });
       next({
         name: "home"
       });

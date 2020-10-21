@@ -17,25 +17,47 @@ let qstResponse = {
   ]
 };
 
-describe("The substance page", () => {
+describe("The substance page anonymous access", () => {
   beforeEach(() => {
-    cy.adminLogin();
     cy.server();
     cy.route("/queryStructureTypes*", qstResponse);
     cy.visit("/substance");
   });
+
   it("should have dropdown", () => {
     cy.get("#compound-type-dropdown").contains("None");
     cy.get("#compound-type-dropdown").contains("Defined Compound");
     cy.get("#compound-type-dropdown").contains("Ill Defined");
     cy.get("#compound-type-dropdown").contains("Markush");
   });
+
   it("should toggle ketcher/marvinjs on dropdown", () => {
     cy.get("#compound-type-dropdown").select("Defined Compound");
     cy.get("iframe[id=ketcher]");
     cy.get("#compound-type-dropdown").select("Ill Defined");
     cy.get("iframe[id=marvin]");
   });
+
+  it("should load the substance form", () => {
+    // Search
+    cy.get("[data-cy=search-box]").type("DTXCID302000003");
+    cy.get("[data-cy=search-button]").click();
+
+    cy.get("#recordCompoundID").should("have.value", "DTXCID302000003");
+    cy.get("#substanceID").should("have.value", "DTXSID502000000");
+    cy.get("#preferredName").should("have.value", "Sample Substance");
+    cy.get("#casrn").should("have.value", "1234567-89-5");
+    cy.get("#qcLevel").should("have.value", "1");
+    cy.get("#source").should("have.value", "1");
+    cy.get("#substanceType").should("have.value", "1");
+    cy.get("#substanceDescription").should(
+      "have.value",
+      "This is the description for the test substance"
+    );
+    cy.get("#privateQCNotes").should("have.value", "Private QC notes");
+    cy.get("#publicQCNotes").should("have.value", "Public QC notes");
+  });
+
   it("should load defined compound into ketcher window", () => {
     // Verify no elements are in the iframe
     cy.get("iframe[id=ketcher]")
@@ -67,6 +89,70 @@ describe("The substance page", () => {
       .should("contain", "O=C(CCCN1CCC(C2C=CC(C)=CC=2)(O)CC1)C1C=CC(F)=CC=1")
       .should("contain", "AGAHNABIDCTLHW-UHFFFAOYSA-N");
   });
+
+  it("should fetch from server when ketcher changes", () => {
+    cy.get("#compound-type-dropdown").select("Defined Compound");
+    cy.get("iframe[id=ketcher]")
+      .its("0.contentDocument.body")
+      .should("not.be.empty")
+      .then(cy.wrap)
+      .find("#canvas")
+      .children()
+      .find("text")
+      .should("not.exist");
+
+    // Find the oxygen button
+    cy.get("iframe[id=ketcher]")
+      .its("0.contentDocument.body")
+      .should("not.be.empty")
+      .then(cy.wrap)
+      .find("#atom")
+      .find("button")
+      .eq(3)
+      .click();
+
+    // Select a point. create a H2O there, click and drag to make H2O2
+    cy.get("iframe[id=ketcher]")
+      .its("0.contentDocument.body")
+      .should("not.be.empty")
+      .then(cy.wrap)
+      .find("#canvas")
+      // create first node
+      .click()
+      .find("text")
+      .first()
+      // select first node
+      .trigger("mousedown", { button: 0 })
+      // back up to canvas
+      .parent()
+      // drag to create compound
+      .trigger("mousemove", 500, 500)
+      .trigger("mouseup", { force: true });
+
+    // Check compound loaded
+    cy.get("#recordCompoundID").should("have.value", "DTXCID502000024");
+
+    // Check substance loaded
+    cy.get("#substanceID").should("have.value", "DTXSID202000002");
+  });
+
+  it("bad search should alert invalidity", () => {
+    cy.get("[data-cy=search-box]").type("compound 47");
+    cy.get("[data-cy=search-button]").click();
+    cy.get("[data-cy=alert-box]").should("contain", "compound 47 not valid");
+  });
+});
+
+describe("The substance page authenticated access", () => {
+  beforeEach(() => {
+    cy.adminLogin();
+  });
+  beforeEach(() => {
+    cy.server();
+    cy.route("/queryStructureTypes*", qstResponse);
+    cy.visit("/substance");
+  });
+
   it("should post not-loaded defined compounds", () => {
     // Watch for posts
     cy.route({
@@ -121,7 +207,7 @@ describe("The substance page", () => {
             /M {2}V30 BEGIN CTAB/,
             /M {2}V30 COUNTS 1 0 0 0 0/,
             /M {2}V30 BEGIN ATOM/,
-            /M {2}V30 1 O 6.5000 -15.05 0.0000 0/,
+            /M {2}V30 1 O [0-9]+\.[0-9]+ -*[0-9]+\.[0-9]+ 0.0000 0/, // numeric wildcards for position
             /M {2}V30 END ATOM/,
             /M {2}V30 BEGIN BOND/,
             /M {2}V30 END BOND/,
@@ -135,6 +221,7 @@ describe("The substance page", () => {
         )
       );
   });
+
   it("should post not-loaded illdefined compounds", () => {
     // Watch for patches
     cy.route({
@@ -195,6 +282,7 @@ describe("The substance page", () => {
         )
       );
   });
+
   it("should patch loaded illdefined compounds", () => {
     // Watch for patches
     cy.route({
@@ -236,75 +324,7 @@ describe("The substance page", () => {
       // Verifying the exact structure would make this test brittle
       .should("match", /(<cml).*(><MDocument>).+(<\/MDocument><\/cml>)/);
   });
-  it("should fetch from server when ketcher changes", () => {
-    cy.get("#compound-type-dropdown").select("Defined Compound");
-    cy.get("iframe[id=ketcher]")
-      .its("0.contentDocument.body")
-      .should("not.be.empty")
-      .then(cy.wrap)
-      .find("#canvas")
-      .children()
-      .find("text")
-      .should("not.exist");
 
-    // Find the oxygen button
-    cy.get("iframe[id=ketcher]")
-      .its("0.contentDocument.body")
-      .should("not.be.empty")
-      .then(cy.wrap)
-      .find("#atom")
-      .find("button")
-      .eq(3)
-      .click();
-
-    // Select a point. create a H2O there, click and drag to make H2O2
-    cy.get("iframe[id=ketcher]")
-      .its("0.contentDocument.body")
-      .should("not.be.empty")
-      .then(cy.wrap)
-      .find("#canvas")
-      // create first node
-      .click()
-      .find("text")
-      .first()
-      // select first node
-      .trigger("mousedown", { button: 0 })
-      // back up to canvas
-      .parent()
-      // drag to create compound
-      .trigger("mousemove", 500, 500)
-      .trigger("mouseup", { force: true });
-
-    // Check compound loaded
-    cy.get("#recordCompoundID").should("have.value", "DTXCID502000024");
-
-    // Check substance loaded
-    cy.get("#substanceID").should("have.value", "DTXSID202000002");
-  });
-  it("should load the substance form", () => {
-    // Search
-    cy.get("[data-cy=search-box]").type("DTXCID302000003");
-    cy.get("[data-cy=search-button]").click();
-
-    cy.get("#recordCompoundID").should("have.value", "DTXCID302000003");
-    cy.get("#substanceID").should("have.value", "DTXSID502000000");
-    cy.get("#preferredName").should("have.value", "Sample Substance");
-    cy.get("#casrn").should("have.value", "1234567-89-5");
-    cy.get("#qcLevel").should("have.value", "1");
-    cy.get("#source").should("have.value", "1");
-    cy.get("#substanceType").should("have.value", "1");
-    cy.get("#substanceDescription").should(
-      "have.value",
-      "This is the description for the test substance"
-    );
-    cy.get("#privateQCNotes").should("have.value", "Private QC notes");
-    cy.get("#publicQCNotes").should("have.value", "Public QC notes");
-  });
-  it("bad search should alert invalidity", () => {
-    cy.get("[data-cy=search-box]").type("compound 47");
-    cy.get("[data-cy=search-button]").click();
-    cy.get("[data-cy=alert-box]").should("contain", "compound 47 not valid");
-  });
   it("confirm navigation away from editor changes", () => {
     cy.get("iframe[id=marvin]")
       .its("0.contentDocument.body")
@@ -338,6 +358,7 @@ describe("The substance page", () => {
     cy.get("button:contains('YES')").click();
     cy.url().should("contain", "/lists");
   });
+
   it("logout should provide message to user", () => {
     cy.get("[data-cy=user-dropdown]").click();
     cy.get("[data-cy=logout-button]").click();
