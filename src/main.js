@@ -9,11 +9,9 @@ import {
 } from "bootstrap-vue/dist/bootstrap-vue.esm";
 import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap-vue/dist/bootstrap-vue.css";
-import BootstrapVueTreeview from "bootstrap-vue-treeview";
 
 Vue.config.productionTip = false;
 Vue.use(BootstrapVue);
-Vue.use(BootstrapVueTreeview);
 Vue.use(IconsPlugin);
 
 new Vue({
