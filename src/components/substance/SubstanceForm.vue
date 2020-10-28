@@ -143,6 +143,7 @@ export default {
     ...mapState("qcLevel", { qcLevelList: "list" }),
 
     form: function() {
+      // todo: don't load this from state
       return this.$store.state.substance.form;
     },
     sourceOptions: function() {
