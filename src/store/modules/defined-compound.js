@@ -2,8 +2,6 @@ import rootActions from "../actions.js";
 import rootMutations from "../mutations.js";
 import { HTTP } from "@/store/http-common";
 
-import substance from "./substance";
-
 const defaultState = () => {
   return {
     data: {},
@@ -38,7 +36,7 @@ const actions = {
         //       or if the json:api id is the same as the cid being passed in.
         if (obj) {
           dispatch("getFetch", obj.id);
-          if (inc) dispatch("substance/loadForm", inc.shift());
+          if (inc) dispatch("substance/loadForm", inc.shift(), { root: true });
         }
       })
       .catch(err => {
@@ -69,8 +67,5 @@ export default {
   state,
   actions,
   getters,
-  mutations,
-  modules: {
-    substance
-  }
+  mutations
 };

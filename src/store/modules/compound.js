@@ -4,7 +4,6 @@ import rootMutations from "../mutations.js";
 
 import router from "@/router";
 
-import substance from "./substance";
 import definedcompound from "./defined-compound";
 import illdefinedcompound from "./illdefined-compound";
 
@@ -57,7 +56,7 @@ let actions = {
             const substance = data.included.shift();
             dispatch("substance/loadForm", substance, { root: true });
           } else {
-            commit("substance/clearForm");
+            commit("substance/clearForm", null, { root: true });
           }
         } else {
           const alert = {
@@ -102,7 +101,6 @@ export default {
   actions,
   mutations,
   modules: {
-    substance,
     definedcompound,
     illdefinedcompound
   }
