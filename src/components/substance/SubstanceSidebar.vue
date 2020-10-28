@@ -20,55 +20,43 @@ export default {
   computed: {
     treeData: function() {
       let data = this.$store.state.substance.list;
-      // organize to keys in an Object
-      let obj = {};
+      let included = this.$store.state.substance.included;
+      // create an array of date objects with nested children
+      let dates = [];
       data.forEach(substance => {
         let dt = new Date(substance.attributes.updatedAt)
           .toISOString()
           .split("T")[0];
-        let user = substance.relationships.updatedBy.data.id;
-        if (!Object.keys(obj).includes(dt)) {
-          obj[dt] = {};
+        let userId = substance.relationships.updatedBy.data.id;
+        let user = included.user[userId].attributes.username;
+        let dateObj = dates.filter(o => Object.keys(o).includes(dt));
+        if (dateObj.length < 1) {
+          dateObj = { name: dt, icon: "calendar", children: [] };
+          dates.push(dateObj);
         }
-        if (!Object.keys(obj[dt]).includes(user)) {
-          obj[dt][user] = [];
+        let userObj = dateObj.children.filter(u =>
+          Object.keys(u).includes(user)
+        );
+        if (userObj.length < 1) {
+          userObj = { name: user, icon: "person-fill", children: [] };
         }
-        obj[dt][user].push({ id: substance.id, sid: substance.attributes.sid });
-      });
-      // reformat obj to array of date objects for tree
-      let dates = []; // array of dates to pass to tree
-      let idCount = 0; // increment an int for unique val in key binding
-      Object.keys(obj).forEach(date => {
-        let users = []; // array of users for the children of date
-        Object.keys(obj[date]).forEach(user => {
-          let substances = []; // array of substances for children of user
-          obj[date][user].forEach(substance => {
-            substances.push({
-              name: substance.sid,
-              icon: "egg-fried",
-              children: [], // substances have no children
-              id: substance.id
-            });
-          });
-          users.push({
-            name: user,
-            icon: "person-fill",
-            children: substances,
-            id: idCount++
-          });
+        userObj.children.push({
+          id: substance.id,
+          name: substance.attributes.sid,
+          icon: "pencil-square"
         });
-        dates.push({
-          name: date,
-          icon: "calendar",
-          children: users,
-          id: idCount++
-        });
+        dateObj.children.push(userObj);
       });
       return dates;
     }
   },
   mounted() {
-    this.$store.dispatch("substance/getList");
+    this.$store.dispatch("substance/getList", {
+      params: [
+        { key: "sort", value: "-updatedAt,updatedBy" },
+        { key: "include", value: "updatedBy" }
+      ]
+    });
   }
 };
 </script>
