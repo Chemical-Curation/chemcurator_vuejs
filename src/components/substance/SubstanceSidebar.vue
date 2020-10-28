@@ -24,14 +24,24 @@ export default {
       // create an array of date objects with nested children
       let dates = [];
       data.forEach(substance => {
-        let dt = new Date(substance.attributes.updatedAt)
-          .toISOString()
-          .split("T")[0];
-        let userId = substance.relationships.updatedBy.data.id;
-        let user = included.user[userId].attributes.username;
-        let dateObj = dates.filter(o => Object.keys(o).includes(dt));
+        let dt = substance.attributes.updatedAt;
+        let dateString;
+        let user;
+        if (!dt) {
+          dateString = "Not Tracked";
+        } else {
+          dateString = new Date(dt).toISOString().split("T")[0];
+        }
+        let userData = substance.relationships.updatedBy.data;
+        console.log(substance.relationships.updatedBy);
+        if (!userData) {
+          user = "Unknown User";
+        } else {
+          user = included.user[userData.id].attributes.username;
+        }
+        let dateObj = dates.filter(o => Object.keys(o).includes(dateString));
         if (dateObj.length < 1) {
-          dateObj = { name: dt, icon: "calendar", children: [] };
+          dateObj = { name: dateString, icon: "calendar", children: [] };
           dates.push(dateObj);
         }
         let userObj = dateObj.children.filter(u =>
