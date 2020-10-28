@@ -44,7 +44,11 @@ describe("KetcherWindow.vue", () => {
           modules: {
             definedcompound: {
               namespaced: true,
-              state: dcState
+              state: dcState,
+              actions: {
+                fetchByMolfile: jest.fn(),
+                updateChanged: jest.fn()
+              }
             }
           }
         }

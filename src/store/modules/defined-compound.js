@@ -1,6 +1,5 @@
 import rootActions from "../actions.js";
 import rootMutations from "../mutations.js";
-import { substanceFormFromRelationship } from "../getters";
 import { HTTP } from "@/store/http-common";
 
 const defaultState = () => {
@@ -28,13 +27,17 @@ const actions = {
       .then(response => {
         commit(`storeIncluded`, response.data.included);
         let obj = response.data.data.shift();
+        let inc = response.data?.included;
 
         // TODO: The following action is because of the difference in what is returned
         //       by the list and detail serializers.  If the compound is a defined compound
         //       in order to load the additional data this response has to be thrown out
         //       and the GET needs to be repeated.  There may be ways around this with resolution
         //       or if the json:api id is the same as the cid being passed in.
-        if (obj) dispatch("getFetch", obj.id);
+        if (obj) {
+          dispatch("getFetch", obj.id);
+          if (inc) dispatch("substance/loadForm", inc.shift(), { root: true });
+        }
       })
       .catch(err => {
         const alert = {
@@ -49,9 +52,7 @@ const actions = {
   }
 };
 
-const getters = {
-  getSubstanceForm: substanceFormFromRelationship
-};
+const getters = {};
 
 // mutations
 const mutations = {

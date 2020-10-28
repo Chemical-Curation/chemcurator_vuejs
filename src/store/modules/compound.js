@@ -38,11 +38,9 @@ let actions = {
         const data = response.data;
         if (data.data.length > 0) {
           const obj = data.data[0];
-
           if (obj.type === "definedCompound") {
             commit("setType", obj.type);
             commit(`definedcompound/storeIncluded`, data.included);
-
             // TODO: The following action is because of the difference in what is returned
             //       by the list and detail serializers.  If the compound is a defined compound
             //       in order to load the additional data this response has to be thrown out
@@ -53,6 +51,12 @@ let actions = {
             commit("setType", obj.relationships.queryStructureType.data.id);
             commit("illdefinedcompound/storeFetch", obj);
             commit("illdefinedcompound/storeIncluded", data.included);
+          }
+          if (data?.included) {
+            const substance = data.included.shift();
+            dispatch("substance/loadForm", substance, { root: true });
+          } else {
+            commit("substance/clearForm", null, { root: true });
           }
         } else {
           const alert = {

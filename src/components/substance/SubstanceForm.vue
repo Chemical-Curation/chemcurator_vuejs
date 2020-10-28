@@ -143,9 +143,8 @@ export default {
     ...mapState("qcLevel", { qcLevelList: "list" }),
 
     form: function() {
-      return this.type === "definedCompound"
-        ? this.getDefSubstanceForm
-        : this.getIndefSubstanceForm;
+      // todo: don't load this from state
+      return this.$store.state.substance.form;
     },
     sourceOptions: function() {
       return this.buildOptions(this.sourceList);
@@ -168,8 +167,8 @@ export default {
   },
   mounted() {
     this.$store.dispatch("source/getList");
-    this.$store.dispatch("substanceType/getList");
     this.$store.dispatch("qcLevel/getList");
+    this.$store.dispatch("substanceType/getList");
   }
 };
 </script>
