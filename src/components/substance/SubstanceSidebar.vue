@@ -27,35 +27,48 @@ export default {
         let dt = substance.attributes.updatedAt;
         let dateString;
         let user;
+
+        // Get Date String
         if (!dt) {
           dateString = "Not Tracked";
         } else {
           dateString = new Date(dt).toISOString().split("T")[0];
         }
+
+        // Get User String
         let userData = substance.relationships.updatedBy.data;
-        console.log(substance.relationships.updatedBy);
         if (!userData) {
           user = "Unknown User";
         } else {
           user = included.user[userData.id].attributes.username;
         }
-        let dateObj = dates.filter(o => Object.keys(o).includes(dateString));
+
+        // Add/Find Date
+        let dateObj = dates.filter(o => Object.values(o).includes(dateString));
         if (dateObj.length < 1) {
           dateObj = { name: dateString, icon: "calendar", children: [] };
           dates.push(dateObj);
+        } else {
+          dateObj = dateObj.shift();
         }
+
+        // Add/Find User
         let userObj = dateObj.children.filter(u =>
-          Object.keys(u).includes(user)
+          Object.values(u).includes(user)
         );
         if (userObj.length < 1) {
           userObj = { name: user, icon: "person-fill", children: [] };
+          dateObj.children.push(userObj);
+        } else {
+          userObj = userObj.shift();
         }
+
+        // Add Substance
         userObj.children.push({
           id: substance.id,
           name: substance.attributes.sid,
           icon: "pencil-square"
         });
-        dateObj.children.push(userObj);
       });
       return dates;
     }
