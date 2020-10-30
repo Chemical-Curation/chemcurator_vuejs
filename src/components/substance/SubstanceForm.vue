@@ -130,14 +130,6 @@ export default {
   },
   computed: {
     ...mapGetters("auth", ["isAuthenticated"]),
-
-    ...mapGetters("compound/definedcompound", {
-      getDefSubstanceForm: "getSubstanceForm"
-    }),
-    ...mapGetters("compound/illdefinedcompound", {
-      getIndefSubstanceForm: "getSubstanceForm"
-    }),
-
     ...mapState("source", { sourceList: "list" }),
     ...mapState("substanceType", { substanceTypeList: "list" }),
     ...mapState("qcLevel", { qcLevelList: "list" }),

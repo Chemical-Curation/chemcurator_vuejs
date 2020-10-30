@@ -40,9 +40,6 @@ let actions = {
 
 // getters
 const getters = {
-  getSubstance: (state, id) => {
-    return state.list.filter(sub => sub.id === id);
-  }
 };
 
 // mutations
