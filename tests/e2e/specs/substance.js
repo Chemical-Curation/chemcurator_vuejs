@@ -44,12 +44,12 @@ describe("The substance page anonymous access", () => {
     cy.get("[data-cy=search-button]").click();
 
     cy.get("#recordCompoundID").should("have.value", "DTXCID302000003");
-    cy.get("#substanceID").should("have.value", "DTXSID502000000");
+    cy.get("#sid").should("have.value", "DTXSID502000000");
     cy.get("#preferredName").should("have.value", "Sample Substance");
     cy.get("#casrn").should("have.value", "1234567-89-5");
-    cy.get("#qcLevel").should("have.value", "1");
-    cy.get("#source").should("have.value", "1");
-    cy.get("#substanceType").should("have.value", "1");
+    cy.get("#qcLevelID").should("have.value", "1");
+    cy.get("#sourceID").should("have.value", "1");
+    cy.get("#substanceTypeID").should("have.value", "1");
     cy.get("#substanceDescription").should(
       "have.value",
       "This is the description for the test substance"
@@ -63,12 +63,12 @@ describe("The substance page anonymous access", () => {
     cy.get("#DTXSID502000000").click({ force: true });
     // below isn't implemented yet
     // cy.get("#recordCompoundID").should("have.value", "DTXCID302000003");
-    cy.get("#substanceID").should("have.value", "DTXSID502000000");
+    cy.get("#sid").should("have.value", "DTXSID502000000");
     cy.get("#preferredName").should("have.value", "Sample Substance");
     cy.get("#casrn").should("have.value", "1234567-89-5");
-    cy.get("#qcLevel").should("have.value", "1");
-    cy.get("#source").should("have.value", "1");
-    cy.get("#substanceType").should("have.value", "1");
+    cy.get("#qcLevelID").should("have.value", "1");
+    cy.get("#sourceID").should("have.value", "1");
+    cy.get("#substanceTypeID").should("have.value", "1");
     cy.get("#substanceDescription").should(
       "have.value",
       "This is the description for the test substance"
@@ -152,7 +152,7 @@ describe("The substance page anonymous access", () => {
     cy.get("#recordCompoundID").should("have.value", "DTXCID502000024");
 
     // Check substance loaded
-    cy.get("#substanceID").should("have.value", "DTXSID202000002");
+    cy.get("#sid").should("have.value", "DTXSID202000002");
   });
 
   it("bad search should alert invalidity", () => {

@@ -5,7 +5,18 @@ const state = {
   loading: false,
   count: 0,
   list: [],
-  form: {}
+  form: {
+    sid: "",
+    preferredName: "",
+    casrn: "",
+    qcLevelID: "",
+    sourceID: "",
+    substanceTypeID: "",
+    substanceDescription: "",
+    privateQCNotes: "",
+    publicQCNotes: ""
+  },
+  savedData: {}
 };
 
 // actions
@@ -27,19 +38,23 @@ let actions = {
       sid: payload.attributes.sid,
       preferredName: payload.attributes.preferredName,
       casrn: payload.attributes.casrn,
-      substanceDescription: payload.attributes.description,
-      privateQCNotes: payload.attributes.privateQcNote,
-      publicQCNotes: payload.attributes.publicQcNote,
       qcLevelID: payload.relationships.qcLevel.data.id,
       sourceID: payload.relationships.source.data.id,
-      substanceTypeID: payload.relationships.substanceType.data.id
+      substanceTypeID: payload.relationships.substanceType.data.id,
+      substanceDescription: payload.attributes.description,
+      privateQCNotes: payload.attributes.privateQcNote,
+      publicQCNotes: payload.attributes.publicQcNote
     };
     commit("loadForm", formLoad);
+  },
+  saveField: ({ commit }, payload) => {
+    commit("saveData", payload);
   }
 };
 
 // getters
 const getters = {
+  getForm: state => state.form
 };
 
 // mutations
@@ -47,6 +62,9 @@ const mutations = {
   ...rootMutations,
   loadForm(state, obj) {
     state.form = obj;
+  },
+  saveData(state, payload) {
+    state.savedData = { ...state.savedData, ...payload };
   },
   clearForm(state) {
     state.form = {};
