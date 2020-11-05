@@ -77,7 +77,7 @@ export default {
       this.$store.dispatch("auth/logout");
     },
     searchCompound: function() {
-      this.$store.dispatch("compound/fetchCompound", {
+      this.$store.dispatch("substance/substanceSearch", {
         searchString: this.searchString,
         push: true
       });
