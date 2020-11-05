@@ -24,25 +24,19 @@ let actions = {
       await router.push("substance");
 
     await HTTP.get(
-      `/${resource}?include=associatedCompound&filter[search]=${encodeURI(
+      `/${resource}?filter[search]=${encodeURI(
         searchString
       )}`
     ).then((response) => {
       context.commit("storeList", response.data.data);
       context.commit("storeCount", response.data.meta.pagination.count);
-      if (response.data.included)
-        context.commit("storeIncluded", response.data.included);
 
       if (response.data.data.length > 0) {
         let loaded_substance = response.data.data[0]
-        let compound_type = loaded_substance.relationships.associatedCompound.data.type
         let compound_id = loaded_substance.relationships.associatedCompound.data.id
-        let associated_compound = context.state.included[compound_type][compound_id]
-        let qst_id = associated_compound?.relationships?.queryStructureType?.data?.id
 
-        context.commit("compound/setType", qst_id ?? compound_type, {root: true})
         context.dispatch("loadForm", loaded_substance)
-        context.commit(`compound/${compound_type.toLowerCase()}/storeFetch`, associated_compound, {root: true})
+        context.dispatch(`compound/fetchCompound`, {id: compound_id}, {root: true})
       }
     })
   },
