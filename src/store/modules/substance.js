@@ -1,15 +1,19 @@
 import rootActions from "../actions.js";
 import rootMutations from "../mutations.js";
-import {HTTP} from "@/store/http-common";
+import { HTTP } from "@/store/http-common";
 import router from "@/router";
 
-const state = {
-  included: {},
-  loading: false,
-  count: 0,
-  list: [],
-  form: {}
+const defaultState = () => {
+  return {
+    included: {},
+    loading: false,
+    count: 0,
+    list: [],
+    form: {}
+  };
 };
+
+const state = defaultState();
 
 // actions
 let actions = {
@@ -24,23 +28,38 @@ let actions = {
       await router.push("substance");
 
     await HTTP.get(
-      `/${resource}?filter[search]=${encodeURI(
-        searchString
-      )}`
-    ).then((response) => {
+      `/${resource}?filter[search]=${encodeURI(searchString)}`
+    ).then(response => {
       context.commit("storeList", response.data.data);
       context.commit("storeCount", response.data.meta.pagination.count);
 
       if (response.data.data.length > 0) {
-        let loaded_substance = response.data.data[0]
-        let compound_id = loaded_substance.relationships.associatedCompound.data.id
+        let loaded_substance = response.data.data[0];
+        let compound_id =
+          loaded_substance.relationships.associatedCompound.data.id;
 
-        context.dispatch("loadForm", loaded_substance)
-        context.dispatch(`compound/fetchCompound`, {id: compound_id}, {root: true})
+        context.dispatch("loadForm", loaded_substance);
+        context.dispatch(
+          `compound/fetchCompound`,
+          { id: compound_id },
+          { root: true }
+        );
+      } else {
+        // Handle no rows returned
+        const alert = {
+          message: `${searchString} not valid`,
+          color: "warning",
+          dismissCountDown: 4
+        };
+        context.commit("clearState");
+        context.dispatch(`compound/clearAllStates`, {}, { root: true });
+        context.dispatch("alert/alert", alert, {
+          root: true
+        });
       }
-    })
+    });
   },
-  loadForm({commit}, payload) {
+  loadForm({ commit }, payload) {
     // filtering here to accomodate the SubstanceSidebar component and
     // the fetchByMolfile action on compound, if fetched we want to use
     // includes and return the obj, but if clicked from the tree we need
@@ -79,6 +98,9 @@ const mutations = {
   },
   clearForm(state) {
     state.form = {};
+  },
+  clearState(state) {
+    Object.assign(state, defaultState());
   }
 };
 
