@@ -40,7 +40,7 @@ describe("The substance page anonymous access", () => {
 
   it("should load the substance form from search", () => {
     // Search
-    cy.get("[data-cy=search-box]").type("DTXCID302000003");
+    cy.get("[data-cy=search-box]").type("Sample Substance");
     cy.get("[data-cy=search-button]").click();
 
     cy.get("#recordCompoundID").should("have.value", "DTXCID302000003");
@@ -89,7 +89,7 @@ describe("The substance page anonymous access", () => {
       .should("not.exist");
 
     // Search
-    cy.get("[data-cy=search-box]").type("DTXCID302000003");
+    cy.get("[data-cy=search-box]").type("Sample Substance");
     cy.get("[data-cy=search-button]").click();
 
     // Verify elements in iframe
@@ -317,7 +317,7 @@ describe("The substance page authenticated access", () => {
       .should("not.be.empty");
 
     // Search
-    cy.get("[data-cy=search-box]").type("DTXCID502000009");
+    cy.get("[data-cy=search-box]").type("Sample Substance 2");
     cy.get("[data-cy=search-button]").click();
     // Click CycloHexane Button
     cy.get("iframe[id=marvin]")
@@ -350,7 +350,7 @@ describe("The substance page authenticated access", () => {
       .should("not.be.empty");
 
     // Search
-    cy.get("[data-cy=search-box]").type("DTXCID502000009");
+    cy.get("[data-cy=search-box]").type("Sample Substance 2");
     cy.get("[data-cy=search-button]").click();
     // Click CycloHexane Button
     cy.get("iframe[id=marvin]")
@@ -403,7 +403,7 @@ describe("The substance page's Synonym Table", () => {
   });
 
   it("should load synonyms", () => {
-    cy.get("[data-cy=search-box]").type("DTXCID502000009");
+    cy.get("[data-cy=search-box]").type("Sample Substance 2");
     cy.get("[data-cy=search-button]").click();
     cy.get("#substanceTable")
       .find("div.ag-center-cols-clipper")
@@ -415,7 +415,7 @@ describe("The substance page's Synonym Table", () => {
     // Queue a simple success message (actual response is not currently used)
     cy.route("PATCH", "/synonyms/*", "success");
 
-    cy.get("[data-cy=search-box]").type("DTXCID502000009");
+    cy.get("[data-cy=search-box]").type("Sample Substance 2");
     cy.get("[data-cy=search-button]").click();
 
     // Find the first row's first cell and type
@@ -453,7 +453,7 @@ describe("The substance page's Synonym Table", () => {
       }
     });
 
-    cy.get("[data-cy=search-box]").type("DTXCID502000009");
+    cy.get("[data-cy=search-box]").type("Sample Substance 2");
     cy.get("[data-cy=search-button]").click();
 
     // Find the first row's first cell and type
@@ -485,7 +485,7 @@ describe("The substance page's Synonym Table", () => {
   });
 
   it("should be able to reset", () => {
-    cy.get("[data-cy=search-box]").type("DTXCID502000009");
+    cy.get("[data-cy=search-box]").type("Sample Substance 2");
     cy.get("[data-cy=search-button]").click();
 
     // Find the first row's first cell and type
@@ -534,7 +534,7 @@ describe("The substance page's Relationships Table", () => {
 
   it("should load relationships", () => {
     // Navigate to substance with relationships
-    cy.get("[data-cy=search-box]").type("DTXCID502000009");
+    cy.get("[data-cy=search-box]").type("Sample Substance 2");
     cy.get("[data-cy=search-button]").click();
 
     // Verify response contains sids as required.
@@ -567,7 +567,7 @@ describe("The substance page's List Table", () => {
 
   it("should load records", () => {
     // Navigate to substance with records
-    cy.get("[data-cy=search-box]").type("DTXCID502000009");
+    cy.get("[data-cy=search-box]").type("Sample Substance 2");
     cy.get("[data-cy=search-button]").click();
 
     // Verify response contains rids as required.
