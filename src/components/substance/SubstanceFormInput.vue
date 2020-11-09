@@ -1,4 +1,4 @@
-<template id="my-form">
+<template >
   <b-form-group
     :label="labels[val]"
     label-align="left"
@@ -7,12 +7,7 @@
     class="pb-3"
   >
     <template v-if="dropdowns.includes(val)">
-      <b-form-select
-        :id="val"
-        v-model="value"
-        :options="options"
-        :disabled="!isAuthenticated"
-      />
+      <SubstanceFormDropdown :val="val" />
     </template>
     <template v-else-if="textareas.includes(val)">
       <b-form-textarea :id="val" v-model="value" :disabled="!isAuthenticated" />
@@ -24,11 +19,15 @@
 </template>
 
 <script>
-import { mapGetters, mapState } from "vuex";
+import { mapGetters} from "vuex"; // , mapState 
+import SubstanceFormDropdown from "@/components/substance/SubstanceFormDropdown";
 
 export default {
   name: "SubstanceFormInput",
-  props: ["val", "form", "store"],
+  components: {
+    SubstanceFormDropdown
+  },
+  props: ["val", "form"],
   data() {
     return {
       textareas: ["privateQCNotes", "publicQCNotes"],
@@ -48,13 +47,6 @@ export default {
   },
   computed: {
     ...mapGetters("auth", ["isAuthenticated"]),
-    ...mapGetters("substance", ["getForm"]),
-    ...mapState({
-      dropdownList(state) {
-        // get the list from the appropriate store module
-        return state[this.val.split("ID").shift()].list;
-      }
-    }),
 
     authAbility: function() {
       if (this.val === "sid") {
@@ -65,29 +57,12 @@ export default {
     },
     value: {
       get() {
-        return this.getForm[this.val];
+        return this.form[this.val];
       },
       set(newValue) {
-        this.$store.commit("substance/saveData", { [this.val]: newValue });
+        this.$store.commit("substance/updatePayload", { key: this.val, value: newValue });
       }
-    },
-    options: function() {
-      return this.buildOptions(this.dropdownList);
     }
-  },
-  methods: {
-    buildOptions: function(list) {
-      let item;
-      let options = [];
-      for (item of list)
-        options.push({ value: item.id, text: item.attributes.label });
-      return options;
-    }
-  },
-  mounted() {
-    this.$store.dispatch("source/getList");
-    this.$store.dispatch("qcLevel/getList");
-    this.$store.dispatch("substanceType/getList");
   }
 };
 </script>

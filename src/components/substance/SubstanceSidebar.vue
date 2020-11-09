@@ -72,14 +72,6 @@ export default {
       });
       return dates;
     }
-  },
-  mounted() {
-    this.$store.dispatch("substance/getList", {
-      params: [
-        { key: "sort", value: "-updatedAt,updatedBy" },
-        { key: "include", value: "updatedBy" }
-      ]
-    });
   }
 };
 </script>

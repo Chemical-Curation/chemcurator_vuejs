@@ -16,7 +16,12 @@ const state = {
     privateQCNotes: "",
     publicQCNotes: ""
   },
-  savedData: {}
+  savedData: {
+    type: "substance",
+    attributes: {},
+    relationships: {}
+  },
+  btnDisabled: true
 };
 
 // actions
@@ -46,15 +51,13 @@ let actions = {
       publicQCNotes: payload.attributes.publicQcNote
     };
     commit("loadForm", formLoad);
-  },
-  saveField: ({ commit }, payload) => {
-    commit("saveData", payload);
+    commit("clearPayload");
   }
 };
 
 // getters
 const getters = {
-  getForm: state => state.form
+  getForm: state => state.form,
 };
 
 // mutations
@@ -63,8 +66,28 @@ const mutations = {
   loadForm(state, obj) {
     state.form = obj;
   },
-  saveData(state, payload) {
-    state.savedData = { ...state.savedData, ...payload };
+  updatePayload(state, { key, value }) {
+    if (["qcLevelID", "sourceID","substanceTypeID"].includes(key)) {
+      if (state.savedData[key] !== value) {
+        let obj = {data: {type: key, id: value}}
+        state.savedData.relationships[key] = obj;
+      }
+    } else {
+      state.savedData.attributes[key] = value;
+    }
+    if (state.form.sid) {
+      state.savedData["id"] = state.form.sid;
+    }
+    state.btnDisabled  = false;
+  },
+  clearPayload(state) {
+    let emptyData = {
+      type: "substance",
+      attributes: {},
+      relationships: {}
+    }
+    state.savedData = emptyData;
+    state.btnDisabled = true;
   },
   clearForm(state) {
     state.form = {};

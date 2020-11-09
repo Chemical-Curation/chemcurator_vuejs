@@ -433,7 +433,7 @@ describe("The substance page's Synonym Table", () => {
     cy.get("body").should("contain.text", "All synonyms saved successfully");
   });
 
-  it("should allow handle errors", () => {
+  it("should handle errors", () => {
     let sampleErrorMessage = "Sample Error";
 
     // Queue a failure response
