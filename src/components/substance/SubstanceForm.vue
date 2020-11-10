@@ -38,7 +38,7 @@ export default {
       console.log(sid);
 
       if (sid) {
-        // if there is an id, patch the currently loaded ill-defined compound.
+        // if there is an id, patch the currently loaded substance.
         this.$store
           .dispatch("substance/patch", {
             id: sid,
@@ -47,8 +47,7 @@ export default {
           // Handle the errors
           .catch(err => this.handleError(err));
       } else {
-        // If there is no id, save the new compound
-        console.log("above");
+        // If there is no id, save the new substance.
         this.$store
           .dispatch("substance/post", substanceForm)
           .then(response => {
@@ -56,9 +55,19 @@ export default {
           })
           // How to deal with errors?
           .catch(err => {
+            let catcher = [];
             for (let error of err.response.data.errors) {
-              console.log(error);
+              console.log(error.source.pointer.split("/").slice(-1).shift());
+              let gert = error.source.pointer.split("/").slice(-1).shift()
+              catcher.push(gert);
               console.log(error.detail);
+              this.$store.commit("substance/loadErrors", { key: gert, value: error.detail });
+              this.$store.commit("substance/formChecked", { key: gert, value: false });
+            }
+            let valids = Object.keys(this.form).filter(key => !catcher.includes(key));
+            console.log("valids", valids);
+            for (let valid of valids) {
+              this.$store.commit("substance/formChecked", { key: valid, value: true });
             }
           });
       }

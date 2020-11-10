@@ -9,9 +9,9 @@ const state = {
     sid: "",
     preferredName: "",
     casrn: "",
-    qcLevelID: "",
-    sourceID: "",
-    substanceTypeID: "",
+    qcLevel: "",
+    source: "",
+    substanceType: "",
     substanceDescription: "",
     privateQCNotes: "",
     publicQCNotes: ""
@@ -21,7 +21,19 @@ const state = {
     attributes: {},
     relationships: {}
   },
-  btnDisabled: true
+  btnDisabled: true,
+  validated: {
+    sid: null,
+    preferredName: null,
+    casrn: null,
+    qcLevel: null,
+    source: null,
+    substanceType: null,
+    substanceDescription: null,
+    privateQCNotes: null,
+    publicQCNotes: null
+  },
+  obj: {}
 };
 
 // actions
@@ -43,9 +55,9 @@ let actions = {
       sid: payload.attributes.sid,
       preferredName: payload.attributes.preferredName,
       casrn: payload.attributes.casrn,
-      qcLevelID: payload.relationships.qcLevel.data.id,
-      sourceID: payload.relationships.source.data.id,
-      substanceTypeID: payload.relationships.substanceType.data.id,
+      qcLevel: payload.relationships.qcLevel.data.id,
+      source: payload.relationships.source.data.id,
+      substanceType: payload.relationships.substanceType.data.id,
       substanceDescription: payload.attributes.description,
       privateQCNotes: payload.attributes.privateQcNote,
       publicQCNotes: payload.attributes.publicQcNote
@@ -58,16 +70,28 @@ let actions = {
 // getters
 const getters = {
   getForm: state => state.form,
+  getValid: state => {
+    if (Object.keys(state.validated).length) {
+      return true;
+    } else {
+      return null;
+    }
+  }
 };
-
 // mutations
 const mutations = {
   ...rootMutations,
   loadForm(state, obj) {
     state.form = obj;
   },
+  loadErrors(state, {key, value}) {
+    state.obj[key] = value;
+  },
+  formChecked(state, {key, value}) {
+    state.validated[key] = value;
+  },
   updatePayload(state, { key, value }) {
-    if (["qcLevelID", "sourceID","substanceTypeID"].includes(key)) {
+    if (["qcLevel", "source","substanceType"].includes(key)) {
       if (state.savedData[key] !== value) {
         let obj = {data: {type: key, id: value}}
         state.savedData.relationships[key] = obj;

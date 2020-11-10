@@ -2,6 +2,7 @@
   <b-form-select
     :id="val"
     v-model="value"
+    :state="empty"
     :options="options"
     :disabled="!isAuthenticated"
   />
@@ -12,13 +13,13 @@ import { mapGetters, mapState } from "vuex";
 
 export default {
   name: "SubstanceFormDropdown",
-  props: ["val"],
+  props: ["val", "empty"],
   computed: {
     ...mapGetters("auth", ["isAuthenticated"]),
     ...mapState({
       dropdownList(state) {
         // get the list from the appropriate store module
-        return state[this.val.split("ID").shift()].list;
+        return state[this.val].list;
       }
     }),
 

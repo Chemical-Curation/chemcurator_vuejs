@@ -7,19 +7,25 @@
     class="pb-3"
   >
     <template v-if="dropdowns.includes(val)">
-      <SubstanceFormDropdown :val="val" />
+      <SubstanceFormDropdown :val="val" :empty="validated[val]"/>
     </template>
     <template v-else-if="textareas.includes(val)">
-      <b-form-textarea :id="val" v-model="value" :disabled="!isAuthenticated" />
+      <b-form-textarea :id="val" :state="validated[val]" v-model="value" :disabled="!isAuthenticated" />
     </template>
     <template v-else>
-      <b-form-input :id="val" v-model="value" :disabled="authAbility" />
+      <b-form-input :id="val" :state="validated[val]" v-model="value" :disabled="authAbility" />
     </template>
+    <b-form-invalid-feedback >
+      {{ obj[val] }}
+    </b-form-invalid-feedback>
+    <b-form-valid-feedback >
+      valid.
+    </b-form-valid-feedback>  
   </b-form-group>
 </template>
 
 <script>
-import { mapGetters} from "vuex"; // , mapState 
+import { mapState , mapGetters} from "vuex"; // , mapState 
 import SubstanceFormDropdown from "@/components/substance/SubstanceFormDropdown";
 
 export default {
@@ -30,8 +36,10 @@ export default {
   props: ["val", "form"],
   data() {
     return {
+      state: false,
+      stateNo: null,
       textareas: ["privateQCNotes", "publicQCNotes"],
-      dropdowns: ["qcLevelID", "sourceID", "substanceTypeID"],
+      dropdowns: ["qcLevel", "source", "substanceType"],
       labels: {
         sid: "Substance ID:",
         preferredName: "Preferred Name:",
@@ -39,15 +47,25 @@ export default {
         substanceDescription: "Substance Description:",
         privateQCNotes: "Private QC Notes:",
         publicQCNotes: "Public QC Notes:",
-        qcLevelID: "QC Level:",
-        sourceID: "Source:",
-        substanceTypeID: "Substance Type:"
+        qcLevel: "QC Level:",
+        source: "Source:",
+        substanceType: "Substance Type:"
       }
     };
   },
   computed: {
     ...mapGetters("auth", ["isAuthenticated"]),
+    ...mapGetters("substance", ["getValid"]),
+    ...mapState("substance", ["validated", "obj"]),
 
+//    isValid: function() {
+//      console.log(Object.keys(this.validated).length);
+//      if (Object.keys(this.validated).length) {
+//        return true;
+//      } else {
+//        return null;
+//      }
+//    },
     authAbility: function() {
       if (this.val === "sid") {
         return true;
