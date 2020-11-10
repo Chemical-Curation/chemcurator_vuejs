@@ -2,7 +2,7 @@
   <b-form-select
     :id="field"
     v-model="inputText"
-    :state="empty"
+    :state="formState"
     :options="options"
     :disabled="!isAuthenticated"
   />
@@ -13,7 +13,7 @@ import { mapGetters, mapState } from "vuex";
 
 export default {
   name: "SubstanceFormDropdown",
-  props: ["field", "empty"],
+  props: ["field", "formState"],
   computed: {
     ...mapGetters("auth", ["isAuthenticated"]),
     ...mapState({

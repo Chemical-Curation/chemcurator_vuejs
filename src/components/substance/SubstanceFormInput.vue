@@ -7,7 +7,7 @@
     class="pb-3"
   >
     <template v-if="dropdowns.includes(field)">
-      <SubstanceFormDropdown :field="field" :empty="getValid(field)"/>
+      <SubstanceFormDropdown :field="field" :formState="getValid(field)"/>
     </template>
     <template v-else-if="textareas.includes(field)">
       <b-form-textarea :id="field" :state="getValid(field)" v-model="inputText" :disabled="!isAuthenticated" />
