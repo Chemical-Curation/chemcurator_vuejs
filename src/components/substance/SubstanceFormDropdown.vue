@@ -1,7 +1,7 @@
 <template>
   <b-form-select
-    :id="val"
-    v-model="value"
+    :id="field"
+    v-model="inputText"
     :state="empty"
     :options="options"
     :disabled="!isAuthenticated"
@@ -13,23 +13,23 @@ import { mapGetters, mapState } from "vuex";
 
 export default {
   name: "SubstanceFormDropdown",
-  props: ["val", "empty"],
+  props: ["field", "empty"],
   computed: {
     ...mapGetters("auth", ["isAuthenticated"]),
     ...mapState({
       dropdownList(state) {
         // get the list from the appropriate store module
-        return state[this.val].list;
+        return state[this.field].list;
       }
     }),
 
-    value: {
+    inputText: {
       get() {
-        return this.$store.state.substance.form[this.val];
+        return this.$store.state.substance.form[this.field];
       },
-      set(value) {
-        if (this.value !== value) {
-          this.$store.commit("substance/updatePayload", { key: this.val, value: value });
+      set(newValue) {
+        if (this.inputText !== newValue) {
+          this.$store.commit("substance/updatePayload", { field: this.field, inputText: newValue });
         }
       }
     },

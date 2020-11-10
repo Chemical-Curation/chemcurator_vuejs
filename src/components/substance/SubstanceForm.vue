@@ -2,8 +2,7 @@
   <b-form class="pb-3">
     <div v-for="(formKey, index) in Object.keys(form)" :key="index">
       <SubstanceFormInput
-        :val="formKey"
-        :form=form
+        :field="formKey"
       />
     </div>
     <b-button
@@ -34,41 +33,46 @@ export default {
   methods: {
     saveSubstance() {
       const substanceForm = this.$store.state.substance.savedData;
-      const { sid } = substanceForm ;
-      console.log(sid);
+      const { id } = substanceForm ;
 
-      if (sid) {
+      if (id) {
+        console.log(id);
         // if there is an id, patch the currently loaded substance.
         this.$store
           .dispatch("substance/patch", {
-            id: sid,
+            id: id,
             body: { ...substanceForm }
           })
           // Handle the errors
-          .catch(err => this.handleError(err));
+          .catch(err => {console.log("patch", err)});
       } else {
         // If there is no id, save the new substance.
         this.$store
           .dispatch("substance/post", substanceForm)
           .then(response => {
-            console.log(response);
+            console.log(response.data);
+            let payload = response.data.data;
+            let { id } = payload;
+            this.$store.dispatch("substance/loadForm", response.data.data);
+            this.$store.dispatch("alert/alert", {
+              message: `Substance ${id} created successfully`,
+              color: "success",
+              dismissCountDown: 5
+            });
           })
           // How to deal with errors?
           .catch(err => {
-            let catcher = [];
+            let ddd = {};
+            this.$store.commit("substance/clearValidated");
             for (let error of err.response.data.errors) {
-              console.log(error.source.pointer.split("/").slice(-1).shift());
-              let gert = error.source.pointer.split("/").slice(-1).shift()
-              catcher.push(gert);
-              console.log(error.detail);
-              this.$store.commit("substance/loadErrors", { key: gert, value: error.detail });
-              this.$store.commit("substance/formChecked", { key: gert, value: false });
+              //console.log(error.source.pointer.split("/").slice(-1).shift());
+              let attr = error.source.pointer.split("/").slice(-1).shift()
+              let jobs = { [`${attr}`] : error.detail }
+              ddd = { ...ddd, ...jobs };
+              this.$store.commit("substance/formChecked", { key: attr, value: false });
             }
-            let valids = Object.keys(this.form).filter(key => !catcher.includes(key));
-            console.log("valids", valids);
-            for (let valid of valids) {
-              this.$store.commit("substance/formChecked", { key: valid, value: true });
-            }
+            this.$store.commit("substance/loadErrors", ddd);
+            console.log("valids", ddd);
           });
       }
     }

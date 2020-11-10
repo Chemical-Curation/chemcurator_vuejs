@@ -23,7 +23,6 @@ const state = {
   },
   btnDisabled: true,
   validated: {
-    sid: null,
     preferredName: null,
     casrn: null,
     qcLevel: null,
@@ -33,7 +32,7 @@ const state = {
     privateQCNotes: null,
     publicQCNotes: null
   },
-  obj: {}
+  errors: {}
 };
 
 // actions
@@ -51,6 +50,8 @@ let actions = {
     if (typeof payload === "string") {
       payload = state.list.filter(sub => sub.id === payload).shift();
     }
+    let { id } = payload;
+    console.log(id);
     let formLoad = {
       sid: payload.attributes.sid,
       preferredName: payload.attributes.preferredName,
@@ -64,18 +65,15 @@ let actions = {
     };
     commit("loadForm", formLoad);
     commit("clearPayload");
+    commit("clearValidated");
   }
 };
 
 // getters
 const getters = {
   getForm: state => state.form,
-  getValid: state => {
-    if (Object.keys(state.validated).length) {
-      return true;
-    } else {
-      return null;
-    }
+  getValid: state => (key) => {
+    return state.validated[key];
   }
 };
 // mutations
@@ -84,20 +82,37 @@ const mutations = {
   loadForm(state, obj) {
     state.form = obj;
   },
-  loadErrors(state, {key, value}) {
-    state.obj[key] = value;
+  loadErrors(state, errors) {
+    state.errors = errors;
+    Object.keys(state.validated).forEach((key) => {
+      if (state.validated[key] === null) {
+        state.validated[key] = true
+      }
+    })
   },
   formChecked(state, {key, value}) {
     state.validated[key] = value;
   },
-  updatePayload(state, { key, value }) {
-    if (["qcLevel", "source","substanceType"].includes(key)) {
-      if (state.savedData[key] !== value) {
-        let obj = {data: {type: key, id: value}}
-        state.savedData.relationships[key] = obj;
+  clearValidated(state) {
+    state.validated = {
+      preferredName: null,
+      casrn: null,
+      qcLevel: null,
+      source: null,
+      substanceType: null,
+      substanceDescription: null,
+      privateQCNotes: null,
+      publicQCNotes: null
+    }
+  },
+  updatePayload(state, { field, inputText }) {
+    if (["qcLevel", "source","substanceType"].includes(field)) {
+      if (state.savedData[field] !== inputText) {
+        let obj = {data: {type: field, id: inputText}}
+        state.savedData.relationships[field] = obj;
       }
     } else {
-      state.savedData.attributes[key] = value;
+      state.savedData.attributes[field] = inputText;
     }
     if (state.form.sid) {
       state.savedData["id"] = state.form.sid;

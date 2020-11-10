@@ -1,26 +1,23 @@
 <template >
   <b-form-group
-    :label="labels[val]"
+    :label="labels[field]"
     label-align="left"
     label-cols="3"
-    :label-for="val"
+    :label-for="field"
     class="pb-3"
   >
-    <template v-if="dropdowns.includes(val)">
-      <SubstanceFormDropdown :val="val" :empty="validated[val]"/>
+    <template v-if="dropdowns.includes(field)">
+      <SubstanceFormDropdown :field="field" :empty="getValid(field)"/>
     </template>
-    <template v-else-if="textareas.includes(val)">
-      <b-form-textarea :id="val" :state="validated[val]" v-model="value" :disabled="!isAuthenticated" />
+    <template v-else-if="textareas.includes(field)">
+      <b-form-textarea :id="field" :state="getValid(field)" v-model="inputText" :disabled="!isAuthenticated" />
     </template>
     <template v-else>
-      <b-form-input :id="val" :state="validated[val]" v-model="value" :disabled="authAbility" />
+      <b-form-input :id="field" :state="getValid(field)" v-model="inputText" :disabled="authAbility" />
     </template>
     <b-form-invalid-feedback >
-      {{ obj[val] }}
+      {{ errors[field] }}
     </b-form-invalid-feedback>
-    <b-form-valid-feedback >
-      valid.
-    </b-form-valid-feedback>  
   </b-form-group>
 </template>
 
@@ -33,11 +30,9 @@ export default {
   components: {
     SubstanceFormDropdown
   },
-  props: ["val", "form"],
+  props: ["field"],
   data() {
     return {
-      state: false,
-      stateNo: null,
       textareas: ["privateQCNotes", "publicQCNotes"],
       dropdowns: ["qcLevel", "source", "substanceType"],
       labels: {
@@ -56,29 +51,21 @@ export default {
   computed: {
     ...mapGetters("auth", ["isAuthenticated"]),
     ...mapGetters("substance", ["getValid"]),
-    ...mapState("substance", ["validated", "obj"]),
+    ...mapState("substance", ["fieldidated", "errors"]),
 
-//    isValid: function() {
-//      console.log(Object.keys(this.validated).length);
-//      if (Object.keys(this.validated).length) {
-//        return true;
-//      } else {
-//        return null;
-//      }
-//    },
     authAbility: function() {
-      if (this.val === "sid") {
+      if (this.field === "sid") {
         return true;
       } else {
         return !this.isAuthenticated;
       }
     },
-    value: {
+    inputText: {
       get() {
-        return this.form[this.val];
+        return this.$store.state.substance.form[this.field];
       },
       set(newValue) {
-        this.$store.commit("substance/updatePayload", { key: this.val, value: newValue });
+        this.$store.commit("substance/updatePayload", { field: this.field, inputText: newValue });
       }
     }
   }
