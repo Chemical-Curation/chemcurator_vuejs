@@ -42,6 +42,7 @@
         if (marvin.Sketch.isSupported()) {
           marvin.sketcherInstance = new marvin.Sketch("sketch");
           marvin.sketcherInstance.setServices(getDefaultServices());
+          marvin.sketcherInstance.setDisplaySettings({toolbars: "reporting"})
           marvin.sketcherInstance.on('molchange', () => exportStructure())
           parent.postMessage("marvinLoaded", "*");
         } else {
