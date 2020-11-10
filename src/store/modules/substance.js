@@ -27,37 +27,46 @@ let actions = {
     if (push && router.currentRoute.name !== "substance")
       await router.push("substance");
 
-    await HTTP.get(
-      `/${resource}?filter[search]=${encodeURI(searchString)}`
-    ).then(response => {
-      context.commit("storeList", response.data.data);
-      context.commit("storeCount", response.data.meta.pagination.count);
+    await HTTP.get(`/${resource}?filter[search]=${encodeURI(searchString)}`)
+      .then(response => {
+        context.commit("storeList", response.data.data);
+        context.commit("storeCount", response.data.meta.pagination.count);
 
-      if (response.data.data.length > 0) {
-        let loaded_substance = response.data.data[0];
-        let compound_id =
-          loaded_substance.relationships.associatedCompound.data.id;
+        if (response.data.data.length > 0) {
+          let loaded_substance = response.data.data[0];
+          let compound_id =
+            loaded_substance.relationships.associatedCompound.data.id;
 
-        context.dispatch("loadForm", loaded_substance);
-        context.dispatch(
-          `compound/fetchCompound`,
-          { id: compound_id },
-          { root: true }
-        );
-      } else {
-        // Handle no rows returned
+          context.dispatch("loadForm", loaded_substance);
+          context.dispatch(
+            `compound/fetchCompound`,
+            { id: compound_id },
+            { root: true }
+          );
+        } else {
+          // Handle no rows returned
+          const alert = {
+            message: `${searchString} not valid`,
+            color: "warning",
+            dismissCountDown: 4
+          };
+          context.commit("clearState");
+          context.dispatch(`compound/clearAllStates`, {}, { root: true });
+          context.dispatch("alert/alert", alert, {
+            root: true
+          });
+        }
+      })
+      .catch(err => {
         const alert = {
-          message: `${searchString} not valid`,
-          color: "warning",
+          message: err.response.data.errors.shift()?.detail,
+          color: "danger",
           dismissCountDown: 4
         };
-        context.commit("clearState");
-        context.dispatch(`compound/clearAllStates`, {}, { root: true });
         context.dispatch("alert/alert", alert, {
           root: true
         });
-      }
-    });
+      });
   },
   loadForm({ commit }, payload) {
     // filtering here to accomodate the SubstanceSidebar component and
