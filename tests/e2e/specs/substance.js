@@ -109,6 +109,25 @@ describe("The substance page anonymous access", () => {
       .should("contain", "AGAHNABIDCTLHW-UHFFFAOYSA-N");
   });
 
+  it("should handle search exceptions", () => {
+    cy.route({
+      url: "/substances?filter[search]=Sample Substance",
+      response: {
+        errors: [{ detail: "The Resolver service is not available right now" }]
+      },
+      status: 500
+    });
+
+    // Search
+    cy.get("[data-cy=search-box]").type("Sample Substance");
+    cy.get("[data-cy=search-button]").click();
+
+    cy.get("body").should(
+      "contain",
+      "The Resolver service is not available right now"
+    );
+  });
+
   it("should fetch from server when ketcher changes", () => {
     cy.get("#compound-type-dropdown").select("Defined Compound");
     cy.get("iframe[id=ketcher]")
