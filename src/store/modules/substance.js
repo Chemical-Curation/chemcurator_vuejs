@@ -24,7 +24,7 @@ let actions = {
       payload = state.list.filter(sub => sub.id === payload).shift();
     }
     let formLoad = {
-      sid: payload.attributes.sid,
+      id: payload.data.id, // sid
       preferredName: payload.attributes.preferredName,
       casrn: payload.attributes.casrn,
       substanceDescription: payload.attributes.description,
