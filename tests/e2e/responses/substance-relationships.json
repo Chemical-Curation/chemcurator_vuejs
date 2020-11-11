@@ -20,7 +20,7 @@
           },
           "data": {
             "type": "substance",
-            "id": "2"
+            "id": "DTXSID602000001"
           }
         },
         "toSubstance": {
@@ -30,7 +30,7 @@
           },
           "data": {
             "type": "substance",
-            "id": "3"
+            "id": "DTXSID202000002"
           }
         },
         "source": {
@@ -72,7 +72,7 @@
           },
           "data": {
             "type": "substance",
-            "id": "2"
+            "id": "DTXSID602000001"
           }
         },
         "toSubstance": {
@@ -82,7 +82,7 @@
           },
           "data": {
             "type": "substance",
-            "id": "2"
+            "id": "DTXSID602000001"
           }
         },
         "source": {
@@ -124,7 +124,7 @@
           },
           "data": {
             "type": "substance",
-            "id": "1"
+            "id": "DTXSID502000000"
           }
         },
         "toSubstance": {
@@ -134,7 +134,7 @@
           },
           "data": {
             "type": "substance",
-            "id": "2"
+            "id": "DTXSID602000001"
           }
         },
         "source": {
