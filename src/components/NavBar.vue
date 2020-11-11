@@ -20,7 +20,7 @@
         <b-form-input
           class="mr-2 search"
           v-model="searchString"
-          placeholder="Search Compounds (cid or inchikey)"
+          placeholder="Search Substances"
           data-cy="search-box"
           @keyup.enter="searchCompound"
         />
