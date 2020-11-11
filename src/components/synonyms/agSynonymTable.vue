@@ -167,9 +167,13 @@ export default {
      * Source objects to be used in a select dropdown
      */
     sourceListOptions: function() {
-      return this.sourceList.map(i => {
-        return { value: i.id, text: i.attributes.label };
-      });
+      return this.sourceList
+        .filter(obj => {
+          return !obj.attributes.deprecated;
+        })
+        .map(i => {
+          return { value: i.id, text: i.attributes.label };
+        });
     },
 
     /**
@@ -185,9 +189,13 @@ export default {
      * Synonym Quality objects to be used in a select dropdown
      */
     qualityListOptions: function() {
-      return this.qualityList.map(i => {
-        return { value: i.id, text: i.attributes.label };
-      });
+      return this.qualityList
+        .filter(obj => {
+          return !obj.attributes.deprecated;
+        })
+        .map(i => {
+          return { value: i.id, text: i.attributes.label };
+        });
     },
 
     /**
@@ -203,9 +211,13 @@ export default {
      * Synonym Type objects to be used in a select dropdown
      */
     typeListOptions: function() {
-      return this.typeList.map(i => {
-        return { value: i.id, text: i.attributes.label };
-      });
+      return this.typeList
+        .filter(obj => {
+          return !obj.attributes.deprecated;
+        })
+        .map(i => {
+          return { value: i.id, text: i.attributes.label };
+        });
     },
 
     /**

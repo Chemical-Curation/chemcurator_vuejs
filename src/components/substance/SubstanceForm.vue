@@ -147,21 +147,29 @@ export default {
       return this.$store.state.substance.form;
     },
     sourceOptions: function() {
-      return this.buildOptions(this.sourceList);
+      return this.buildOptions(this.sourceList, this.form.sourceID);
     },
     substanceTypeOptions: function() {
-      return this.buildOptions(this.substanceTypeList);
+      return this.buildOptions(
+        this.substanceTypeList,
+        this.form.substanceTypeID
+      );
     },
     qcLevelsOptions: function() {
-      return this.buildOptions(this.qcLevelList);
+      return this.buildOptions(this.qcLevelList, this.form.qcLevelID);
     }
   },
   methods: {
-    buildOptions: function(list) {
+    buildOptions: function(list, selected) {
       let item;
       let options = [];
       for (item of list)
-        options.push({ value: item.id, text: item.attributes.label });
+        if (!item.attributes.deprecated || item.id === selected)
+          options.push({
+            value: item.id,
+            text: item.attributes.label,
+            disabled: item.attributes.deprecated
+          });
       return options;
     }
   },

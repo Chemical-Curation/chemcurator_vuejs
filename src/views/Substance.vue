@@ -75,7 +75,7 @@ export default {
       return this.illDefinedCompoundData.attributes?.cid;
     },
     options: function() {
-      return this.buildOptions(this.qstList);
+      return this.buildOptions(this.qstList, this.type);
     },
     substanceId: function() {
       if (
@@ -94,14 +94,19 @@ export default {
     }
   },
   methods: {
-    buildOptions: function(list) {
+    buildOptions: function(list, selected) {
       let item;
       let options = [
         { value: "none", text: "None" },
         { value: "definedCompound", text: "Defined Compound" }
       ];
       for (item of list)
-        options.push({ value: item.id, text: item.attributes.label });
+        if (!item.attributes.deprecated || item.id === selected)
+          options.push({
+            value: item.id,
+            text: item.attributes.label,
+            disabled: item.attributes.deprecated
+          });
       return options;
     },
     checkChanged: function(event) {
