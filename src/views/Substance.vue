@@ -69,10 +69,9 @@ export default {
     ...mapState("queryStructureType", { qstList: "list" }),
 
     cid: function() {
-      if (this.type === "definedCompound")
-        return this.definedCompoundData.attributes?.cid;
+      if (this.type === "definedCompound") return this.definedCompoundData.id;
       else if (this.type === "none") return "";
-      return this.illDefinedCompoundData.attributes?.cid;
+      return this.illDefinedCompoundData.id;
     },
     options: function() {
       return this.buildOptions(this.qstList);

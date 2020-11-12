@@ -32,7 +32,7 @@ let actions = {
     const endpoint =
       searchString.indexOf("-") > 0
         ? "/definedCompounds?include=substance&filter[inchikey]="
-        : "/compounds?include=substance&filter[cid]=";
+        : "/compounds?include=substance&filter[id]=";
     await HTTP.get(endpoint + searchString)
       .then(response => {
         const data = response.data;
