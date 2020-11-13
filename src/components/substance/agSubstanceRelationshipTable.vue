@@ -191,16 +191,11 @@ export default {
       if (
         params.data.relationships.fromSubstance.data.id === this.substanceId
       ) {
-        let substanceData = params.data.relationships.toSubstance.data;
-        return this.included[substanceData.type][substanceData.id].attributes
-          .sid;
+        return params.data.relationships.toSubstance.data.id;
       } else {
-        let substanceData = params.data.relationships.fromSubstance.data;
-        return this.included[substanceData.type][substanceData.id].attributes
-          .sid;
+        return params.data.relationships.fromSubstance.data.id;
       }
     },
-
     /**
      * Returns an int comparing two objects
      *
