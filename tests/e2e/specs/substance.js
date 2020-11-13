@@ -1,17 +1,26 @@
 let qstResponse = {
   data: [
     {
-      id: 1,
+      id: "1",
       type: "queryStructureType",
       attributes: {
         label: "Markush"
       }
     },
     {
-      id: 2,
+      id: "2",
       type: "queryStructureType",
       attributes: {
         label: "Ill Defined"
+      }
+    },
+    {
+      id: "4",
+      type: "queryStructureType",
+      attributes: {
+        name: "deprecated",
+        label: "Deprecated",
+        deprecated: true
       }
     }
   ]
@@ -29,6 +38,18 @@ describe("The substance page anonymous access", () => {
     cy.get("#compound-type-dropdown").contains("Defined Compound");
     cy.get("#compound-type-dropdown").contains("Ill Defined");
     cy.get("#compound-type-dropdown").contains("Markush");
+    cy.get("#compound-type-dropdown").should("not.contain", "Deprecated");
+  });
+
+  it("should show depreciated qst if the compound is set to it", () => {
+    cy.get("[data-cy=search-box]").type("DTXCID502000555");
+    cy.get("[data-cy=search-button]").click();
+
+    cy.get("#compound-type-dropdown").should("contain", "Deprecated");
+    cy.get("#compound-type-dropdown")
+      .find("[value=4]")
+      .should("be.selected")
+      .should("have.attr", "disabled");
   });
 
   it("should toggle ketcher/marvinjs on dropdown", () => {
@@ -170,6 +191,34 @@ describe("The substance page authenticated access", () => {
     cy.server();
     cy.route("/queryStructureTypes*", qstResponse);
     cy.visit("/substance");
+  });
+
+  it("should show depreciated controlled vocabs on the substance form's dropdowns", () => {
+    cy.get("[data-cy=search-box]").type("DTXCID502000555");
+    cy.get("[data-cy=search-button]").click();
+
+    // Assert substance loaded
+    cy.get("#substanceID").should("have.value", "DTXSID502000555");
+
+    // Build assertion info
+    let test_data = [
+      { htmlID: "#qcLevel", name: "Deprecated QC Levels", id: 12 },
+      {
+        htmlID: "#source",
+        name: "Deprecated Source",
+        id: 9
+      },
+      { htmlID: "#substanceType", name: "Deprecated Substance Type", id: 8 }
+    ];
+
+    // Test Dropdowns
+    cy.wrap(test_data).each(param => {
+      cy.get(param.htmlID).should("contain", param.name);
+      cy.get(param.htmlID)
+        .find(`[value=${param.id}]`)
+        .should("be.selected")
+        .should("have.attr", "disabled");
+    });
   });
 
   it("should post not-loaded defined compounds", () => {
@@ -431,6 +480,37 @@ describe("The substance page's Synonym Table", () => {
     cy.get("#synonym-save-button").click();
 
     cy.get("body").should("contain.text", "All synonyms saved successfully");
+  });
+
+  it("should not show deprecated data", () => {
+    // Queue a simple success message (actual response is not currently used)
+    cy.route("PATCH", "/synonyms/*", "success");
+
+    cy.get("[data-cy=search-box]").type("DTXCID502000555");
+    cy.get("[data-cy=search-button]").click();
+
+    // Build assertion info
+    let test_data = [
+      { column_number: 1, depreciated_label: "Depreciated Source" },
+      {
+        column_number: 2,
+        depreciated_label: "Depreciated Synonym Quality"
+      },
+      { column_number: 3, depreciated_label: "Depreciated Synonym Type" }
+    ];
+
+    // Test Dropdowns
+    cy.wrap(test_data).each(param => {
+      cy.get("#substanceTable")
+        .find("div.ag-center-cols-clipper")
+        .find("div.ag-row[role=row]")
+        .first()
+        .children()
+        .eq(param.column_number)
+        .dblclick()
+        .find("select")
+        .should("not.contain", param.deprecated_name);
+    });
   });
 
   it("should allow handle errors", () => {
