@@ -13,7 +13,7 @@ import { mapGetters, mapState } from "vuex";
 
 export default {
   name: "SubstanceFormDropdown",
-  props: ["field", "state", "pld"],
+  props: ["field", "state", "payload"],
   computed: {
     ...mapGetters("auth", ["isAuthenticated"]),
     ...mapState({
@@ -28,11 +28,16 @@ export default {
         return this.$store.state.substance.form[this.field];
       },
       set(newValue) {
-        if (!Object.keys(this.pld).includes("relationships")) {
-          this.$set(this.pld, "relationships", {})
+        // for some reason these values get set on formLoad
+        // so only when the user changes them in the dropdown
+        // should this be updated
+        if (this.inputText !== newValue ) {
+          if (!Object.keys(this.payload).includes("relationships")) {
+            this.$set(this.payload, "relationships", {})
+          }
+          let obj = {data: {type: this.field, id: newValue}}
+          this.$set(this.payload.relationships, this.field, obj);
         }
-        let obj = {data: {type: this.field, id: newValue}}
-        this.$set(this.pld.relationships, this.field, obj);
       }
     }
   },

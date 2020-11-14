@@ -3,7 +3,7 @@
     <div v-for="field in Object.keys(form)" :key="field">
       <SubstanceFormInput
         :field="field"
-        :pld="payload"
+        :payload="payload"
         :validation="validationState[field]"
       />
     </div>
@@ -34,7 +34,7 @@ export default {
   data() {
     return {
       validationState: this.clearValidation(),
-      payload: {}
+      payload: this.clearPayload()
     };
   },
   computed: {
@@ -43,7 +43,16 @@ export default {
       return !Object.keys(this.payload).length > 0;
     },
   },
+  watch: {
+    // let's hope that Chris never wants to edit the `sid` here!
+    "form.sid": function() {
+      this.payload = this.clearPayload()
+    }
+  },
   methods: {
+    clearPayload() {
+      return {}
+    },
     clearValidation() {
       let clean = {
           state: null,
@@ -69,24 +78,23 @@ export default {
       this.validationState["qcLevel"].message = "true"
     },
     saveSubstance() {
-      console.log(this.payload);
-      const substanceForm = this.$store.state.substance.savedData;
-      const { id } = substanceForm ;
-
-      if (id) {
-        console.log(id);
+      this.payload["type"] = "substance";
+      const { sid } = this.form;
+      if (sid) {
+        console.log(sid);
+        this.payload["id"] = sid;
         // if there is an id, patch the currently loaded substance.
         this.$store
           .dispatch("substance/patch", {
-            id: id,
-            body: { ...substanceForm }
+            id: sid,
+            body: { ...this.payload }
           })
           // Handle the errors
           .catch(err => {console.log("patch", err)});
       } else {
         // If there is no id, save the new substance.
         this.$store
-          .dispatch("substance/post", substanceForm)
+          .dispatch("substance/post", this.payload)
           .then(response => {
             console.log(response.data);
             let payload = response.data.data;
@@ -101,7 +109,6 @@ export default {
           // How to deal with errors?
           .catch(err => {
             let ddd = {};
-            this.$store.commit("substance/clearValidated");
             for (let error of err.response.data.errors) {
               //console.log(error.source.pointer.split("/").slice(-1).shift());
               let attr = error.source.pointer.split("/").slice(-1).shift()

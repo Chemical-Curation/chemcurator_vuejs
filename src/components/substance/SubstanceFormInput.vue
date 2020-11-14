@@ -10,7 +10,7 @@
       <SubstanceFormDropdown
         :field="field"
         :state="validation.state"
-        :pld="pld" />
+        :payload="payload" />
     </template>
     <template v-else-if="textareas.includes(field)">
       <b-form-textarea :id="field" :state="validation.state" v-model="inputText" :disabled="!isAuthenticated" />
@@ -33,7 +33,7 @@ export default {
   components: {
     SubstanceFormDropdown
   },
-  props: ["validation", "field","error","pld"],
+  props: ["validation", "field","error","payload"],
   data() {
     return {
       textareas: ["privateQCNotes", "publicQCNotes"],
@@ -64,10 +64,10 @@ export default {
         return this.$store.state.substance.form[this.field];
       },
       set(newValue) {
-        if (!Object.keys(this.pld).includes("attributes")) {
-          this.$set(this.pld, "attributes", {})
+        if (!Object.keys(this.payload).includes("attributes")) {
+          this.$set(this.payload, "attributes", {})
         }
-        this.$set(this.pld.attributes, this.field, newValue);
+        this.$set(this.payload.attributes, this.field, newValue);
       }
     }
   }

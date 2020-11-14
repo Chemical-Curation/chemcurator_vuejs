@@ -15,7 +15,7 @@ const state = {
     substanceDescription: "",
     privateQCNotes: "",
     publicQCNotes: ""
-  },
+  }
 };
 
 // actions
