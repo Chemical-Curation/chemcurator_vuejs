@@ -31,11 +31,11 @@ export default {
         // for some reason these values get set on formLoad
         // so only when the user changes them in the dropdown
         // should this be updated, hence the comparison with the form value
-        if (this.inputText !== newValue ) {
+        if (this.inputText !== newValue) {
           if (!Object.keys(this.payload).includes("relationships")) {
-            this.$set(this.payload, "relationships", {})
+            this.$set(this.payload, "relationships", {});
           }
-          let obj = {data: {type: this.field, id: newValue}}
+          let obj = { data: { type: this.field, id: newValue } };
           this.$set(this.payload.relationships, this.field, obj);
         }
       }
@@ -47,7 +47,7 @@ export default {
         return {
           value: item.id,
           text: item.attributes.label
-        }
+        };
       });
     }
   }

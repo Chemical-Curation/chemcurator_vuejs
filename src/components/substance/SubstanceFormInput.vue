@@ -1,4 +1,4 @@
-<template >
+<template>
   <b-form-group
     :label="labels[field]"
     label-align="left"
@@ -10,30 +10,33 @@
       <SubstanceFormDropdown
         :field="field"
         :state="validation.state"
-        :payload="payload" />
+        :payload="payload"
+      />
     </template>
     <template v-else-if="textareas.includes(field)">
       <b-form-textarea
         :id="field"
         v-model="inputText"
         :state="validation.state"
-        :disabled="!isAuthenticated" />
+        :disabled="!isAuthenticated"
+      />
     </template>
     <template v-else>
       <b-form-input
         :id="field"
         v-model="inputText"
         :state="validation.state"
-        :disabled="editable" />
+        :disabled="editable"
+      />
     </template>
-    <b-form-invalid-feedback >
+    <b-form-invalid-feedback>
       {{ validation.message }}
     </b-form-invalid-feedback>
   </b-form-group>
 </template>
 
 <script>
-import { mapState, mapGetters} from "vuex";
+import { mapState, mapGetters } from "vuex";
 import SubstanceFormDropdown from "@/components/substance/SubstanceFormDropdown";
 
 export default {
@@ -41,7 +44,7 @@ export default {
   components: {
     SubstanceFormDropdown
   },
-  props: ["validation", "field","error","payload"],
+  props: ["validation", "field", "error", "payload"],
   data() {
     return {
       textareas: ["description", "privateQCNote", "publicQCNote"],
@@ -65,7 +68,7 @@ export default {
     ...mapState("substance", ["errors"]),
 
     editable: function() {
-      return (this.field === "sid") ? true : !this.isAuthenticated;
+      return this.field === "sid" ? true : !this.isAuthenticated;
     },
     inputText: {
       get() {
@@ -73,7 +76,7 @@ export default {
       },
       set(newValue) {
         if (!Object.keys(this.payload).includes("attributes")) {
-          this.$set(this.payload, "attributes", {})
+          this.$set(this.payload, "attributes", {});
         }
         this.$set(this.payload.attributes, this.field, newValue);
       }

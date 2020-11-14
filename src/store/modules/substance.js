@@ -54,7 +54,7 @@ let actions = {
 
 // getters
 const getters = {
-  getForm: state => state.form,
+  getForm: state => state.form
 };
 // mutations
 const mutations = {

@@ -7,16 +7,10 @@
         :validation="validationState[field]"
       />
     </div>
-    <b-button
-      @click="saveSubstance"
-      variant="primary"
-      :disabled="btnDisabled"
+    <b-button @click="saveSubstance" variant="primary" :disabled="btnDisabled"
       >Save Substance</b-button
     >
-    <b-button
-      class="ml-2"
-      @click="clearForm"
-      variant="secondary"
+    <b-button class="ml-2" @click="clearForm" variant="secondary"
       >Clear Form</b-button
     >
   </b-form>
@@ -41,12 +35,12 @@ export default {
     ...mapState("substance", ["form"]),
     btnDisabled: function() {
       return !Object.keys(this.payload).length > 0;
-    },
+    }
   },
   watch: {
     // let's hope that Chris never wants to edit the `sid` here!
     "form.sid": function() {
-      this.payload = this.clearPayload()
+      this.payload = this.clearPayload();
     }
   },
   methods: {
@@ -54,24 +48,24 @@ export default {
       this.$store.commit("substance/clearForm");
     },
     clearPayload() {
-      return {}
+      return {};
     },
     clearValidation() {
       let clean = {
-          state: null,
-          message: ""
-      }
+        state: null,
+        message: ""
+      };
       return {
-        "sid": {...clean},
-        "casrn": {...clean},
-        "preferredName": {...clean},
-        "privateQCNote": {...clean},
-        "publicQCNote": {...clean},
-        "qcLevel": {...clean},
-        "source": {...clean},
-        "description": {...clean},
-        "substanceType": {...clean}
-      }
+        sid: { ...clean },
+        casrn: { ...clean },
+        preferredName: { ...clean },
+        privateQCNote: { ...clean },
+        publicQCNote: { ...clean },
+        qcLevel: { ...clean },
+        source: { ...clean },
+        description: { ...clean },
+        substanceType: { ...clean }
+      };
     },
     saveSubstance() {
       this.payload["type"] = "substance";
@@ -95,11 +89,13 @@ export default {
       }
     },
     handleSuccess(response) {
-      let action = (response.status === 201) ? "created" : "updated";
+      let action = response.status === 201 ? "created" : "updated";
       let { id } = response.data.data;
       this.clearPayload();
       this.clearValidation();
       this.$store.dispatch("substance/loadForm", response.data.data);
+      // update for the tree
+      this.$store.dispatch("substance/getList");
       this.$store.dispatch("alert/alert", {
         message: `Substance ${id} ${action} successfully`,
         color: "success",
@@ -110,15 +106,20 @@ export default {
       // `sid` is included here to prevent it's input state from going true
       let errd = ["sid"];
       for (let error of err.response.data.errors) {
-        let attr = error.source.pointer.split("/").slice(-1).shift()
+        let attr = error.source.pointer
+          .split("/")
+          .slice(-1)
+          .shift();
         errd.push(attr);
         this.$set(this.validationState[attr], "state", false);
         this.$set(this.validationState[attr], "message", error.detail);
       }
       // make all fields w/o errors valid
-      Object.keys(this.form).filter(k => !errd.includes(k)).forEach(field => {
-        this.$set(this.validationState[field], "state", true);
-      })
+      Object.keys(this.form)
+        .filter(k => !errd.includes(k))
+        .forEach(field => {
+          this.$set(this.validationState[field], "state", true);
+        });
     }
   }
 };
