@@ -1,12 +1,20 @@
 <template>
   <b-form class="pb-3">
-    <div v-for="(formKey, index) in Object.keys(form)" :key="index">
+    <div v-for="field in Object.keys(form)" :key="field">
       <SubstanceFormInput
-        :field="formKey"
+        :field="field"
+        :pld="payload"
+        :validation="validationState[field]"
       />
     </div>
     <b-button
-      @click="saveSubstance(type)"
+      @click="changeThis"
+      variant="primary"
+      :disabled="btnDisabled"
+      >Save Substance</b-button
+    >
+    <b-button
+      @click="changeThat"
       variant="primary"
       :disabled="btnDisabled"
       >Save Substance</b-button
@@ -23,15 +31,45 @@ export default {
   components: {
     SubstanceFormInput
   },
-  props: {
-    // Type compound being displayed. Important for knowing which store to fetch from.
-    type: String
+  data() {
+    return {
+      validationState: this.clearValidation(),
+      payload: {}
+    };
   },
   computed: {
-    ...mapState("substance", ["form", "btnDisabled"]),
+    ...mapState("substance", ["form"]),
+    btnDisabled: function() {
+      return !Object.keys(this.payload).length > 0;
+    },
   },
   methods: {
+    clearValidation() {
+      let clean = {
+          state: null,
+          message: ""
+      }
+      return {
+        "sid": {...clean},
+        "casrn": {...clean},
+        "preferredName": {...clean},
+        "privateQCNotes": {...clean},
+        "publicQCNotes": {...clean},
+        "qcLevel": {...clean},
+        "source": {...clean},
+        "substanceDescription": {...clean},
+        "substanceType": {...clean}
+      }
+    },
+    changeThat() {
+      this.validationState = this.clearValidation()
+    },
+    changeThis() {
+      this.validationState["qcLevel"].state = false
+      this.validationState["qcLevel"].message = "true"
+    },
     saveSubstance() {
+      console.log(this.payload);
       const substanceForm = this.$store.state.substance.savedData;
       const { id } = substanceForm ;
 

@@ -66,7 +66,7 @@ export default {
         // Add Substance
         userObj.children.push({
           id: substance.id,
-          name: substance.attributes.sid,
+          name: substance.id,
           icon: "pencil-square"
         });
       });

@@ -3,7 +3,7 @@
     <SubstanceSidebar />
     <b-row>
       <b-col cols="12" order="1" lg="4" order-lg="0">
-        <SubstanceForm :type="type" />
+        <SubstanceForm />
       </b-col>
       <b-col>
         <div class="row mb-3">
@@ -69,10 +69,9 @@ export default {
     ...mapState("queryStructureType", { qstList: "list" }),
 
     cid: function() {
-      if (this.type === "definedCompound")
-        return this.definedCompoundData.attributes?.cid;
+      if (this.type === "definedCompound") return this.definedCompoundData.id;
       else if (this.type === "none") return "";
-      return this.illDefinedCompoundData.attributes?.cid;
+      return this.illDefinedCompoundData.id;
     },
     options: function() {
       return this.buildOptions(this.qstList);

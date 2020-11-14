@@ -7,22 +7,25 @@
     class="pb-3"
   >
     <template v-if="dropdowns.includes(field)">
-      <SubstanceFormDropdown :field="field" :formState="getValid(field)"/>
+      <SubstanceFormDropdown
+        :field="field"
+        :state="validation.state"
+        :pld="pld" />
     </template>
     <template v-else-if="textareas.includes(field)">
-      <b-form-textarea :id="field" :state="getValid(field)" v-model="inputText" :disabled="!isAuthenticated" />
+      <b-form-textarea :id="field" :state="validation.state" v-model="inputText" :disabled="!isAuthenticated" />
     </template>
     <template v-else>
-      <b-form-input :id="field" :state="getValid(field)" v-model="inputText" :disabled="authAbility" />
+      <b-form-input :id="field" :state="validation.state" v-model="inputText" :disabled="authAbility" />
     </template>
     <b-form-invalid-feedback >
-      {{ errors[field] }}
+      {{ validation.message }}
     </b-form-invalid-feedback>
   </b-form-group>
 </template>
 
 <script>
-import { mapState , mapGetters} from "vuex"; // , mapState 
+import { mapState, mapGetters} from "vuex"; // , mapState
 import SubstanceFormDropdown from "@/components/substance/SubstanceFormDropdown";
 
 export default {
@@ -30,7 +33,7 @@ export default {
   components: {
     SubstanceFormDropdown
   },
-  props: ["field"],
+  props: ["validation", "field","error","pld"],
   data() {
     return {
       textareas: ["privateQCNotes", "publicQCNotes"],
@@ -51,21 +54,20 @@ export default {
   computed: {
     ...mapGetters("auth", ["isAuthenticated"]),
     ...mapGetters("substance", ["getValid"]),
-    ...mapState("substance", ["fieldidated", "errors"]),
+    ...mapState("substance", ["errors"]),
 
     authAbility: function() {
-      if (this.field === "sid") {
-        return true;
-      } else {
-        return !this.isAuthenticated;
-      }
+      return (this.field === "sid") ? true : !this.isAuthenticated;
     },
     inputText: {
       get() {
         return this.$store.state.substance.form[this.field];
       },
       set(newValue) {
-        this.$store.commit("substance/updatePayload", { field: this.field, inputText: newValue });
+        if (!Object.keys(this.pld).includes("attributes")) {
+          this.$set(this.pld, "attributes", {})
+        }
+        this.$set(this.pld.attributes, this.field, newValue);
       }
     }
   }

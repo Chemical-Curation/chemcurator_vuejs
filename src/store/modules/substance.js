@@ -16,23 +16,6 @@ const state = {
     privateQCNotes: "",
     publicQCNotes: ""
   },
-  savedData: {
-    type: "substance",
-    attributes: {},
-    relationships: {}
-  },
-  btnDisabled: true,
-  validated: {
-    preferredName: null,
-    casrn: null,
-    qcLevel: null,
-    source: null,
-    substanceType: null,
-    substanceDescription: null,
-    privateQCNotes: null,
-    publicQCNotes: null
-  },
-  errors: {}
 };
 
 // actions
@@ -50,10 +33,8 @@ let actions = {
     if (typeof payload === "string") {
       payload = state.list.filter(sub => sub.id === payload).shift();
     }
-    let { id } = payload;
-    console.log(id);
     let formLoad = {
-      sid: payload.attributes.sid,
+      sid: payload.id, // sid
       preferredName: payload.attributes.preferredName,
       casrn: payload.attributes.casrn,
       qcLevel: payload.relationships.qcLevel.data.id,
@@ -64,69 +45,18 @@ let actions = {
       publicQCNotes: payload.attributes.publicQcNote
     };
     commit("loadForm", formLoad);
-    commit("clearPayload");
-    commit("clearValidated");
   }
 };
 
 // getters
 const getters = {
   getForm: state => state.form,
-  getValid: state => (key) => {
-    return state.validated[key];
-  }
 };
 // mutations
 const mutations = {
   ...rootMutations,
   loadForm(state, obj) {
     state.form = obj;
-  },
-  loadErrors(state, errors) {
-    state.errors = errors;
-    Object.keys(state.validated).forEach((key) => {
-      if (state.validated[key] === null) {
-        state.validated[key] = true
-      }
-    })
-  },
-  formChecked(state, {key, value}) {
-    state.validated[key] = value;
-  },
-  clearValidated(state) {
-    state.validated = {
-      preferredName: null,
-      casrn: null,
-      qcLevel: null,
-      source: null,
-      substanceType: null,
-      substanceDescription: null,
-      privateQCNotes: null,
-      publicQCNotes: null
-    }
-  },
-  updatePayload(state, { field, inputText }) {
-    if (["qcLevel", "source","substanceType"].includes(field)) {
-      if (state.savedData[field] !== inputText) {
-        let obj = {data: {type: field, id: inputText}}
-        state.savedData.relationships[field] = obj;
-      }
-    } else {
-      state.savedData.attributes[field] = inputText;
-    }
-    if (state.form.sid) {
-      state.savedData["id"] = state.form.sid;
-    }
-    state.btnDisabled  = false;
-  },
-  clearPayload(state) {
-    let emptyData = {
-      type: "substance",
-      attributes: {},
-      relationships: {}
-    }
-    state.savedData = emptyData;
-    state.btnDisabled = true;
   },
   clearForm(state) {
     state.form = {};
