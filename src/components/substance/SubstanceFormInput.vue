@@ -36,15 +36,15 @@ export default {
   props: ["validation", "field","error","payload"],
   data() {
     return {
-      textareas: ["privateQCNotes", "publicQCNotes"],
+      textareas: ["description", "privateQCNote", "publicQCNote"],
       dropdowns: ["qcLevel", "source", "substanceType"],
       labels: {
         sid: "Substance ID:",
         preferredName: "Preferred Name:",
         casrn: "CAS-RN:",
-        substanceDescription: "Substance Description:",
-        privateQCNotes: "Private QC Notes:",
-        publicQCNotes: "Public QC Notes:",
+        description: "Substance Description:",
+        privateQCNote: "Private QC Notes:",
+        publicQCNote: "Public QC Notes:",
         qcLevel: "QC Level:",
         source: "Source:",
         substanceType: "Substance Type:"

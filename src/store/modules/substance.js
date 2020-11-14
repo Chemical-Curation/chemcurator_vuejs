@@ -12,9 +12,9 @@ const state = {
     qcLevel: "",
     source: "",
     substanceType: "",
-    substanceDescription: "",
-    privateQCNotes: "",
-    publicQCNotes: ""
+    description: "",
+    privateQCNote: "",
+    publicQCNote: ""
   }
 };
 
@@ -40,9 +40,9 @@ let actions = {
       qcLevel: payload.relationships.qcLevel.data.id,
       source: payload.relationships.source.data.id,
       substanceType: payload.relationships.substanceType.data.id,
-      substanceDescription: payload.attributes.description,
-      privateQCNotes: payload.attributes.privateQcNote,
-      publicQCNotes: payload.attributes.publicQcNote
+      description: payload.attributes.description,
+      privateQCNote: payload.attributes.privateQcNote,
+      publicQCNote: payload.attributes.publicQcNote
     };
     commit("loadForm", formLoad);
   }

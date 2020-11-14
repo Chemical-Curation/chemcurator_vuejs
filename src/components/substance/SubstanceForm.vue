@@ -8,16 +8,16 @@
       />
     </div>
     <b-button
-      @click="changeThis"
+      @click="saveSubstance"
       variant="primary"
       :disabled="btnDisabled"
       >Save Substance</b-button
     >
     <b-button
-      @click="changeThat"
-      variant="primary"
-      :disabled="btnDisabled"
-      >Save Substance</b-button
+      class="ml-2"
+      @click="saveSubstance"
+      variant="secondary"
+      >Clear Form</b-button
     >
   </b-form>
 </template>
@@ -62,26 +62,18 @@ export default {
         "sid": {...clean},
         "casrn": {...clean},
         "preferredName": {...clean},
-        "privateQCNotes": {...clean},
-        "publicQCNotes": {...clean},
+        "privateQCNote": {...clean},
+        "publicQCNote": {...clean},
         "qcLevel": {...clean},
         "source": {...clean},
-        "substanceDescription": {...clean},
+        "description": {...clean},
         "substanceType": {...clean}
       }
-    },
-    changeThat() {
-      this.validationState = this.clearValidation()
-    },
-    changeThis() {
-      this.validationState["qcLevel"].state = false
-      this.validationState["qcLevel"].message = "true"
     },
     saveSubstance() {
       this.payload["type"] = "substance";
       const { sid } = this.form;
       if (sid) {
-        console.log(sid);
         this.payload["id"] = sid;
         // if there is an id, patch the currently loaded substance.
         this.$store
@@ -89,37 +81,40 @@ export default {
             id: sid,
             body: { ...this.payload }
           })
-          // Handle the errors
-          .catch(err => {console.log("patch", err)});
+          .then(response => this.handleSuccess(response))
+          .catch(err => this.handleFail(err));
       } else {
         // If there is no id, save the new substance.
         this.$store
           .dispatch("substance/post", this.payload)
-          .then(response => {
-            console.log(response.data);
-            let payload = response.data.data;
-            let { id } = payload;
-            this.$store.dispatch("substance/loadForm", response.data.data);
-            this.$store.dispatch("alert/alert", {
-              message: `Substance ${id} created successfully`,
-              color: "success",
-              dismissCountDown: 5
-            });
-          })
-          // How to deal with errors?
-          .catch(err => {
-            let ddd = {};
-            for (let error of err.response.data.errors) {
-              //console.log(error.source.pointer.split("/").slice(-1).shift());
-              let attr = error.source.pointer.split("/").slice(-1).shift()
-              let jobs = { [`${attr}`] : error.detail }
-              ddd = { ...ddd, ...jobs };
-              this.$store.commit("substance/formChecked", { key: attr, value: false });
-            }
-            this.$store.commit("substance/loadErrors", ddd);
-            console.log("valids", ddd);
-          });
+          .then(response => this.handleSuccess(response))
+          .catch(err => this.handleFail(err));
       }
+    },
+    handleSuccess(response) {
+      let action = (response.status === 201) ? "created" : "updated";
+      let { id } = response.data.data;
+      this.clearPayload();
+      this.clearValidation();
+      this.$store.dispatch("substance/loadForm", response.data.data);
+      this.$store.dispatch("alert/alert", {
+        message: `Substance ${id} ${action} successfully`,
+        color: "success",
+        dismissCountDown: 5
+      });
+    },
+    handleFail(err) {
+      let errd = ["sid"];
+      for (let error of err.response.data.errors) {
+        let attr = error.source.pointer.split("/").slice(-1).shift()
+        errd.push(attr);
+        this.$set(this.validationState[attr], "state", false);
+        this.$set(this.validationState[attr], "message", error.detail);
+      }
+      // make all fields w/o errors valid
+      Object.keys(this.form).filter(k => !errd.includes(k)).forEach(field => {
+        this.$set(this.validationState[field], "state", true);
+      })
     }
   }
 };
