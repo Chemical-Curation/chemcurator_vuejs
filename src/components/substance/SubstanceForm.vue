@@ -15,7 +15,7 @@
     >
     <b-button
       class="ml-2"
-      @click="saveSubstance"
+      @click="clearForm"
       variant="secondary"
       >Clear Form</b-button
     >
@@ -50,6 +50,9 @@ export default {
     }
   },
   methods: {
+    clearForm() {
+      this.$store.commit("substance/clearForm");
+    },
     clearPayload() {
       return {}
     },
@@ -104,6 +107,7 @@ export default {
       });
     },
     handleFail(err) {
+      // `sid` is included here to prevent it's input state from going true
       let errd = ["sid"];
       for (let error of err.response.data.errors) {
         let attr = error.source.pointer.split("/").slice(-1).shift()

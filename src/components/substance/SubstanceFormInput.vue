@@ -13,10 +13,18 @@
         :payload="payload" />
     </template>
     <template v-else-if="textareas.includes(field)">
-      <b-form-textarea :id="field" :state="validation.state" v-model="inputText" :disabled="!isAuthenticated" />
+      <b-form-textarea
+        :id="field"
+        v-model="inputText"
+        :state="validation.state"
+        :disabled="!isAuthenticated" />
     </template>
     <template v-else>
-      <b-form-input :id="field" :state="validation.state" v-model="inputText" :disabled="authAbility" />
+      <b-form-input
+        :id="field"
+        v-model="inputText"
+        :state="validation.state"
+        :disabled="editable" />
     </template>
     <b-form-invalid-feedback >
       {{ validation.message }}
@@ -25,7 +33,7 @@
 </template>
 
 <script>
-import { mapState, mapGetters} from "vuex"; // , mapState
+import { mapState, mapGetters} from "vuex";
 import SubstanceFormDropdown from "@/components/substance/SubstanceFormDropdown";
 
 export default {
@@ -56,7 +64,7 @@ export default {
     ...mapGetters("substance", ["getValid"]),
     ...mapState("substance", ["errors"]),
 
-    authAbility: function() {
+    editable: function() {
       return (this.field === "sid") ? true : !this.isAuthenticated;
     },
     inputText: {
