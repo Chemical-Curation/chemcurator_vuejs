@@ -47,15 +47,15 @@ describe("The substance page anonymous access", () => {
     cy.get("#sid").should("have.value", "DTXSID502000000");
     cy.get("#preferredName").should("have.value", "Sample Substance");
     cy.get("#casrn").should("have.value", "1234567-89-5");
-    cy.get("#qcLevelID").should("have.value", "1");
-    cy.get("#sourceID").should("have.value", "1");
-    cy.get("#substanceTypeID").should("have.value", "1");
-    cy.get("#substanceDescription").should(
+    cy.get("#qcLevel").should("have.value", "1");
+    cy.get("#source").should("have.value", "1");
+    cy.get("#substanceType").should("have.value", "1");
+    cy.get("#description").should(
       "have.value",
       "This is the description for the test substance"
     );
-    cy.get("#privateQCNotes").should("have.value", "Private QC notes");
-    cy.get("#publicQCNotes").should("have.value", "Public QC notes");
+    cy.get("#privateQCNote").should("have.value", "Private QC notes");
+    cy.get("#publicQCNote").should("have.value", "Public QC notes");
   });
 
   it("should load the substance form from tree", () => {
@@ -66,15 +66,15 @@ describe("The substance page anonymous access", () => {
     cy.get("#sid").should("have.value", "DTXSID502000000");
     cy.get("#preferredName").should("have.value", "Sample Substance");
     cy.get("#casrn").should("have.value", "1234567-89-5");
-    cy.get("#qcLevelID").should("have.value", "1");
-    cy.get("#sourceID").should("have.value", "1");
-    cy.get("#substanceTypeID").should("have.value", "1");
-    cy.get("#substanceDescription").should(
+    cy.get("#qcLevel").should("have.value", "1");
+    cy.get("#source").should("have.value", "1");
+    cy.get("#substanceType").should("have.value", "1");
+    cy.get("#description").should(
       "have.value",
       "This is the description for the test substance"
     );
-    cy.get("#privateQCNotes").should("have.value", "Private QC notes");
-    cy.get("#publicQCNotes").should("have.value", "Public QC notes");
+    cy.get("#privateQCNote").should("have.value", "Private QC notes");
+    cy.get("#publicQCNote").should("have.value", "Public QC notes");
   });
 
   it("should load defined compound into ketcher window", () => {
