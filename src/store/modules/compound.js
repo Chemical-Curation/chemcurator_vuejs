@@ -2,8 +2,6 @@ import { HTTP } from "../http-common";
 import rootActions from "../actions.js";
 import rootMutations from "../mutations.js";
 
-import router from "@/router";
-
 import definedcompound from "./defined-compound";
 import illdefinedcompound from "./illdefined-compound";
 
@@ -23,59 +21,20 @@ let actions = {
   getResourceURI: () => {
     return "compounds";
   },
-  fetchCompound: async ({ commit, dispatch }, { searchString, push }) => {
-    // Search drops you on the Substance page.
-    if (push && router.currentRoute.name !== "substance")
-      await router.push("substance");
+  fetchCompound: async ({ commit, dispatch }, { id }) => {
     dispatch("clearAllStates");
 
-    const endpoint =
-      searchString.indexOf("-") > 0
-        ? "/definedCompounds?include=substance&filter[inchikey]="
-        : "/compounds?include=substance&filter[id]=";
-    await HTTP.get(endpoint + searchString)
-      .then(response => {
-        const data = response.data;
-        if (data.data.length > 0) {
-          const obj = data.data[0];
-          if (obj.type === "definedCompound") {
-            commit("setType", obj.type);
-            commit(`definedcompound/storeIncluded`, data.included);
-            // TODO: The following action is because of the difference in what is returned
-            //       by the list and detail serializers.  If the compound is a defined compound
-            //       in order to load the additional data this response has to be thrown out
-            //       and the GET needs to be repeated.  There may be ways around this with resolution
-            //       or if the json:api id is the same as the cid being passed in.
-            dispatch("definedcompound/getFetch", obj.id);
-          } else {
-            commit("setType", obj.relationships.queryStructureType.data.id);
-            commit("illdefinedcompound/storeFetch", obj);
-            commit("illdefinedcompound/storeIncluded", data.included);
-          }
-          if (data?.included) {
-            const substance = data.included.shift();
-            dispatch("substance/loadForm", substance, { root: true });
-          } else {
-            commit("substance/clearForm", null, { root: true });
-          }
-        } else {
-          const alert = {
-            message: `${searchString} not valid`,
-            color: "warning",
-            dismissCountDown: 4
-          };
-          commit("clearState");
-          dispatch("alert/alert", alert, {
-            root: true
-          });
-        }
-      })
-      // this catch won't likely be used without any permissions set on GET
-      .catch(() =>
-        dispatch("auth/logout", {
-          root: true
-        })
-      );
+    let endpoint = `/compounds/${id}`;
+    await HTTP.get(endpoint).then(response => {
+      const obj = response.data.data;
+      if (obj.type === "definedCompound") {
+        commit("setType", obj.type);
+        commit("definedcompound/storeFetch", obj);
+      } else {
+        commit("setType", obj.relationships.queryStructureType.data.id);
+        commit("illdefinedcompound/storeFetch", obj);
+      }
+    });
   },
   clearAllStates: async ({ commit }) => {
     commit("clearState");
