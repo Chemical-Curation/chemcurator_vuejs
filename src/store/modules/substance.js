@@ -35,14 +35,16 @@ let actions = {
         if (response.data.data.length > 0) {
           let loaded_substance = response.data.data[0];
           let compound_id =
-            loaded_substance.relationships.associatedCompound.data.id;
+            loaded_substance.relationships.associatedCompound.data?.id;
 
           context.dispatch("loadForm", loaded_substance);
-          context.dispatch(
-            `compound/fetchCompound`,
-            { id: compound_id },
-            { root: true }
-          );
+          if (compound_id) {
+            context.dispatch(
+              `compound/fetchCompound`,
+              { id: compound_id },
+              { root: true }
+            );
+          }
         } else {
           // Handle no rows returned
           const alert = {

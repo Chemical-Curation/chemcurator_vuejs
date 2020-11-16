@@ -174,6 +174,16 @@ describe("The substance page anonymous access", () => {
     cy.get("#substanceID").should("have.value", "DTXSID202000002");
   });
 
+  it("should load substances without compounds", () => {
+    // Navigate to substance with records
+    cy.get("[data-cy=search-box]").type("Solo Substance");
+    cy.get("[data-cy=search-button]").click();
+
+    // Verify response contains rids as required.
+    cy.get("#substanceID").should("have.value", "DTXSID202000099");
+  }
+  );
+
   it("bad search should alert invalidity", () => {
     cy.get("[data-cy=search-box]").type("compound 47");
     cy.get("[data-cy=search-button]").click();
