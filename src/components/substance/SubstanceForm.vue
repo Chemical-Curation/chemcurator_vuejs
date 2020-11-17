@@ -39,8 +39,7 @@ export default {
     }
   },
   watch: {
-    // let's hope that Chris never wants to edit the `sid` here!
-    "form.sid": function() {
+    "form.id": function() {
       this.payload = this.clearPayload();
     }
   },
@@ -72,13 +71,13 @@ export default {
     },
     saveSubstance() {
       this.payload["type"] = "substance";
-      const { sid } = this.form;
-      if (sid) {
-        this.payload["id"] = sid;
+      const { id } = this.form;
+      if (id) {
+        this.payload["id"] = id;
         // if there is an id, patch the currently loaded substance.
         this.$store
           .dispatch("substance/patch", {
-            id: sid,
+            id: id,
             body: { ...this.payload }
           })
           .then(response => this.handleSuccess(response))
@@ -96,7 +95,7 @@ export default {
       let { id } = response.data.data;
       this.clearPayload();
       this.clearValidation();
-      this.$store.dispatch("substance/loadForm", response.data.data);
+      this.$store.dispatch("substance/loadDetail", response.data.data);
       // update for the tree
       this.$store.dispatch("substance/getList");
       this.$store.dispatch("alert/alert", {

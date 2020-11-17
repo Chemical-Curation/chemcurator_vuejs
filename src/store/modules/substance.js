@@ -73,9 +73,6 @@ const getters = {
 // mutations
 const mutations = {
   ...rootMutations,
-  loadForm(state, obj) {
-    state.form = obj;
-  },
   loadDetail(state, payload) {
     state.detail = payload;
   },
