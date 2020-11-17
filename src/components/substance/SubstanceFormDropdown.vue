@@ -3,7 +3,7 @@
     :id="field"
     v-model="inputText"
     :state="state"
-    :options="buildOptions(dropdownList)"
+    :options="options"
     :disabled="!isAuthenticated"
   />
 </template>
@@ -17,9 +17,9 @@ export default {
   computed: {
     ...mapGetters("auth", ["isAuthenticated"]),
     ...mapState({
-      dropdownList(state) {
-        // get the list from the appropriate store module
-        return state[this.field].list;
+      options (state, getters) {
+        // get the options from the appropriate store module
+        return getters[`${this.field}/getOptions`]
       }
     }),
 
@@ -39,16 +39,6 @@ export default {
           this.$set(this.payload.relationships, this.field, obj);
         }
       }
-    }
-  },
-  methods: {
-    buildOptions: function(list) {
-      return list.map(item => {
-        return {
-          value: item.id,
-          text: item.attributes.label
-        };
-      });
     }
   }
 };
