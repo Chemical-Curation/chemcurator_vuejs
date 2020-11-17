@@ -1,25 +1,43 @@
 import rootActions from "../actions.js";
 import rootMutations from "../mutations.js";
 
-const defaultForm = () => {
+const defaultDetail = () => {
   return {
-    sid: "",
-    preferredName: "",
-    casrn: "",
-    qcLevel: "",
-    source: "",
-    substanceType: "",
-    description: "",
-    privateQCNote: "",
-    publicQCNote: ""
+    id: "",
+    type: "",
+    attributes: {
+      preferredName: "",
+      casrn: "",
+      description: "",
+      privateQCNote: "",
+      publicQCNote: ""
+    },
+    relationships: {
+      source: {
+        data: {
+          id: ""
+        }
+      },
+      substanceType: {
+        data: {
+          id: ""
+        }
+      },
+      qcLevel: {
+        data: {
+          id: ""
+        }
+      }
+
+    }
   };
 };
 
 const state = {
-  loading: false,
   count: 0,
+  detail: defaultDetail(),
+  loading: false,
   list: [],
-  form: defaultForm()
 };
 
 // actions
@@ -28,42 +46,41 @@ let actions = {
   getResourceURI: () => {
     return "substances";
   },
-  loadForm({ commit }, payload) {
-    // filtering here to accomodate the SubstanceSidebar component and
-    // the fetchByMolfile action on compound, if fetched we want to use
-    // includes and return the obj, but if clicked from the tree we need
-    // to use the ID, the object may not exist in the state.list when
-    // using fetchByMolfile once the list of substances get big enough
-    if (typeof payload === "string") {
-      payload = state.list.filter(sub => sub.id === payload).shift();
-    }
-    let formLoad = {
-      sid: payload.id, // sid
-      preferredName: payload.attributes.preferredName,
-      casrn: payload.attributes.casrn,
-      qcLevel: payload.relationships.qcLevel.data.id,
-      source: payload.relationships.source.data.id,
-      substanceType: payload.relationships.substanceType.data.id,
-      description: payload.attributes.description,
-      privateQCNote: payload.attributes.privateQcNote,
-      publicQCNote: payload.attributes.publicQcNote
-    };
-    commit("loadForm", formLoad);
+  loadDetail({ commit }, id) {
+    let payload = state.list.filter(sub => sub.id === id).shift();
+    commit("loadDetail", payload);
   }
 };
 
 // getters
 const getters = {
-  getForm: state => state.form
+  form: state => {
+    let { detail } = state;
+    return {
+      id: detail.id, // sid
+      preferredName: detail.attributes.preferredName,
+      casrn: detail.attributes.casrn,
+      qcLevel: detail.relationships.qcLevel.data.id,
+      source: detail.relationships.source.data.id,
+      substanceType: detail.relationships.substanceType.data.id,
+      description: detail.attributes.description,
+      privateQCNote: detail.attributes.privateQcNote,
+      publicQCNote: detail.attributes.publicQcNote
+    }
+  }
 };
+
 // mutations
 const mutations = {
   ...rootMutations,
   loadForm(state, obj) {
     state.form = obj;
   },
+  loadDetail(state, payload) {
+    state.detail = payload;
+  },
   clearForm(state) {
-    state.form = defaultForm();
+    state.detail = defaultDetail();
   }
 };
 

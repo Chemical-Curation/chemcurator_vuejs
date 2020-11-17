@@ -54,7 +54,7 @@ let actions = {
           }
           if (data?.included) {
             const substance = data.included.shift();
-            dispatch("substance/loadForm", substance, { root: true });
+            commit("substance/loadDetail", substance, { root: true });
           } else {
             commit("substance/clearForm", null, { root: true });
           }

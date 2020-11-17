@@ -13,7 +13,7 @@ import { mapGetters, mapState } from "vuex";
 
 export default {
   name: "SubstanceFormDropdown",
-  props: ["field", "state", "payload"],
+  props: ["field", "value", "state", "payload"],
   computed: {
     ...mapGetters("auth", ["isAuthenticated"]),
     ...mapState({
@@ -25,7 +25,7 @@ export default {
 
     inputText: {
       get() {
-        return this.$store.state.substance.form[this.field];
+        return this.value;
       },
       set(newValue) {
         // for some reason these values get set on formLoad

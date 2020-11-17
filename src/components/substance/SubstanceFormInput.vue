@@ -9,6 +9,7 @@
     <template v-if="dropdowns.includes(field)">
       <SubstanceFormDropdown
         :field="field"
+        :value="value"
         :state="validation.state"
         :payload="payload"
       />
@@ -36,7 +37,7 @@
 </template>
 
 <script>
-import { mapState, mapGetters } from "vuex";
+import { mapGetters } from "vuex";
 import SubstanceFormDropdown from "@/components/substance/SubstanceFormDropdown";
 
 export default {
@@ -44,13 +45,13 @@ export default {
   components: {
     SubstanceFormDropdown
   },
-  props: ["validation", "field", "error", "payload"],
+  props: ["validation", "field", "value", "error", "payload"],
   data() {
     return {
       textareas: ["description", "privateQCNote", "publicQCNote"],
       dropdowns: ["qcLevel", "source", "substanceType"],
       labels: {
-        sid: "Substance ID:",
+        id: "Substance ID:",
         preferredName: "Preferred Name:",
         casrn: "CAS-RN:",
         description: "Substance Description:",
@@ -64,15 +65,13 @@ export default {
   },
   computed: {
     ...mapGetters("auth", ["isAuthenticated"]),
-    ...mapGetters("substance", ["getValid"]),
-    ...mapState("substance", ["errors"]),
 
     editable: function() {
-      return this.field === "sid" ? true : !this.isAuthenticated;
+      return this.field === "id" ? true : !this.isAuthenticated;
     },
     inputText: {
       get() {
-        return this.$store.state.substance.form[this.field];
+        return this.value
       },
       set(newValue) {
         if (!Object.keys(this.payload).includes("attributes")) {

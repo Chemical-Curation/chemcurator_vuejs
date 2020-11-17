@@ -1,8 +1,9 @@
 <template>
   <b-form class="pb-3">
-    <div v-for="field in Object.keys(form)" :key="field">
+    <div v-for="[field, value] in Object.entries(form)" :key="field">
       <SubstanceFormInput
         :field="field"
+        :value="value"
         :payload="payload"
         :validation="validationState[field]"
       />
@@ -18,7 +19,7 @@
 
 <script>
 import SubstanceFormInput from "@/components/substance/SubstanceFormInput";
-import { mapState } from "vuex";
+import { mapGetters } from "vuex";
 
 export default {
   name: "SubstanceForm",
@@ -32,7 +33,7 @@ export default {
     };
   },
   computed: {
-    ...mapState("substance", ["form"]),
+    ...mapGetters("substance", ["form"]),
     btnDisabled: function() {
       return !Object.keys(this.payload).length > 0;
     }
@@ -46,6 +47,8 @@ export default {
   methods: {
     clearForm() {
       this.$store.commit("substance/clearForm");
+      this.payload = this.clearPayload();
+      this.validationState = this.clearValidation();
     },
     clearPayload() {
       return {};
@@ -56,7 +59,7 @@ export default {
         message: ""
       };
       return {
-        sid: { ...clean },
+        id: { ...clean },
         casrn: { ...clean },
         preferredName: { ...clean },
         privateQCNote: { ...clean },
@@ -104,7 +107,7 @@ export default {
     },
     handleFail(err) {
       // `sid` is included here to prevent it's input state from going true
-      let errd = ["sid"];
+      let errd = ["id"];
       for (let error of err.response.data.errors) {
         let attr = error.source.pointer
           .split("/")
