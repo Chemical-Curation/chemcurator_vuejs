@@ -149,11 +149,15 @@ export default {
       if (id) {
         let { attributes } = this.detail;
         Object.keys(attrs).forEach(
-          key => attrs[key] == attributes[key] && delete attrs[key]
+          key => {
+            if(attrs[key] == attributes[key])  delete attrs[key]
+          }
         );
       } else {
         Object.keys(attrs).forEach(
-          key => attrs[key] == null && delete attrs[key]
+          key => {
+            if(attrs[key] == null) delete attrs[key]
+          }
         );
       }
       // create relationship object
@@ -171,13 +175,15 @@ export default {
       if (id) {
         let { relationships } = this.detail;
         Object.keys(related).forEach(
-          key =>
-            related[key].data.id == relationships[key].data.id &&
-            delete related[key]
+          key => {
+            if(related[key].data.id == relationships[key].data.id) delete related[key]
+          }
         );
       } else {
         Object.keys(related).forEach(
-          key => related[key].data.id == null && delete related[key]
+          key => {
+            if(related[key].data.id == null) delete related[key]
+          }
         );
       }
       let payload = {
@@ -211,7 +217,7 @@ export default {
     handleSuccess(response) {
       let action = response.status === 201 ? "created" : "updated";
       let { id } = response.data.data;
-      this.clearValidation();
+      this.validationState = this.clearValidation();
       this.changed = 0;
       this.$store.commit("substance/loadDetail", response.data.data);
       // update for the tree
