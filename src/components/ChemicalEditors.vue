@@ -1,9 +1,33 @@
 <template>
   <div>
+    <div class="row mb-3">
+      <b-form-group
+        label="Record Compound ID:"
+        label-align="left"
+        label-cols="4"
+        label-for="recordCompoundID"
+        class="col"
+      >
+        <b-form-input id="recordCompoundID" :value="compoundId" disabled />
+      </b-form-group>
+      <b-form-group
+        label="Structure Type:"
+        label-align="left"
+        label-cols="4"
+        label-for="compound-type-dropdown"
+        class="col"
+      >
+        <b-form-select
+          id="compound-type-dropdown"
+          v-model="type"
+          :options="options"
+        />
+      </b-form-group>
+    </div>
     <div v-show="type === 'definedCompound'">
       <KetcherWindow ref="ketcher" />
     </div>
-    <div v-show="type !== 'definedCompound'">
+    <div v-show="type !== 'definedCompound' && type !== 'none'">
       <MarvinWindow ref="marvin" />
     </div>
     <div class="my-3">
@@ -29,8 +53,28 @@ export default {
     MarvinWindow
   },
   props: {
-    type: String,
-    editable: Boolean
+    compoundType: String,
+    compoundId: String,
+    editable: Boolean,
+    options: Array
+  },
+  data() {
+    return {
+      type: 'none'
+    }
+  },
+  watch: {
+    compoundId: function() {
+      if (this.compoundId && this.compoundType === 'definedCompound'){
+        this.$refs["ketcher"].loadCompound(this.compoundId)
+      }
+      else if (this.compoundId && this.compoundType !== 'none'){
+        this.$refs["marvin"].loadCompound(this.compoundId)
+      }
+    },
+    compoundType: function() {
+      this.type = this.compoundType
+    }
   },
   computed: {
     editorChanged: function() {

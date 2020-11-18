@@ -6,33 +6,10 @@
         <SubstanceForm :type="type" />
       </b-col>
       <b-col>
-        <div class="row mb-3">
-          <b-form-group
-            label="Record Compound ID:"
-            label-align="left"
-            label-cols="4"
-            label-for="recordCompoundID"
-            class="col"
-          >
-            <b-form-input id="recordCompoundID" :value="cid" disabled />
-          </b-form-group>
-          <b-form-group
-            label="Structure Type:"
-            label-align="left"
-            label-cols="4"
-            label-for="compound-type-dropdown"
-            class="col"
-          >
-            <b-form-select
-              id="compound-type-dropdown"
-              v-model="type"
-              :options="options"
-            />
-          </b-form-group>
-        </div>
         <ChemicalEditors
-          v-show="type !== 'none'"
-          :type="type"
+          :compoundId="compoundId"
+          :compoundType="type"
+          :options="options"
           :editable="isAuthenticated"
         />
       </b-col>
@@ -56,40 +33,21 @@ export default {
   name: "home",
   data() {
     return {
-      type: "none"
+      type: "none",
     };
   },
   computed: {
     ...mapGetters("auth", ["isAuthenticated"]),
-    ...mapState("compound", { compoundType: "type" }),
-    ...mapState("compound/definedcompound", { definedCompoundData: "data" }),
-    ...mapState("compound/illdefinedcompound", {
-      illDefinedCompoundData: "data"
-    }),
+    ...mapState("substance", { compoundType: "compoundType", compoundId: "compoundId", substanceId: "form.id" }),
     ...mapState("queryStructureType", { qstList: "list" }),
 
-    cid: function() {
-      if (this.type === "definedCompound") return this.definedCompoundData.id;
-      else if (this.type === "none") return "";
-      return this.illDefinedCompoundData.id;
-    },
     options: function() {
       return this.buildOptions(this.qstList);
     },
-    substanceId: function() {
-      if (
-        this.type === "definedCompound" &&
-        this.definedCompoundData.relationships?.substance
-      )
-        return this.definedCompoundData.relationships?.substance?.data?.id;
-      else if (this.illDefinedCompoundData.relationships?.substance)
-        return this.illDefinedCompoundData.relationships?.substance?.data?.id;
-      return "";
-    }
   },
   watch: {
     compoundType: function() {
-      this.type = this.compoundType;
+      this.type = this.compoundType ?? 'none';
     }
   },
   methods: {

@@ -21,7 +21,7 @@
         class="ketcher flex-fill"
         data-cy="ketcher"
         :src="ketcherURL"
-        @load="loadMolfile"
+        @load="loadMolfile(molfile)"
         height="600"
         ref="ketcher"
         >ketcher</iframe
@@ -32,6 +32,7 @@
 
 <script>
 import { mapActions, mapState } from "vuex";
+import compoundApi from "@/api/compound";
 
 export default {
   name: "KetcherWindow",
@@ -58,17 +59,18 @@ export default {
         "M  V30 END BOND\n" +
         "M  V30 END CTAB\n" +
         "M  END",
-      molfile: ""
+      molfile: "",
+      compound: {}
     };
   },
   methods: {
     ...mapActions("compound/definedcompound", ["fetchByMolfile"]),
-    loadMolfile: function() {
-      if (this.data?.attributes?.molfileV3000) {
+    loadMolfile: function(molfile) {
+      if (molfile) {
         this.ketcherFrame.contentWindow.postMessage(
           {
             type: "importMolfile",
-            molfile: this.data.attributes.molfileV3000
+            molfile: molfile
           },
           "*"
         );
@@ -92,6 +94,10 @@ export default {
         .split("\n")
         .slice(3, -1)
         .join("\n");
+    },
+    loadCompound: async function(id) {
+      this.compound = await compoundApi.fetchCompound(id)
+      this.loadMolfile(this.compound?.data?.attributes?.molfileV3000)
     }
   },
   computed: {
@@ -100,24 +106,24 @@ export default {
       return this.$refs.ketcher;
     },
     molecularWeight: function() {
-      return this.data.attributes?.molecularWeight ?? "-";
+      return this.compound?.data?.attributes?.molecularWeight ?? "-";
     },
     molecularFormula: function() {
-      return this.data.attributes?.molecularFormula ?? "-";
+      return this.compound?.data?.attributes?.molecularFormula ?? "-";
     },
     smiles: function() {
-      return this.data.attributes?.smiles ?? "-";
+      return this.compound?.data?.attributes?.smiles ?? "-";
     },
     inchikey: function() {
-      return this.data.attributes?.inchikey ?? "-";
+      return this.compound?.data?.attributes?.inchikey ?? "-";
     }
   },
   watch: {
-    data: function() {
-      this.loadMolfile();
-    },
-    molfile: function() {
-      this.fetchByMolfile(this.molfile);
+    molfile: async function() {
+      let foobar = await compoundApi.fetchByMolfile(this.molfile);
+      delete foobar?.attributes?.molfileV3000
+      this.compound = foobar
+
       let temp = this.removeHeader(this.molfile);
       if (temp !== this.initial_molfile) {
         this.$store.dispatch("compound/definedcompound/updateChanged", true);

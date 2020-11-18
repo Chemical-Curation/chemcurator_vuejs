@@ -9,6 +9,8 @@ const defaultState = () => {
     loading: false,
     count: 0,
     list: [],
+    compoundType: null,
+    compoundId: null,
     form: {}
   };
 };
@@ -34,17 +36,14 @@ let actions = {
 
         if (response.data.data.length > 0) {
           let loaded_substance = response.data.data[0];
-          let compound_id =
+          let compoundId =
             loaded_substance.relationships.associatedCompound.data?.id;
+          let compoundType =
+            loaded_substance.relationships.associatedCompound.data?.type;
 
           context.dispatch("loadForm", loaded_substance);
-          if (compound_id) {
-            context.dispatch(
-              `compound/fetchCompound`,
-              { id: compound_id },
-              { root: true }
-            );
-          }
+          context.commit("setAssociatedCompound", compoundId)
+          context.commit("setCompoundType", compoundType)
         } else {
           // Handle no rows returned
           const alert = {
@@ -112,6 +111,12 @@ const mutations = {
   },
   clearState(state) {
     Object.assign(state, defaultState());
+  },
+  setAssociatedCompound(state, compoundId){
+    state.compoundId = compoundId
+  },
+  setCompoundType(state, compoundType){
+    state.compoundType = compoundType
   }
 };
 
