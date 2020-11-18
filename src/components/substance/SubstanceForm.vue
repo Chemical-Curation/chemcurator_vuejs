@@ -148,17 +148,13 @@ export default {
       // filter out attributes that have not been changed
       if (id) {
         let { attributes } = this.detail;
-        Object.keys(attrs).forEach(
-          key => {
-            if(attrs[key] == attributes[key])  delete attrs[key]
-          }
-        );
+        Object.keys(attrs).forEach(key => {
+          if (attrs[key] == attributes[key]) delete attrs[key];
+        });
       } else {
-        Object.keys(attrs).forEach(
-          key => {
-            if(attrs[key] == null) delete attrs[key]
-          }
-        );
+        Object.keys(attrs).forEach(key => {
+          if (attrs[key] == null) delete attrs[key];
+        });
       }
       // create relationship object
       let pickRelationships = (...props) => o =>
@@ -174,17 +170,14 @@ export default {
       // filter out the relationships that haven't been changed
       if (id) {
         let { relationships } = this.detail;
-        Object.keys(related).forEach(
-          key => {
-            if(related[key].data.id == relationships[key].data.id) delete related[key]
-          }
-        );
+        Object.keys(related).forEach(key => {
+          if (related[key].data.id == relationships[key].data.id)
+            delete related[key];
+        });
       } else {
-        Object.keys(related).forEach(
-          key => {
-            if(related[key].data.id == null) delete related[key]
-          }
-        );
+        Object.keys(related).forEach(key => {
+          if (related[key].data.id == null) delete related[key];
+        });
       }
       let payload = {
         type: "substance",
