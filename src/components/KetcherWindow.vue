@@ -120,9 +120,8 @@ export default {
   },
   watch: {
     molfile: async function() {
-      let foobar = await compoundApi.fetchByMolfile(this.molfile);
-      delete foobar?.attributes?.molfileV3000
-      this.compound = foobar
+      this.compound = await compoundApi.fetchByMolfile(this.molfile);
+      this.$emit("compoundUpdate", this.compound?.data?.id ?? "")
 
       let temp = this.removeHeader(this.molfile);
       if (temp !== this.initial_molfile) {

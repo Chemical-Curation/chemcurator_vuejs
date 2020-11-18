@@ -8,7 +8,7 @@
         label-for="recordCompoundID"
         class="col"
       >
-        <b-form-input id="recordCompoundID" :value="compoundId" disabled />
+        <b-form-input id="recordCompoundID" :value="cid" disabled />
       </b-form-group>
       <b-form-group
         label="Structure Type:"
@@ -25,7 +25,7 @@
       </b-form-group>
     </div>
     <div v-show="type === 'definedCompound'">
-      <KetcherWindow ref="ketcher" />
+      <KetcherWindow ref="ketcher" @compoundUpdate="cid=$event" />
     </div>
     <div v-show="type !== 'definedCompound' && type !== 'none'">
       <MarvinWindow ref="marvin" />
@@ -35,7 +35,7 @@
         @click="saveCompound(type)"
         variant="primary"
         :disabled="!editorChanged"
-        v-if="editable"
+        v-if="editable && type !== 'none'"
         >Save Compound</b-button
       >
     </div>
@@ -60,7 +60,8 @@ export default {
   },
   data() {
     return {
-      type: 'none'
+      type: 'none',
+      cid: ''
     }
   },
   watch: {
@@ -69,12 +70,14 @@ export default {
         this.$refs["ketcher"].loadCompound(this.compoundId)
       }
       else if (this.compoundId && this.compoundType !== 'none'){
-        this.$refs["marvin"].loadCompound(this.compoundId)
+        this.$refs["marvin"].loadMrvfile()
       }
+      this.cid = this.compoundId
     },
     compoundType: function() {
       this.type = this.compoundType
-    }
+    },
+
   },
   computed: {
     editorChanged: function() {
@@ -99,7 +102,6 @@ export default {
       }
     },
     saveDefinedCompound() {
-      let compoundId = this.$store.state.compound.definedcompound.data.id;
       // replace is used to escape "\" so that the JSON is parsable
       let requestBody = {
         type: "definedCompound",
@@ -107,12 +109,12 @@ export default {
           molfileV3000: this.$refs["ketcher"].molfile.replace(/\\/g, "\\\\")
         }
       };
-      if (compoundId) {
+      if (this.cid) {
         // if there is an id, patch the currently loaded defined compound.
         this.$store
           .dispatch("compound/definedcompound/patch", {
-            id: compoundId,
-            body: { ...requestBody, id: compoundId }
+            id: this.cid,
+            body: { ...requestBody, id: this.cid }
           })
           // Handle the errors
           .catch(err => this.handleError(err));
