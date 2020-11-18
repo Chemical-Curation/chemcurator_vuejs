@@ -28,7 +28,6 @@ const defaultDetail = () => {
           id: ""
         }
       }
-
     }
   };
 };
@@ -37,7 +36,7 @@ const state = {
   count: 0,
   detail: defaultDetail(),
   loading: false,
-  list: [],
+  list: []
 };
 
 // actions
@@ -66,7 +65,7 @@ const getters = {
       description: detail.attributes.description,
       privateQCNote: detail.attributes.privateQcNote,
       publicQCNote: detail.attributes.publicQcNote
-    }
+    };
   }
 };
 

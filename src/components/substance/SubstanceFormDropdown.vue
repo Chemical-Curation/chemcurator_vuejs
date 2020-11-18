@@ -17,9 +17,9 @@ export default {
   computed: {
     ...mapGetters("auth", ["isAuthenticated"]),
     ...mapState({
-      options (state, getters) {
+      options(state, getters) {
         // get the options from the appropriate store module
-        return getters[`${this.field}/getOptions`]
+        return getters[`${this.field}/getOptions`];
       }
     }),
 

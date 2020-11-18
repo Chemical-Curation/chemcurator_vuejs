@@ -71,7 +71,7 @@ export default {
     },
     inputText: {
       get() {
-        return this.value
+        return this.value;
       },
       set(newValue) {
         if (!Object.keys(this.payload).includes("attributes")) {

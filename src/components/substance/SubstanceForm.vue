@@ -8,7 +8,11 @@
         :validation="validationState[field]"
       />
     </div>
-    <b-button id="save-substance-btn" @click="saveSubstance" variant="primary" :disabled="btnDisabled"
+    <b-button
+      id="save-substance-btn"
+      @click="saveSubstance"
+      variant="primary"
+      :disabled="btnDisabled"
       >Save Substance</b-button
     >
     <b-button class="ml-2" @click="clearForm" variant="secondary"
@@ -139,7 +143,11 @@ export default {
         // to the API to get these fields in the response in a cleaner way
         // I think this is the only nonField Error that we have for the moment
         this.$set(this.validationState["preferredName"], "state", false);
-        this.$set(this.validationState["preferredName"], "message", "not unique");
+        this.$set(
+          this.validationState["preferredName"],
+          "message",
+          "not unique"
+        );
         this.$set(this.validationState["casrn"], "state", false);
         this.$set(this.validationState["casrn"], "message", "not unique");
       }

@@ -19,7 +19,7 @@ let actions = {
 // getters
 let getters = {
   ...rootGetters
-}
+};
 
 // mutations
 const mutations = {

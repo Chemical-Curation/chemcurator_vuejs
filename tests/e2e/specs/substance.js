@@ -1,4 +1,4 @@
-import valid_casrns from "../../valid_casrns.js"
+import valid_casrns from "../../valid_casrns.js";
 
 let qstResponse = {
   data: [
@@ -29,8 +29,12 @@ describe("The substance form", () => {
     cy.get("#casrn").type("not a casrn");
     cy.get("#substanceType").select("area professor home47");
     cy.get("#save-substance-btn").click();
-    cy.get("#feedback-casrn").contains("The proposed CASRN does not conform to the regular expression ^[0-9]{2,7}-[0-9]{2}-[0-9]$");
-    cy.get("#feedback-substanceType").contains("The SubstanceType submitted is no longer supported.");
+    cy.get("#feedback-casrn").contains(
+      "The proposed CASRN does not conform to the regular expression ^[0-9]{2,7}-[0-9]{2}-[0-9]$"
+    );
+    cy.get("#feedback-substanceType").contains(
+      "The SubstanceType submitted is no longer supported."
+    );
   });
   it("should validate nonFieldErrors", () => {
     let casrn = valid_casrns[Math.floor(Math.random() * valid_casrns.length)];
@@ -40,7 +44,10 @@ describe("The substance form", () => {
     cy.get("#source").select("Source 1");
     cy.get("#substanceType").select("Substance Type 1");
     cy.get("#save-substance-btn").click();
-    cy.get("[data-cy=alert-box]").should("contain", `${casrn} is not unique in ['preferred_name', 'casrn']`);
+    cy.get("[data-cy=alert-box]").should(
+      "contain",
+      `${casrn} is not unique in ['preferred_name', 'casrn']`
+    );
     cy.get("#feedback-preferredName").contains("not unique");
     cy.get("#feedback-casrn").contains("not unique");
   });
