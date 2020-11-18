@@ -5,29 +5,29 @@ import router from "@/router";
 
 const defaultDetail = () => {
   return {
-    id: "",
+    id: null,
     type: "",
     attributes: {
-      preferredName: "",
-      casrn: "",
-      description: "",
-      privateQCNote: "",
-      publicQCNote: ""
+      preferredName: null,
+      casrn: null,
+      description: null,
+      privateQCNote: null,
+      publicQCNote: null
     },
     relationships: {
       source: {
         data: {
-          id: ""
+          id: null
         }
       },
       substanceType: {
         data: {
-          id: ""
+          id: null
         }
       },
       qcLevel: {
         data: {
-          id: ""
+          id: null
         }
       }
     }

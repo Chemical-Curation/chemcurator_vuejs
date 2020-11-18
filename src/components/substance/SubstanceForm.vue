@@ -1,13 +1,45 @@
 <template>
   <b-form class="pb-3">
-    <div v-for="[field, value] in Object.entries(form)" :key="field">
-      <SubstanceFormInput
-        :field="field"
-        :value="value"
-        :payload="payload"
-        :validation="validationState[field]"
+    <div v-for="field in Object.keys(form)" :key="field">
+      <b-form-group
         :label="labels[field]"
-      />
+        label-align="left"
+        label-cols="3"
+        :label-for="field"
+        class="pb-3"
+      >
+        <template v-if="dropdowns.includes(field)">
+          <b-form-select
+            :id="field"
+            v-model="form[field]"
+            :state="validationState[field].state"
+            :options="options[field]"
+            :disabled="!isAuthenticated"
+            @change="markChanged"
+          />
+        </template>
+        <template v-else-if="textareas.includes(field)">
+          <b-form-textarea
+            :id="field"
+            v-model="form[field]"
+            :state="validationState[field].state"
+            :disabled="!isAuthenticated"
+            @change="markChanged"
+          />
+        </template>
+        <template v-else>
+          <b-form-input
+            :id="field"
+            v-model="form[field]"
+            :state="validationState[field].state"
+            :disabled="editable(field)"
+            @change="markChanged"
+          />
+        </template>
+        <b-form-invalid-feedback :id="'feedback-' + field">
+          {{ validationState[field].message }}
+        </b-form-invalid-feedback>
+      </b-form-group>
     </div>
     <b-button
       id="save-substance-btn"
@@ -23,18 +55,16 @@
 </template>
 
 <script>
-import SubstanceFormInput from "@/components/substance/SubstanceFormInput";
-import { mapGetters } from "vuex";
+import { mapGetters, mapState } from "vuex";
 
 export default {
   name: "SubstanceForm",
-  components: {
-    SubstanceFormInput
-  },
   data() {
     return {
+      changed: 0,
       validationState: this.clearValidation(),
-      payload: this.clearPayload(),
+      textareas: ["description", "privateQCNote", "publicQCNote"],
+      dropdowns: ["qcLevel", "source", "substanceType"],
       labels: {
         id: "Substance ID:",
         preferredName: "Preferred Name:",
@@ -50,23 +80,40 @@ export default {
   },
   computed: {
     ...mapGetters("substance", ["form"]),
+    ...mapState("substance", ["detail"]),
+    ...mapGetters("auth", ["isAuthenticated"]),
+    ...mapGetters("qcLevel", { qcLevelOptions: "getOptions" }),
+    ...mapGetters("source", { sourceOptions: "getOptions" }),
+    ...mapGetters("substanceType", { substanceTypeOptions: "getOptions" }),
+
     btnDisabled: function() {
-      return !Object.keys(this.payload).length > 0;
+      return !(this.changed > 0);
+    },
+    options: function() {
+      return {
+        qcLevel: this.qcLevelOptions,
+        source: this.sourceOptions,
+        substanceType: this.substanceTypeOptions
+      };
     }
   },
   watch: {
     "form.id": function() {
-      this.payload = this.clearPayload();
+      this.validationState = this.clearValidation();
+      this.changed = 0;
     }
   },
   methods: {
+    editable(fld) {
+      return fld === "id" ? true : !this.isAuthenticated;
+    },
+    markChanged() {
+      this.changed++;
+    },
     clearForm() {
       this.$store.commit("substance/clearForm");
-      this.payload = this.clearPayload();
       this.validationState = this.clearValidation();
-    },
-    clearPayload() {
-      return {};
+      this.changed = 0;
     },
     clearValidation() {
       let clean = {
@@ -85,23 +132,78 @@ export default {
         substanceType: { ...clean }
       };
     },
-    saveSubstance() {
-      this.payload["type"] = "substance";
-      const { id } = this.form;
+    buildPayload() {
+      let { id } = this.form;
+      let data = { ...this.form };
+      // create attributes object
+      let pickAttributes = (...props) => o =>
+        props.reduce((a, e) => ({ ...a, [e]: o[e] }), {});
+      let attrs = pickAttributes(
+        "preferredName",
+        "casrn",
+        "description",
+        "publicQCNote",
+        "privateQCNote"
+      )(data);
+      // filter out attributes that have not been changed
       if (id) {
-        this.payload["id"] = id;
+        let { attributes } = this.detail;
+        Object.keys(attrs).forEach(
+          key => attrs[key] == attributes[key] && delete attrs[key]
+        );
+      } else {
+        Object.keys(attrs).forEach(
+          key => attrs[key] == null && delete attrs[key]
+        );
+      }
+      // create relationship object
+      let pickRelationships = (...props) => o =>
+        props.reduce(
+          (a, e) => ({ ...a, [e]: { data: { type: e, id: o[e] } } }),
+          {}
+        );
+      let related = pickRelationships(
+        "qcLevel",
+        "source",
+        "substanceType"
+      )(data);
+      // filter out the relationships that haven't been changed
+      if (id) {
+        let { relationships } = this.detail;
+        Object.keys(related).forEach(
+          key =>
+            related[key].data.id == relationships[key].data.id &&
+            delete related[key]
+        );
+      } else {
+        Object.keys(related).forEach(
+          key => related[key].data.id == null && delete related[key]
+        );
+      }
+      let payload = {
+        type: "substance",
+        attributes: attrs,
+        relationships: related
+      };
+      return payload;
+    },
+    saveSubstance() {
+      let { id } = this.form;
+      let payload = this.buildPayload();
+      if (id) {
+        payload["id"] = id;
         // if there is an id, patch the currently loaded substance.
         this.$store
           .dispatch("substance/patch", {
             id: id,
-            body: { ...this.payload }
+            body: { ...payload }
           })
           .then(response => this.handleSuccess(response))
           .catch(err => this.handleFail(err));
       } else {
         // If there is no id, save the new substance.
         this.$store
-          .dispatch("substance/post", this.payload)
+          .dispatch("substance/post", payload)
           .then(response => this.handleSuccess(response))
           .catch(err => this.handleFail(err));
       }
@@ -109,9 +211,8 @@ export default {
     handleSuccess(response) {
       let action = response.status === 201 ? "created" : "updated";
       let { id } = response.data.data;
-      this.clearPayload();
       this.clearValidation();
-      console.log(response.data.data);
+      this.changed = 0;
       this.$store.commit("substance/loadDetail", response.data.data);
       // update for the tree
       this.$store.dispatch("substance/getList");
@@ -126,7 +227,6 @@ export default {
       let errd = ["id"];
       let nonField = [];
       for (let error of err.response.data.errors) {
-        console.log(error);
         let attr = error.source.pointer
           .split("/")
           .slice(-1)
@@ -145,6 +245,7 @@ export default {
         .forEach(field => {
           this.$set(this.validationState[field], "state", true);
         });
+      // handle nonField errors
       if (nonField.length > 0) {
         this.$store.dispatch("alert/alert", {
           message: nonField.shift(),
