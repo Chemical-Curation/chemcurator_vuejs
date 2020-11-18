@@ -24,7 +24,7 @@
             v-model="form[field]"
             :state="validationState[field].state"
             :disabled="!isAuthenticated"
-            @change="markChanged"
+            @input="markChanged"
           />
         </template>
         <template v-else>
@@ -33,7 +33,7 @@
             v-model="form[field]"
             :state="validationState[field].state"
             :disabled="editable(field)"
-            @change="markChanged"
+            @input="markChanged"
           />
         </template>
         <b-form-invalid-feedback :id="'feedback-' + field">
