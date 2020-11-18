@@ -38,8 +38,26 @@ export default {
   data() {
     return {
       ketcherURL: process.env.VUE_APP_KETCHER_URL,
-      initial_molfile: "  0  0  0     0  0            999 V3000\nM  END",
-      blank: "  0  0  0     0  0            999 V3000\nM  END",
+      initial_molfile:
+        "  0  0  0     0  0            999 V3000\n" +
+        "M  V30 BEGIN CTAB\n" +
+        "M  V30 COUNTS 0 0 0 0 0\n" +
+        "M  V30 BEGIN ATOM\n" +
+        "M  V30 END ATOM\n" +
+        "M  V30 BEGIN BOND\n" +
+        "M  V30 END BOND\n" +
+        "M  V30 END CTAB\n" +
+        "M  END",
+      blank:
+        "  0  0  0     0  0            999 V3000\n" +
+        "M  V30 BEGIN CTAB\n" +
+        "M  V30 COUNTS 0 0 0 0 0\n" +
+        "M  V30 BEGIN ATOM\n" +
+        "M  V30 END ATOM\n" +
+        "M  V30 BEGIN BOND\n" +
+        "M  V30 END BOND\n" +
+        "M  V30 END CTAB\n" +
+        "M  END",
       molfile: ""
     };
   },
@@ -55,7 +73,7 @@ export default {
           "*"
         );
         this.exportMolfile();
-      }
+      } else this.clearMolfile();
     },
     exportMolfile: function() {
       this.ketcherFrame.contentWindow.postMessage(
@@ -96,9 +114,7 @@ export default {
   },
   watch: {
     data: function() {
-      if (this.data?.attributes?.molfileV3000) {
-        this.loadMolfile();
-      }
+      this.loadMolfile();
     },
     molfile: function() {
       this.fetchByMolfile(this.molfile);

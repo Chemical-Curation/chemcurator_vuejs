@@ -20,7 +20,7 @@
         <b-form-input
           class="mr-2 search"
           v-model="searchString"
-          placeholder="Search Compounds (cid or inchikey)"
+          placeholder="Search Substances"
           data-cy="search-box"
           @keyup.enter="searchCompound"
         />
@@ -77,7 +77,7 @@ export default {
       this.$store.dispatch("auth/logout");
     },
     searchCompound: function() {
-      this.$store.dispatch("compound/fetchCompound", {
+      this.$store.dispatch("substance/substanceSearch", {
         searchString: this.searchString,
         push: true
       });
