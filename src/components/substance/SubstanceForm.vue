@@ -8,7 +8,7 @@
         :validation="validationState[field]"
       />
     </div>
-    <b-button @click="saveSubstance" variant="primary" :disabled="btnDisabled"
+    <b-button id="save-substance-btn" @click="saveSubstance" variant="primary" :disabled="btnDisabled"
       >Save Substance</b-button
     >
     <b-button class="ml-2" @click="clearForm" variant="secondary"
@@ -95,11 +95,12 @@ export default {
       let { id } = response.data.data;
       this.clearPayload();
       this.clearValidation();
-      this.$store.dispatch("substance/loadDetail", response.data.data);
+      console.log(response.data.data);
+      this.$store.commit("substance/loadDetail", response.data.data);
       // update for the tree
       this.$store.dispatch("substance/getList");
       this.$store.dispatch("alert/alert", {
-        message: `Substance ${id} ${action} successfully`,
+        message: `Substance '${id}' ${action} successfully`,
         color: "success",
         dismissCountDown: 5
       });
@@ -107,14 +108,20 @@ export default {
     handleFail(err) {
       // `sid` is included here to prevent it's input state from going true
       let errd = ["id"];
+      let nonField = [];
       for (let error of err.response.data.errors) {
+        console.log(error);
         let attr = error.source.pointer
           .split("/")
           .slice(-1)
           .shift();
-        errd.push(attr);
-        this.$set(this.validationState[attr], "state", false);
-        this.$set(this.validationState[attr], "message", error.detail);
+        if (attr == "nonFieldErrors") {
+          nonField.push(error.detail);
+        } else {
+          errd.push(attr);
+          this.$set(this.validationState[attr], "state", false);
+          this.$set(this.validationState[attr], "message", error.detail);
+        }
       }
       // make all fields w/o errors valid
       Object.keys(this.form)
@@ -122,6 +129,20 @@ export default {
         .forEach(field => {
           this.$set(this.validationState[field], "state", true);
         });
+      if (nonField.length > 0) {
+        this.$store.dispatch("alert/alert", {
+          message: nonField.shift(),
+          color: "warning",
+          dismissCountDown: 5
+        });
+        // hard-coding this for now as we might need to make some adjustments
+        // to the API to get these fields in the response in a cleaner way
+        // I think this is the only nonField Error that we have for the moment
+        this.$set(this.validationState["preferredName"], "state", false);
+        this.$set(this.validationState["preferredName"], "message", "not unique");
+        this.$set(this.validationState["casrn"], "state", false);
+        this.$set(this.validationState["casrn"], "message", "not unique");
+      }
     }
   }
 };

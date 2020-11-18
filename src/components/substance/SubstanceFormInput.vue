@@ -30,7 +30,7 @@
         :disabled="editable"
       />
     </template>
-    <b-form-invalid-feedback>
+    <b-form-invalid-feedback :id="'feedback-' + field">
       {{ validation.message }}
     </b-form-invalid-feedback>
   </b-form-group>

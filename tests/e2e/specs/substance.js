@@ -1,3 +1,5 @@
+import valid_casrns from "../../valid_casrns.js"
+
 let qstResponse = {
   data: [
     {
@@ -16,6 +18,59 @@ let qstResponse = {
     }
   ]
 };
+
+describe("The substance form", () => {
+  beforeEach(() => {
+    cy.server();
+    cy.adminLogin();
+    cy.visit("/substance");
+  });
+  it("should validate inputs", () => {
+    cy.get("#casrn").type("not a casrn");
+    cy.get("#substanceType").select("area professor home47");
+    cy.get("#save-substance-btn").click();
+    cy.get("#feedback-casrn").contains("The proposed CASRN does not conform to the regular expression ^[0-9]{2,7}-[0-9]{2}-[0-9]$");
+    cy.get("#feedback-substanceType").contains("The SubstanceType submitted is no longer supported.");
+  });
+  it("should validate nonFieldErrors", () => {
+    let casrn = valid_casrns[Math.floor(Math.random() * valid_casrns.length)];
+    cy.get("#preferredName").type(casrn);
+    cy.get("#casrn").type(casrn);
+    cy.get("#qcLevel").select("QC Level 1");
+    cy.get("#source").select("Source 1");
+    cy.get("#substanceType").select("Substance Type 1");
+    cy.get("#save-substance-btn").click();
+    cy.get("[data-cy=alert-box]").should("contain", `${casrn} is not unique in ['preferred_name', 'casrn']`);
+    cy.get("#feedback-preferredName").contains("not unique");
+    cy.get("#feedback-casrn").contains("not unique");
+  });
+  // NOT sure that we should do this with it being so difficult to keep the
+  // attrs unique amongst themselves
+  //it("should save valid substance", () => {
+  //  cy.route({
+  //    method: "POST",
+  //    url: "/subtance",
+  //    status: 201,
+  //    response: {}
+  //  }).as("post");
+  //  let casrn = valid_casrns[Math.floor(Math.random() * valid_casrns.length)];
+  //  cy.get("#preferredName").type("preferred substance name");
+  //  cy.get("#casrn").type(casrn);
+  //  cy.get("#qcLevel").select("QC Level 1");
+  //  cy.get("#source").select("Source 1");
+  //  cy.get("#substanceType").select("Substance Type 1");
+  //  cy.get("#save-substance-btn").click();
+  //  //cy.get("[data-cy=alert-box]").should("contain", `created successfully`);
+  //  cy.get("@post").should("have.property", "status", 201);
+  //  cy.get("@post")
+  //    .its("request.body.data.id")
+  //    // This regex accepts only an Oxygen structure
+  //    .should(
+  //      "contain",
+  //      "DTXSID"
+  //    );
+  //})
+});
 
 describe("The substance page anonymous access", () => {
   beforeEach(() => {
@@ -44,7 +99,7 @@ describe("The substance page anonymous access", () => {
     cy.get("[data-cy=search-button]").click();
 
     cy.get("#recordCompoundID").should("have.value", "DTXCID302000003");
-    cy.get("#sid").should("have.value", "DTXSID502000000");
+    cy.get("#id").should("have.value", "DTXSID502000000");
     cy.get("#preferredName").should("have.value", "Sample Substance");
     cy.get("#casrn").should("have.value", "1234567-89-5");
     cy.get("#qcLevel").should("have.value", "1");
@@ -63,7 +118,7 @@ describe("The substance page anonymous access", () => {
     cy.get("#DTXSID502000000").click({ force: true });
     // below isn't implemented yet
     // cy.get("#recordCompoundID").should("have.value", "DTXCID302000003");
-    cy.get("#sid").should("have.value", "DTXSID502000000");
+    cy.get("#id").should("have.value", "DTXSID502000000");
     cy.get("#preferredName").should("have.value", "Sample Substance");
     cy.get("#casrn").should("have.value", "1234567-89-5");
     cy.get("#qcLevel").should("have.value", "1");
@@ -152,7 +207,7 @@ describe("The substance page anonymous access", () => {
     cy.get("#recordCompoundID").should("have.value", "DTXCID502000024");
 
     // Check substance loaded
-    cy.get("#sid").should("have.value", "DTXSID202000002");
+    cy.get("#id").should("have.value", "DTXSID202000002");
   });
 
   it("bad search should alert invalidity", () => {
