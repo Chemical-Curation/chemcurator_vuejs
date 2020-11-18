@@ -1,6 +1,6 @@
 <template>
   <b-form-group
-    :label="labels[field]"
+    :label="label"
     label-align="left"
     label-cols="3"
     :label-for="field"
@@ -45,22 +45,11 @@ export default {
   components: {
     SubstanceFormDropdown
   },
-  props: ["validation", "field", "value", "error", "payload"],
+  props: ["validation", "field", "value", "payload", "label"],
   data() {
     return {
       textareas: ["description", "privateQCNote", "publicQCNote"],
-      dropdowns: ["qcLevel", "source", "substanceType"],
-      labels: {
-        id: "Substance ID:",
-        preferredName: "Preferred Name:",
-        casrn: "CAS-RN:",
-        description: "Substance Description:",
-        privateQCNote: "Private QC Notes:",
-        publicQCNote: "Public QC Notes:",
-        qcLevel: "QC Level:",
-        source: "Source:",
-        substanceType: "Substance Type:"
-      }
+      dropdowns: ["qcLevel", "source", "substanceType"]
     };
   },
   computed: {

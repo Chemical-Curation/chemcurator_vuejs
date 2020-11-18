@@ -6,6 +6,7 @@
         :value="value"
         :payload="payload"
         :validation="validationState[field]"
+        :label="labels[field]"
       />
     </div>
     <b-button
@@ -33,7 +34,18 @@ export default {
   data() {
     return {
       validationState: this.clearValidation(),
-      payload: this.clearPayload()
+      payload: this.clearPayload(),
+      labels: {
+        id: "Substance ID:",
+        preferredName: "Preferred Name:",
+        casrn: "CAS-RN:",
+        description: "Substance Description:",
+        privateQCNote: "Private QC Notes:",
+        publicQCNote: "Public QC Notes:",
+        qcLevel: "QC Level:",
+        source: "Source:",
+        substanceType: "Substance Type:"
+      }
     };
   },
   computed: {
