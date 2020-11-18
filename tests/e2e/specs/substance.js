@@ -51,32 +51,45 @@ describe("The substance form", () => {
     cy.get("#feedback-preferredName").contains("not unique");
     cy.get("#feedback-casrn").contains("not unique");
   });
-  // NOT sure that we should do this with it being so difficult to keep the
-  // attrs unique amongst themselves
-  //it("should save valid substance", () => {
-  //  cy.route({
-  //    method: "POST",
-  //    url: "/subtance",
-  //    status: 201,
-  //    response: {}
-  //  }).as("post");
-  //  let casrn = valid_casrns[Math.floor(Math.random() * valid_casrns.length)];
-  //  cy.get("#preferredName").type("preferred substance name");
-  //  cy.get("#casrn").type(casrn);
-  //  cy.get("#qcLevel").select("QC Level 1");
-  //  cy.get("#source").select("Source 1");
-  //  cy.get("#substanceType").select("Substance Type 1");
-  //  cy.get("#save-substance-btn").click();
-  //  //cy.get("[data-cy=alert-box]").should("contain", `created successfully`);
-  //  cy.get("@post").should("have.property", "status", 201);
-  //  cy.get("@post")
-  //    .its("request.body.data.id")
-  //    // This regex accepts only an Oxygen structure
-  //    .should(
-  //      "contain",
-  //      "DTXSID"
-  //    );
-  //})
+  it("should save valid substance", () => {
+    cy.route({
+      method: "POST",
+      url: "/substances",
+      status: 201,
+      response: {
+        data: {
+          id: "DTXSID502000000"
+        }
+      }
+    }).as("post");
+    let casrn = valid_casrns[Math.floor(Math.random() * valid_casrns.length)];
+    cy.get("#preferredName").type("preferred substance name");
+    cy.get("#casrn").type(casrn);
+    cy.get("#qcLevel").select("QC Level 1");
+    cy.get("#source").select("Source 1");
+    cy.get("#substanceType").select("Substance Type 1");
+    cy.get("#save-substance-btn").click();
+    cy.get("[data-cy=alert-box]").should(
+      "contain",
+      "Substance 'DTXSID502000000' created successfully"
+    );
+    cy.get("@post").should("have.property", "status", 201);
+    cy.get("@post")
+      .its("request.body.data.attributes.preferredName")
+      .should("contain", "preferred substance name");
+    cy.get("@post")
+      .its("request.body.data.attributes.casrn")
+      .should("contain", casrn);
+    cy.get("@post")
+      .its("request.body.data.relationships.qcLevel.data.id")
+      .should("contain", "1");
+    cy.get("@post")
+      .its("request.body.data.relationships.source.data.id")
+      .should("contain", "1");
+    cy.get("@post")
+      .its("request.body.data.relationships.substanceType.data.id")
+      .should("contain", "1");
+  });
 });
 
 describe("The substance page anonymous access", () => {
