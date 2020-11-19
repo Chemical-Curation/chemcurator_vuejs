@@ -19,5 +19,13 @@ export default {
       };
     }
     return these;
+  },
+  getOptions: state => {
+    return state.list.map(item => {
+      return {
+        value: item.id,
+        text: item.attributes.label
+      };
+    });
   }
 };

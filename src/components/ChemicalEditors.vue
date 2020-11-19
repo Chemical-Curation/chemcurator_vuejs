@@ -81,7 +81,7 @@ export default {
             // storing the response but this verifies the compound is the same and
             // further searches will work
             this.$store.dispatch("compound/fetchCompound", {
-              searchString: response.data.data.id
+              id: response.data.data.id
             })
           )
           // Handle the errors
@@ -123,7 +123,7 @@ export default {
             // storing the response but this verifies the compound is the same and
             // further searches will work
             this.$store.dispatch("compound/fetchCompound", {
-              searchString: response.data.data.id
+              id: response.data.data.id
             })
           )
           // Handle the errors
