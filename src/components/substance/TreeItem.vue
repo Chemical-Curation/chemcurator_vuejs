@@ -39,13 +39,13 @@ export default {
     }
   },
   methods: {
-    ...mapActions({ loadForm: "substance/loadForm" }),
+    ...mapActions({ loadDetail: "substance/loadDetail" }),
     toggle: function(val) {
       if (this.isFolder) {
         this.isOpen = !this.isOpen;
       } else {
         this.$root.$emit("bv::toggle::collapse", "substance-sidebar");
-        this.loadForm(val);
+        this.loadDetail(val);
       }
     }
   }

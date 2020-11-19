@@ -36,7 +36,7 @@ const actions = {
         //       or if the json:api id is the same as the cid being passed in.
         if (obj) {
           dispatch("getFetch", obj.id);
-          if (inc) dispatch("substance/loadForm", inc.shift(), { root: true });
+          if (inc) commit("substance/loadDetail", inc.shift(), { root: true });
         }
       })
       .catch(err => {

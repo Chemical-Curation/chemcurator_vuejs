@@ -40,7 +40,7 @@ export default {
         if (!userData) {
           user = "Unknown User";
         } else {
-          user = included.user[userData.id].attributes.username;
+          user = included?.user?.[userData.id].attributes.username;
         }
 
         // Add/Find Date
@@ -72,14 +72,6 @@ export default {
       });
       return dates;
     }
-  },
-  mounted() {
-    this.$store.dispatch("substance/getList", {
-      params: [
-        { key: "sort", value: "-updatedAt,updatedBy" },
-        { key: "include", value: "updatedBy" }
-      ]
-    });
   }
 };
 </script>
