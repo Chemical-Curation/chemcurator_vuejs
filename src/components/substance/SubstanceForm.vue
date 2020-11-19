@@ -1,121 +1,56 @@
 <template>
   <b-form class="pb-3">
-    <b-form-group
-      label="Substance ID:"
-      label-align="left"
-      label-cols="3"
-      label-for="substanceID"
-      class="pb-3"
+    <div v-for="field in Object.keys(form)" :key="field">
+      <b-form-group
+        :label="labels[field]"
+        label-align="left"
+        label-cols="3"
+        :label-for="field"
+        class="pb-3"
+      >
+        <template v-if="dropdowns.includes(field)">
+          <b-form-select
+            :id="field"
+            v-model="form[field]"
+            :state="validationState[field].state"
+            :options="options[field]"
+            :disabled="!isAuthenticated"
+            @change="markChanged"
+          />
+        </template>
+        <template v-else-if="textareas.includes(field)">
+          <b-form-textarea
+            :id="field"
+            v-model="form[field]"
+            :state="validationState[field].state"
+            :disabled="!isAuthenticated"
+            @input="markChanged"
+          />
+        </template>
+        <template v-else>
+          <b-form-input
+            :id="field"
+            v-model="form[field]"
+            :state="validationState[field].state"
+            :disabled="editable(field)"
+            @input="markChanged"
+          />
+        </template>
+        <b-form-invalid-feedback :id="'feedback-' + field">
+          {{ validationState[field].message }}
+        </b-form-invalid-feedback>
+      </b-form-group>
+    </div>
+    <b-button
+      id="save-substance-btn"
+      @click="saveSubstance"
+      variant="primary"
+      :disabled="btnDisabled"
+      >Save Substance</b-button
     >
-      <b-form-input id="substanceID" v-model="form.sid" disabled></b-form-input>
-    </b-form-group>
-    <b-form-group
-      label="Preferred Name:"
-      label-align="left"
-      label-cols="3"
-      label-for="preferredName"
-      class="pb-3"
+    <b-button class="ml-2" @click="clearForm" variant="secondary"
+      >Clear Form</b-button
     >
-      <b-form-input
-        id="preferredName"
-        v-model="form.preferredName"
-        :disabled="!isAuthenticated"
-      ></b-form-input>
-    </b-form-group>
-    <b-form-group
-      label="CAS-RN:"
-      label-align="left"
-      label-cols="3"
-      label-for="casrn"
-      class="pb-3"
-    >
-      <b-form-input
-        id="casrn"
-        v-model="form.casrn"
-        :disabled="!isAuthenticated"
-      ></b-form-input>
-    </b-form-group>
-    <b-form-group
-      label="QC Level:"
-      label-align="left"
-      label-cols="3"
-      label-for="qcLevel"
-      class="pb-3"
-    >
-      <b-form-select
-        id="qcLevel"
-        v-model="form.qcLevelID"
-        :options="qcLevelsOptions"
-        :disabled="!isAuthenticated"
-      ></b-form-select>
-    </b-form-group>
-    <b-form-group
-      label="Source:"
-      label-align="left"
-      label-cols="3"
-      label-for="source"
-      class="pb-3"
-    >
-      <b-form-select
-        id="source"
-        v-model="form.sourceID"
-        :options="sourceOptions"
-        :disabled="!isAuthenticated"
-      ></b-form-select>
-    </b-form-group>
-    <b-form-group
-      label="Substance Type:"
-      label-align="left"
-      label-cols="3"
-      label-for="substanceType"
-      class="pb-3"
-    >
-      <b-form-select
-        id="substanceType"
-        v-model="form.substanceTypeID"
-        :options="substanceTypeOptions"
-        :disabled="!isAuthenticated"
-      ></b-form-select>
-    </b-form-group>
-    <b-form-group
-      label="Substance Description:"
-      label-align="left"
-      label-cols="3"
-      label-for="substanceDescription"
-      class="pb-3"
-    >
-      <b-form-textarea
-        id="substanceDescription"
-        v-model="form.substanceDescription"
-        :disabled="!isAuthenticated"
-      ></b-form-textarea>
-    </b-form-group>
-    <b-form-group
-      label="Private QC Notes:"
-      label-align="left"
-      label-cols="3"
-      label-for="privateQCNotes"
-      class="pb-3"
-    >
-      <b-form-textarea
-        id="privateQCNotes"
-        v-model="form.privateQCNotes"
-        :disabled="!isAuthenticated"
-      ></b-form-textarea>
-    </b-form-group>
-    <b-form-group
-      label="Public QC Notes:"
-      label-align="left"
-      label-cols="3"
-      label-for="publicQCNotes"
-      class="pb-3"
-    >
-      <b-form-textarea
-        id="publicQCNotes"
-        v-model="form.publicQCNotes"
-        :disabled="!isAuthenticated"
-      ></b-form-textarea>
-    </b-form-group>
   </b-form>
 </template>
 
@@ -124,51 +59,211 @@ import { mapGetters, mapState } from "vuex";
 
 export default {
   name: "SubstanceForm",
-  props: {
-    // Type compound being displayed.  Important for knowing which store to fetch from.
-    type: String
+  data() {
+    return {
+      changed: 0,
+      validationState: this.clearValidation(),
+      textareas: ["description", "privateQCNote", "publicQCNote"],
+      dropdowns: ["qcLevel", "source", "substanceType"],
+      labels: {
+        id: "Substance ID:",
+        preferredName: "Preferred Name:",
+        casrn: "CAS-RN:",
+        description: "Substance Description:",
+        privateQCNote: "Private QC Notes:",
+        publicQCNote: "Public QC Notes:",
+        qcLevel: "QC Level:",
+        source: "Source:",
+        substanceType: "Substance Type:"
+      }
+    };
   },
   computed: {
+    ...mapGetters("substance", ["form"]),
+    ...mapState("substance", ["detail"]),
     ...mapGetters("auth", ["isAuthenticated"]),
+    ...mapGetters("qcLevel", { qcLevelOptions: "getOptions" }),
+    ...mapGetters("source", { sourceOptions: "getOptions" }),
+    ...mapGetters("substanceType", { substanceTypeOptions: "getOptions" }),
 
-    ...mapGetters("compound/definedcompound", {
-      getDefSubstanceForm: "getSubstanceForm"
-    }),
-    ...mapGetters("compound/illdefinedcompound", {
-      getIndefSubstanceForm: "getSubstanceForm"
-    }),
-
-    ...mapState("source", { sourceList: "list" }),
-    ...mapState("substanceType", { substanceTypeList: "list" }),
-    ...mapState("qcLevel", { qcLevelList: "list" }),
-
-    form: function() {
-      // todo: don't load this from state
-      return this.$store.state.substance.form;
+    btnDisabled: function() {
+      return !(this.changed > 0);
     },
-    sourceOptions: function() {
-      return this.buildOptions(this.sourceList);
-    },
-    substanceTypeOptions: function() {
-      return this.buildOptions(this.substanceTypeList);
-    },
-    qcLevelsOptions: function() {
-      return this.buildOptions(this.qcLevelList);
+    options: function() {
+      return {
+        qcLevel: this.qcLevelOptions,
+        source: this.sourceOptions,
+        substanceType: this.substanceTypeOptions
+      };
+    }
+  },
+  watch: {
+    "form.id": function() {
+      this.validationState = this.clearValidation();
+      this.changed = 0;
     }
   },
   methods: {
-    buildOptions: function(list) {
-      let item;
-      let options = [];
-      for (item of list)
-        options.push({ value: item.id, text: item.attributes.label });
-      return options;
+    editable(fld) {
+      return fld === "id" ? true : !this.isAuthenticated;
+    },
+    markChanged() {
+      this.changed++;
+    },
+    clearForm() {
+      this.$store.commit("substance/clearForm");
+      this.validationState = this.clearValidation();
+      this.changed = 0;
+    },
+    clearValidation() {
+      let clean = {
+        state: null,
+        message: ""
+      };
+      return {
+        id: { ...clean },
+        casrn: { ...clean },
+        preferredName: { ...clean },
+        privateQCNote: { ...clean },
+        publicQCNote: { ...clean },
+        qcLevel: { ...clean },
+        source: { ...clean },
+        description: { ...clean },
+        substanceType: { ...clean }
+      };
+    },
+    buildPayload() {
+      let { id } = this.form;
+      let data = { ...this.form };
+      // create attributes object
+      let pickAttributes = (...props) => o =>
+        props.reduce((a, e) => ({ ...a, [e]: o[e] }), {});
+      let attrs = pickAttributes(
+        "preferredName",
+        "casrn",
+        "description",
+        "publicQCNote",
+        "privateQCNote"
+      )(data);
+      // filter out attributes that have not been changed
+      if (id) {
+        let { attributes } = this.detail;
+        Object.keys(attrs).forEach(key => {
+          if (attrs[key] == attributes[key]) delete attrs[key];
+        });
+      } else {
+        Object.keys(attrs).forEach(key => {
+          if (attrs[key] == null) delete attrs[key];
+        });
+      }
+      // create relationship object
+      let pickRelationships = (...props) => o =>
+        props.reduce(
+          (a, e) => ({ ...a, [e]: { data: { type: e, id: o[e] } } }),
+          {}
+        );
+      let related = pickRelationships(
+        "qcLevel",
+        "source",
+        "substanceType"
+      )(data);
+      // filter out the relationships that haven't been changed
+      if (id) {
+        let { relationships } = this.detail;
+        Object.keys(related).forEach(key => {
+          if (related[key].data.id == relationships[key].data.id)
+            delete related[key];
+        });
+      } else {
+        Object.keys(related).forEach(key => {
+          if (related[key].data.id == null) delete related[key];
+        });
+      }
+      let payload = {
+        type: "substance",
+        attributes: attrs,
+        relationships: related
+      };
+      return payload;
+    },
+    saveSubstance() {
+      let { id } = this.form;
+      let payload = this.buildPayload();
+      if (id) {
+        payload["id"] = id;
+        // if there is an id, patch the currently loaded substance.
+        this.$store
+          .dispatch("substance/patch", {
+            id: id,
+            body: { ...payload }
+          })
+          .then(response => this.handleSuccess(response))
+          .catch(err => this.handleFail(err));
+      } else {
+        // If there is no id, save the new substance.
+        this.$store
+          .dispatch("substance/post", payload)
+          .then(response => this.handleSuccess(response))
+          .catch(err => this.handleFail(err));
+      }
+    },
+    handleSuccess(response) {
+      let action = response.status === 201 ? "created" : "updated";
+      let { id } = response.data.data;
+      this.validationState = this.clearValidation();
+      this.changed = 0;
+      this.$store.commit("substance/loadDetail", response.data.data);
+      // update for the tree
+      this.$store.dispatch("substance/getList");
+      this.$store.dispatch("alert/alert", {
+        message: `Substance '${id}' ${action} successfully`,
+        color: "success",
+        dismissCountDown: 5
+      });
+    },
+    handleFail(err) {
+      // `sid` is included here to prevent it's input state from going true
+      let errd = ["id"];
+      let nonField = [];
+      for (let error of err.response.data.errors) {
+        let attr = error.source.pointer
+          .split("/")
+          .slice(-1)
+          .shift();
+        if (attr == "nonFieldErrors") {
+          nonField.push(error.detail);
+        } else {
+          errd.push(attr);
+          this.$set(this.validationState[attr], "state", false);
+          this.$set(this.validationState[attr], "message", error.detail);
+        }
+      }
+      // make all fields w/o errors valid
+      Object.keys(this.form)
+        .filter(k => !errd.includes(k))
+        .forEach(field => {
+          this.$set(this.validationState[field], "state", true);
+        });
+      // handle nonField errors
+      if (nonField.length > 0) {
+        this.$store.dispatch("alert/alert", {
+          message: nonField.shift(),
+          color: "warning",
+          dismissCountDown: 5
+        });
+        // hard-coding this for now as we might need to make some adjustments
+        // to the API to get these fields in the response in a cleaner way
+        // I think this is the only nonField Error that we have for the moment
+        this.$set(this.validationState["preferredName"], "state", false);
+        this.$set(
+          this.validationState["preferredName"],
+          "message",
+          "not unique"
+        );
+        this.$set(this.validationState["casrn"], "state", false);
+        this.$set(this.validationState["casrn"], "message", "not unique");
+      }
     }
-  },
-  mounted() {
-    this.$store.dispatch("source/getList");
-    this.$store.dispatch("qcLevel/getList");
-    this.$store.dispatch("substanceType/getList");
   }
 };
 </script>

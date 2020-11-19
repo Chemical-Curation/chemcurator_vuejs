@@ -3,7 +3,7 @@
     <SubstanceSidebar />
     <b-row>
       <b-col cols="12" order="1" lg="4" order-lg="0">
-        <SubstanceForm :type="type" />
+        <SubstanceForm />
       </b-col>
       <b-col>
         <ChemicalEditors
@@ -84,6 +84,15 @@ export default {
   },
   mounted() {
     this.$store.dispatch("queryStructureType/getList");
+    this.$store.dispatch("source/getList");
+    this.$store.dispatch("qcLevel/getList");
+    this.$store.dispatch("substanceType/getList");
+    this.$store.dispatch("substance/getList", {
+      params: [
+        { key: "sort", value: "-updatedAt,updatedBy" },
+        { key: "include", value: "updatedBy" }
+      ]
+    });
   },
   beforeRouteLeave(to, from, next) {
     if (
