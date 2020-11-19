@@ -36,13 +36,9 @@ describe("The substance form", () => {
   });
   it("should validate inputs", () => {
     cy.get("#casrn").type("not a casrn");
-    cy.get("#substanceType").select("area professor home47");
     cy.get("#save-substance-btn").click();
     cy.get("#feedback-casrn").contains(
       "The proposed CASRN does not conform to the regular expression ^[0-9]{2,7}-[0-9]{2}-[0-9]$"
-    );
-    cy.get("#feedback-substanceType").contains(
-      "The SubstanceType submitted is no longer supported."
     );
   });
   it("should validate nonFieldErrors", () => {
