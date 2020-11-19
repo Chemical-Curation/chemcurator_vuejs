@@ -297,7 +297,7 @@ describe("The substance page authenticated access", () => {
     cy.get("[data-cy=search-button]").click();
 
     // Assert substance loaded
-    cy.get("#substanceID").should("have.value", "DTXSID502000555");
+    cy.get("#id").should("have.value", "DTXSID502000555");
 
     // Build assertion info
     let test_data = [
