@@ -117,7 +117,7 @@ describe("The substance page anonymous access", () => {
   });
 
   it("should show depreciated qst if the compound is set to it", () => {
-    cy.get("[data-cy=search-box]").type("DTXCID502000555");
+    cy.get("[data-cy=search-box]").type("Deprecated Substance");
     cy.get("[data-cy=search-button]").click();
 
     cy.get("#compound-type-dropdown").should("contain", "Deprecated");
@@ -589,7 +589,7 @@ describe("The substance page's Synonym Table", () => {
     // Queue a simple success message (actual response is not currently used)
     cy.route("PATCH", "/synonyms/*", "success");
 
-    cy.get("[data-cy=search-box]").type("DTXCID502000555");
+    cy.get("[data-cy=search-box]").type("Deprecated Substance");
     cy.get("[data-cy=search-button]").click();
 
     // Build assertion info
