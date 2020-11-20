@@ -40,7 +40,7 @@
           },
           "data": {
             "type": "source",
-            "id": "1"
+            "id": "source-1"
           }
         },
         "relationshipType": {
@@ -50,7 +50,7 @@
           },
           "data": {
             "type": "relationshipType",
-            "id": "1"
+            "id": "area-professor-home"
           }
         }
       },
@@ -92,7 +92,7 @@
           },
           "data": {
             "type": "source",
-            "id": "1"
+            "id": "source-1"
           }
         },
         "relationshipType": {
@@ -102,7 +102,7 @@
           },
           "data": {
             "type": "relationshipType",
-            "id": "1"
+            "id": "area-professor-home"
           }
         }
       },
@@ -144,7 +144,7 @@
           },
           "data": {
             "type": "source",
-            "id": "1"
+            "id": "source-1"
           }
         },
         "relationshipType": {
@@ -154,7 +154,7 @@
           },
           "data": {
             "type": "relationshipType",
-            "id": "1"
+            "id": "area-professor-home"
           }
         }
       },
@@ -166,9 +166,8 @@
   "included": [
     {
       "type": "substance",
-      "id": "1",
+      "id": "DTXSID502000000",
       "attributes": {
-        "sid": "DTXSID502000000",
         "preferredName": "Sample Substance",
         "displayName": "Display Sample Substance",
         "description": "This is the description for the test substance",
@@ -184,7 +183,7 @@
           },
           "data": {
             "type": "source",
-            "id": "1"
+            "id": "source-1"
           }
         },
         "substanceType": {
@@ -194,7 +193,7 @@
           },
           "data": {
             "type": "substanceType",
-            "id": "1"
+            "id": "substance-type-1"
           }
         },
         "qcLevel": {
@@ -204,7 +203,7 @@
           },
           "data": {
             "type": "qcLevel",
-            "id": "1"
+            "id": "qc-level-1"
           }
         },
         "associatedCompound": {
@@ -224,9 +223,8 @@
     },
     {
       "type": "substance",
-      "id": "2",
+      "id": "DTXSID602000001",
       "attributes": {
-        "sid": "DTXSID602000001",
         "preferredName": "Sample Substance 2",
         "displayName": "Display Sample Substance 2",
         "description": "area professor home",
@@ -242,7 +240,7 @@
           },
           "data": {
             "type": "source",
-            "id": "2"
+            "id": "Source-Two"
           }
         },
         "substanceType": {
@@ -252,7 +250,7 @@
           },
           "data": {
             "type": "substanceType",
-            "id": "2"
+            "id": "area-professor-home47"
           }
         },
         "qcLevel": {
@@ -262,7 +260,7 @@
           },
           "data": {
             "type": "qcLevel",
-            "id": "1"
+            "id": "qc-level-1"
           }
         },
         "associatedCompound": {
@@ -282,9 +280,8 @@
     },
     {
       "type": "substance",
-      "id": "3",
+      "id": "DTXSID202000002",
       "attributes": {
-        "sid": "DTXSID202000002",
         "preferredName": "Hydrogen Peroxide",
         "displayName": "Hydrogen Peroxide",
         "description": "Hydrogen peroxide is a mild antiseptic used on the skin to prevent infection of minor cuts, scrapes, and burns.",
@@ -300,7 +297,7 @@
           },
           "data": {
             "type": "source",
-            "id": "2"
+            "id": "Source-Two"
           }
         },
         "substanceType": {
@@ -310,7 +307,7 @@
           },
           "data": {
             "type": "substanceType",
-            "id": "1"
+            "id": "substance-type-1"
           }
         },
         "qcLevel": {
@@ -320,7 +317,7 @@
           },
           "data": {
             "type": "qcLevel",
-            "id": "1"
+            "id": "qc-level-1"
           }
         },
         "associatedCompound": {

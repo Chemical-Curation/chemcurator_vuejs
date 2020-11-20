@@ -21,7 +21,7 @@
           },
           "data": {
             "type": "source",
-            "id": "7"
+            "id": "popular-general-3"
           }
         },
         "substance": {
@@ -41,7 +41,7 @@
           },
           "data": {
             "type": "synonymQuality",
-            "id": "8"
+            "id": "talk-society-hand-4"
           }
         },
         "synonymType": {
@@ -51,7 +51,7 @@
           },
           "data": {
             "type": "synonymType",
-            "id": "5"
+            "id": "stand-brother-3"
           }
         }
       },
@@ -74,7 +74,7 @@
           },
           "data": {
             "type": "source",
-            "id": "1"
+            "id": "source-1"
           }
         },
         "substance": {
@@ -94,7 +94,7 @@
           },
           "data": {
             "type": "synonymQuality",
-            "id": "1"
+            "id": "area-professor-home"
           }
         },
         "synonymType": {
@@ -104,7 +104,7 @@
           },
           "data": {
             "type": "synonymType",
-            "id": "5"
+            "id": "stand-brother-3"
           }
         }
       },
@@ -127,7 +127,7 @@
           },
           "data": {
             "type": "source",
-            "id": "1"
+            "id": "source-1"
           }
         },
         "substance": {
@@ -147,7 +147,7 @@
           },
           "data": {
             "type": "synonymQuality",
-            "id": "1"
+            "id": "area-professor-home"
           }
         },
         "synonymType": {
@@ -157,7 +157,7 @@
           },
           "data": {
             "type": "synonymType",
-            "id": "2"
+            "id": "their-mean-attack-0"
           }
         }
       },
@@ -180,7 +180,7 @@
           },
           "data": {
             "type": "source",
-            "id": "1"
+            "id": "source-1"
           }
         },
         "substance": {
@@ -200,7 +200,7 @@
           },
           "data": {
             "type": "synonymQuality",
-            "id": "1"
+            "id": "area-professor-home"
           }
         },
         "synonymType": {
@@ -210,7 +210,7 @@
           },
           "data": {
             "type": "synonymType",
-            "id": "2"
+            "id": "their-mean-attack-0"
           }
         }
       },
@@ -233,7 +233,7 @@
           },
           "data": {
             "type": "source",
-            "id": "1"
+            "id": "source-1"
           }
         },
         "substance": {
@@ -253,7 +253,7 @@
           },
           "data": {
             "type": "synonymQuality",
-            "id": "1"
+            "id": "area-professor-home"
           }
         },
         "synonymType": {
@@ -263,7 +263,7 @@
           },
           "data": {
             "type": "synonymType",
-            "id": "2"
+            "id": "their-mean-attack-0"
           }
         }
       },
@@ -286,7 +286,7 @@
           },
           "data": {
             "type": "source",
-            "id": "2"
+            "id": "Source-Two"
           }
         },
         "substance": {
@@ -306,7 +306,7 @@
           },
           "data": {
             "type": "synonymQuality",
-            "id": "1"
+            "id": "area-professor-home"
           }
         },
         "synonymType": {
@@ -316,7 +316,7 @@
           },
           "data": {
             "type": "synonymType",
-            "id": "2"
+            "id": "their-mean-attack-0"
           }
         }
       },
@@ -339,7 +339,7 @@
           },
           "data": {
             "type": "source",
-            "id": "2"
+            "id": "Source-Two"
           }
         },
         "substance": {
@@ -359,7 +359,7 @@
           },
           "data": {
             "type": "synonymQuality",
-            "id": "1"
+            "id": "area-professor-home"
           }
         },
         "synonymType": {
@@ -369,7 +369,7 @@
           },
           "data": {
             "type": "synonymType",
-            "id": "2"
+            "id": "their-mean-attack-0"
           }
         }
       },
@@ -392,7 +392,7 @@
           },
           "data": {
             "type": "source",
-            "id": "2"
+            "id": "Source-Two"
           }
         },
         "substance": {
@@ -412,7 +412,7 @@
           },
           "data": {
             "type": "synonymQuality",
-            "id": "1"
+            "id": "area-professor-home"
           }
         },
         "synonymType": {
@@ -422,7 +422,7 @@
           },
           "data": {
             "type": "synonymType",
-            "id": "2"
+            "id": "their-mean-attack-0"
           }
         }
       },
