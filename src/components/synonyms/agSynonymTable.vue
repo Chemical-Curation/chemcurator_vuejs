@@ -81,6 +81,9 @@ export default {
   },
   computed: {
     ...mapGetters("auth", ["isAuthenticated"]),
+    ...mapGetters("qcLevel", { qualityListOptions: "getOptions" }),
+    ...mapGetters("source", { sourceListOptions: "getOptions" }),
+    ...mapGetters("substanceType", { typeListOptions: "getOptions" }),
     ...mapState("synonym", ["list", "loading"]),
     ...mapState("source", { sourceList: "list" }),
     ...mapState("synonymQuality", { qualityList: "list" }),
@@ -103,7 +106,7 @@ export default {
           cellEditor: "selectObjectCellEditor",
           cellEditorParams: {
             cellRenderer: "mappableCellRenderer",
-            values: this.sourceListOptions
+            values: this.sourceListOptions("relationships.source.data.id")
           }
         },
         {
@@ -117,7 +120,9 @@ export default {
           cellEditor: "selectObjectCellEditor",
           cellEditorParams: {
             cellRenderer: "mappableCellRenderer",
-            values: this.qualityListOptions
+            values: this.qualityListOptions(
+              "relationships.synonymQuality.data.id"
+            )
           }
         },
         {
@@ -131,7 +136,7 @@ export default {
           cellEditor: "selectObjectCellEditor",
           cellEditorParams: {
             cellRenderer: "mappableCellRenderer",
-            values: this.typeListOptions
+            values: this.typeListOptions("relationships.synonymType.data.id")
           }
         },
         {
@@ -164,19 +169,6 @@ export default {
     },
 
     /**
-     * Source objects to be used in a select dropdown
-     */
-    sourceListOptions: function() {
-      return this.sourceList
-        .filter(obj => {
-          return !obj.attributes.deprecated;
-        })
-        .map(i => {
-          return { value: i.id, text: i.attributes.label };
-        });
-    },
-
-    /**
      * Source objects to be looked up by id.  (used in cell renderers from id)
      */
     sourceListMap: function() {
@@ -186,38 +178,12 @@ export default {
     },
 
     /**
-     * Synonym Quality objects to be used in a select dropdown
-     */
-    qualityListOptions: function() {
-      return this.qualityList
-        .filter(obj => {
-          return !obj.attributes.deprecated;
-        })
-        .map(i => {
-          return { value: i.id, text: i.attributes.label };
-        });
-    },
-
-    /**
      * Synonym Quality objects to be looked up by id.  (used in cell renderers from id)
      */
     qualityListMap: function() {
       let map = {};
       for (let quality of this.qualityList) map[quality.id] = quality;
       return map;
-    },
-
-    /**
-     * Synonym Type objects to be used in a select dropdown
-     */
-    typeListOptions: function() {
-      return this.typeList
-        .filter(obj => {
-          return !obj.attributes.deprecated;
-        })
-        .map(i => {
-          return { value: i.id, text: i.attributes.label };
-        });
     },
 
     /**
