@@ -95,7 +95,7 @@ export default {
     }
   },
   computed: {
-    ...mapState("compound/definedcompound", ["data"]),
+    ...mapState("compound/definedcompound", ["data", "push"]),
     ketcherFrame: function() {
       return this.$refs.ketcher;
     },
@@ -114,7 +114,7 @@ export default {
   },
   watch: {
     data: function() {
-      this.loadMolfile();
+      if (this.push) this.loadMolfile();
     },
     molfile: function() {
       this.fetchByMolfile(this.molfile);

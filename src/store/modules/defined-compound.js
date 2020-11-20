@@ -6,7 +6,8 @@ const defaultState = () => {
   return {
     data: {},
     included: {},
-    changed: false
+    changed: false,
+    push: true
   };
 };
 
@@ -19,6 +20,8 @@ const actions = {
     return "definedCompounds";
   },
   fetchByMolfile: async ({ commit, dispatch }, searchString) => {
+    commit("push", false);
+
     await HTTP.get(
       `/definedCompounds?include=substance&filter[molfileV3000]=${encodeURI(
         searchString
@@ -59,6 +62,9 @@ const mutations = {
   ...rootMutations,
   clearState(state) {
     Object.assign(state, defaultState());
+  },
+  push(state, push) {
+    state.push = push;
   }
 };
 
