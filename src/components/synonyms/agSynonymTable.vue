@@ -63,27 +63,11 @@ export default {
     substanceId: String,
     editable: Boolean
   },
-  data() {
-    return {
-      originalData: null,
-      rowData: null,
-      defaultColDef: null,
-      gridOptions: null,
-      // Whether the save / reset buttons are enabled
-      buttonsEnabled: false,
-      // Rows that returned errors on save
-      errorRows: {},
-      // Currently selected error row.  Null if no errors
-      selectedError: null,
-      // Display options for error table.
-      errorFields: [{ label: "Errors", key: "detail" }]
-    };
-  },
   computed: {
     ...mapGetters("auth", ["isAuthenticated"]),
-    ...mapGetters("qcLevel", { qualityListOptions: "getOptions" }),
+    ...mapGetters("synonymQuality", { qualityListOptions: "getOptions" }),
     ...mapGetters("source", { sourceListOptions: "getOptions" }),
-    ...mapGetters("substanceType", { typeListOptions: "getOptions" }),
+    ...mapGetters("synonymType", { typeListOptions: "getOptions" }),
     ...mapState("synonym", ["list", "loading"]),
     ...mapState("source", { sourceList: "list" }),
     ...mapState("synonymQuality", { qualityList: "list" }),
@@ -194,6 +178,22 @@ export default {
       for (let type of this.typeList) map[type.id] = type;
       return map;
     }
+  },
+  data() {
+    return {
+      originalData: null,
+      rowData: null,
+      defaultColDef: null,
+      gridOptions: null,
+      // Whether the save / reset buttons are enabled
+      buttonsEnabled: false,
+      // Rows that returned errors on save
+      errorRows: {},
+      // Currently selected error row.  Null if no errors
+      selectedError: null,
+      // Display options for error table.
+      errorFields: [{ label: "Errors", key: "detail" }]
+    };
   },
   watch: {
     /**
