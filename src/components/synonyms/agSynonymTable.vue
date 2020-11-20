@@ -63,24 +63,11 @@ export default {
     substanceId: String,
     editable: Boolean
   },
-  data() {
-    return {
-      originalData: null,
-      rowData: null,
-      defaultColDef: null,
-      gridOptions: null,
-      // Whether the save / reset buttons are enabled
-      buttonsEnabled: false,
-      // Rows that returned errors on save
-      errorRows: {},
-      // Currently selected error row.  Null if no errors
-      selectedError: null,
-      // Display options for error table.
-      errorFields: [{ label: "Errors", key: "detail" }]
-    };
-  },
   computed: {
     ...mapGetters("auth", ["isAuthenticated"]),
+    ...mapGetters("synonymQuality", { qualityListOptions: "getOptions" }),
+    ...mapGetters("source", { sourceListOptions: "getOptions" }),
+    ...mapGetters("synonymType", { typeListOptions: "getOptions" }),
     ...mapState("synonym", ["list", "loading"]),
     ...mapState("source", { sourceList: "list" }),
     ...mapState("synonymQuality", { qualityList: "list" }),
@@ -103,7 +90,7 @@ export default {
           cellEditor: "selectObjectCellEditor",
           cellEditorParams: {
             cellRenderer: "mappableCellRenderer",
-            values: this.sourceListOptions
+            values: this.sourceListOptions("relationships.source.data.id")
           }
         },
         {
@@ -117,7 +104,9 @@ export default {
           cellEditor: "selectObjectCellEditor",
           cellEditorParams: {
             cellRenderer: "mappableCellRenderer",
-            values: this.qualityListOptions
+            values: this.qualityListOptions(
+              "relationships.synonymQuality.data.id"
+            )
           }
         },
         {
@@ -131,7 +120,7 @@ export default {
           cellEditor: "selectObjectCellEditor",
           cellEditorParams: {
             cellRenderer: "mappableCellRenderer",
-            values: this.typeListOptions
+            values: this.typeListOptions("relationships.synonymType.data.id")
           }
         },
         {
@@ -164,30 +153,12 @@ export default {
     },
 
     /**
-     * Source objects to be used in a select dropdown
-     */
-    sourceListOptions: function() {
-      return this.sourceList.map(i => {
-        return { value: i.id, text: i.attributes.label };
-      });
-    },
-
-    /**
      * Source objects to be looked up by id.  (used in cell renderers from id)
      */
     sourceListMap: function() {
       let map = {};
       for (let source of this.sourceList) map[source.id] = source;
       return map;
-    },
-
-    /**
-     * Synonym Quality objects to be used in a select dropdown
-     */
-    qualityListOptions: function() {
-      return this.qualityList.map(i => {
-        return { value: i.id, text: i.attributes.label };
-      });
     },
 
     /**
@@ -200,15 +171,6 @@ export default {
     },
 
     /**
-     * Synonym Type objects to be used in a select dropdown
-     */
-    typeListOptions: function() {
-      return this.typeList.map(i => {
-        return { value: i.id, text: i.attributes.label };
-      });
-    },
-
-    /**
      * Synonym Type objects to be looked up by id.  (used in cell renderers from id)
      */
     typeListMap: function() {
@@ -216,6 +178,22 @@ export default {
       for (let type of this.typeList) map[type.id] = type;
       return map;
     }
+  },
+  data() {
+    return {
+      originalData: null,
+      rowData: null,
+      defaultColDef: null,
+      gridOptions: null,
+      // Whether the save / reset buttons are enabled
+      buttonsEnabled: false,
+      // Rows that returned errors on save
+      errorRows: {},
+      // Currently selected error row.  Null if no errors
+      selectedError: null,
+      // Display options for error table.
+      errorFields: [{ label: "Errors", key: "detail" }]
+    };
   },
   watch: {
     /**

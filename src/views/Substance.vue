@@ -26,8 +26,13 @@
             <b-form-select
               id="compound-type-dropdown"
               v-model="type"
-              :options="options"
-            />
+              :options="options(type)"
+            >
+              <template #first>
+                <option value="none">None</option>
+                <option value="definedCompound">Defined Compound</option>
+              </template>
+            </b-form-select>
           </b-form-group>
         </div>
         <ChemicalEditors
@@ -61,6 +66,7 @@ export default {
   },
   computed: {
     ...mapGetters("auth", ["isAuthenticated"]),
+    ...mapGetters("queryStructureType", { options: "getOptions" }),
     ...mapState("compound", { compoundType: "type" }),
     ...mapState("compound/definedcompound", { definedCompoundData: "data" }),
     ...mapState("compound/illdefinedcompound", {
@@ -72,9 +78,6 @@ export default {
       if (this.type === "definedCompound") return this.definedCompoundData.id;
       else if (this.type === "none") return "";
       return this.illDefinedCompoundData.id;
-    },
-    options: function() {
-      return this.buildOptions(this.qstList);
     },
     substanceId: function() {
       if (
@@ -93,16 +96,6 @@ export default {
     }
   },
   methods: {
-    buildOptions: function(list) {
-      let item;
-      let options = [
-        { value: "none", text: "None" },
-        { value: "definedCompound", text: "Defined Compound" }
-      ];
-      for (item of list)
-        options.push({ value: item.id, text: item.attributes.label });
-      return options;
-    },
     checkChanged: function(event) {
       if (
         this.$store.state.compound.illdefinedcompound.changed ||

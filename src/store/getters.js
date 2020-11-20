@@ -20,12 +20,17 @@ export default {
     }
     return these;
   },
-  getOptions: state => {
-    return state.list.map(item => {
-      return {
-        value: item.id,
-        text: item.attributes.label
-      };
-    });
+  getOptions: state => selected => {
+    return state.list
+      .filter(item => {
+        return !item.attributes.deprecated || item.id === selected;
+      })
+      .map(item => {
+        return {
+          value: item.id,
+          text: item.attributes.label,
+          disabled: item.attributes.deprecated
+        };
+      });
   }
 };

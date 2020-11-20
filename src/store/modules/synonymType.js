@@ -1,5 +1,6 @@
 import rootActions from "../actions.js";
 import rootMutations from "../mutations.js";
+import rootGetters from "../getters.js";
 
 const state = {
   loading: false,
@@ -20,9 +21,15 @@ const mutations = {
   ...rootMutations
 };
 
+// getters
+const getters = {
+  ...rootGetters
+};
+
 export default {
   namespaced: true,
   state,
+  getters,
   actions,
   mutations
 };

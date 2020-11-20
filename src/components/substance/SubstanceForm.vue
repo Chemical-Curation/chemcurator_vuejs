@@ -91,9 +91,13 @@ export default {
     },
     options: function() {
       return {
-        qcLevel: this.qcLevelOptions,
-        source: this.sourceOptions,
-        substanceType: this.substanceTypeOptions
+        qcLevel: this.qcLevelOptions(
+          this.detail?.relationships.qcLevel.data?.id
+        ),
+        source: this.sourceOptions(this.detail?.relationships.source.data?.id),
+        substanceType: this.substanceTypeOptions(
+          this.detail?.relationships.substanceType.data?.id
+        )
       };
     }
   },
