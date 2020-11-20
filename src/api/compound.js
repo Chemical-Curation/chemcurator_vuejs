@@ -1,7 +1,7 @@
 import {HTTP} from "@/store/http-common";
 
 async function fetchCompound(id) {
-  return HTTP.get(`definedCompounds/${id}`).then(res => { return res.data })
+  return HTTP.get(`compounds/${id}`).then(res => { return res.data.data })
 }
 
 async function fetchByMolfile(molfile) {

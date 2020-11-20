@@ -7,8 +7,7 @@
       </b-col>
       <b-col>
         <ChemicalEditors
-          :compoundId="compoundId"
-          :compoundType="type"
+          :initial-compound="compound"
           :options="options"
           :editable="isAuthenticated"
         />
@@ -28,17 +27,20 @@ import SynonymTable from "@/components/synonyms/agSynonymTable";
 import SubstanceRelationshipTable from "@/components/substance/agSubstanceRelationshipTable";
 import ListTable from "@/components/records/agRecordTable";
 import { mapGetters, mapState } from "vuex";
+import compoundApi from "@/api/compound";
+
 
 export default {
   name: "home",
   data() {
     return {
       type: "none",
+      compound: {},
     };
   },
   computed: {
     ...mapGetters("auth", ["isAuthenticated"]),
-    ...mapState("substance", { compoundType: "compoundType", compoundId: "compoundId", substanceId: "form.id" }),
+    ...mapState("substance", { substanceId: "form.id", substance: "detail" }),
     ...mapState("queryStructureType", { qstList: "list" }),
 
     options: function() {
@@ -46,11 +48,14 @@ export default {
     },
   },
   watch: {
-    compoundType: function() {
-      this.type = this.compoundType ?? 'none';
+    substance: function() {
+      this.fetchCompound(this.substance?.relationships.associatedCompound.data?.id)
     }
   },
   methods: {
+    fetchCompound: async function(cid) {
+      this.compound = await compoundApi.fetchCompound(cid)
+    },
     buildOptions: function(list) {
       let item;
       let options = [

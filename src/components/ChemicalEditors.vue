@@ -25,10 +25,25 @@
       </b-form-group>
     </div>
     <div v-show="type === 'definedCompound'">
-      <KetcherWindow ref="ketcher" @compoundUpdate="cid=$event" />
+      <div id="substanceInfoPanel" class="border rounded mb-3">
+        <dl class="row my-1 p-2">
+          <dt class="col-lg-2">Molecular Weight</dt>
+          <dd class="col-lg-4 overflow-auto">{{ molecularWeight }}</dd>
+
+          <dt class="col-lg-2">Molecular Formula</dt>
+          <dd class="col-lg-4 overflow-auto">{{ molecularFormula }}</dd>
+
+          <dt class="col-lg-2">SMILES</dt>
+          <dd class="col-lg-4 overflow-auto">{{ smiles }}</dd>
+
+          <dt class="col-lg-2">Inchikey</dt>
+          <dd class="col-lg-4 overflow-auto">{{ inchikey }}</dd>
+        </dl>
+      </div>
+      <KetcherWindow ref="ketcher" :initial-molfile="molfile" @molfileUpdate="fetchByMolfile($event)" />
     </div>
     <div v-show="type !== 'definedCompound' && type !== 'none'">
-      <MarvinWindow ref="marvin" />
+      <MarvinWindow ref="marvin" :initial-mrvfile="mrvfile" />
     </div>
     <div class="my-3">
       <b-button
@@ -45,6 +60,7 @@
 <script>
 import KetcherWindow from "@/components/KetcherWindow";
 import MarvinWindow from "@/components/MarvinWindow";
+import compoundApi from "@/api/compound";
 
 export default {
   name: "ChemicalEditors",
@@ -53,33 +69,51 @@ export default {
     MarvinWindow
   },
   props: {
-    compoundType: String,
-    compoundId: String,
+    initialCompound: Object,
     editable: Boolean,
     options: Array
   },
   data() {
     return {
       type: 'none',
-      cid: ''
+      compound: {}
     }
   },
   watch: {
-    compoundId: function() {
-      if (this.compoundId && this.compoundType === 'definedCompound'){
-        this.$refs["ketcher"].loadCompound(this.compoundId)
-      }
-      else if (this.compoundId && this.compoundType !== 'none'){
-        this.$refs["marvin"].loadMrvfile()
-      }
-      this.cid = this.compoundId
-    },
-    compoundType: function() {
-      this.type = this.compoundType
-    },
+    initialCompound: function() {
+      this.compound = this.initialCompound
 
+      if (!this.compound?.id)  this.type = "none"
+      else if (this.compound?.type === "definedCompound") {
+        this.type = "definedCompound"
+      }
+      else
+        this.type = this.compound?.relationships?.queryStructureType?.data?.id
+    },
   },
   computed: {
+    molecularWeight: function() {
+      return this.compound?.attributes?.molecularWeight ?? "-";
+    },
+    molecularFormula: function() {
+      return this.compound?.attributes?.molecularFormula ?? "-";
+    },
+    smiles: function() {
+      return this.compound?.attributes?.smiles ?? "-";
+    },
+    inchikey: function() {
+      return this.compound?.attributes?.inchikey ?? "-";
+    },
+    cid: function() {
+      console.log(this.compound)
+      return this.compound?.id ?? "";
+    },
+    molfile: function() {
+      return this.initialCompound?.attributes?.molfileV3000 ?? ""
+    },
+    mrvfile: function() {
+      return this.initialCompound?.attributes?.mrvfile ?? ""
+    },
     editorChanged: function() {
       if (
         (this.$store.state.compound.illdefinedcompound.changed &&
@@ -94,6 +128,17 @@ export default {
     }
   },
   methods: {
+    async fetchByMolfile(molfile) {
+      if (molfile) {
+        let fetchedCompound = await compoundApi.fetchByMolfile(molfile);
+        if (fetchedCompound)
+          this.compound = fetchedCompound
+        else
+          this.compound = {}
+      }
+      else
+        this.compound = {}
+    },
     saveCompound(type) {
       if (type === "definedCompound") {
         this.saveDefinedCompound();
