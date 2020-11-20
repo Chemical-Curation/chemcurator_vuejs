@@ -19,13 +19,10 @@
 
 export default {
   name: "MarvinWindow",
-  props:{
-    initialMrvfile: String
-  },
   data() {
     return {
       marvinURL: process.env.VUE_APP_MARVIN_URL + "/editorws.html",
-      localMrvfile: "",
+      localMrvfile: ""
     };
   },
   methods: {
@@ -57,7 +54,7 @@ export default {
         // }
         // this.updateLocalMrvfile(event.data.mrvfile);
       }
-    },
+    }
     // updateLocalMrvfile: function(mrvfile) {
     //   // Save the external mrvfile to the local vue instance
     //   this.localMrvfile = mrvfile;
@@ -81,14 +78,6 @@ export default {
     // ...mapState("compound/illdefinedcompound", ["data"]),
     marvinFrame: function() {
       return this.$refs.marvin;
-    }
-  },
-  watch: {
-    initialMrvfile: function() {
-      this.localMrvfile = this.initialMrvfile
-      console.log(this.localMrvfile)
-      if (this.localMrvfile)
-        this.loadMrvfile(this.localMrvfile)
     }
   },
   mounted() {

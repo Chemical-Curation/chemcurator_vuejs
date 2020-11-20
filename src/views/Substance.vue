@@ -29,13 +29,12 @@ import ListTable from "@/components/records/agRecordTable";
 import { mapGetters, mapState } from "vuex";
 import compoundApi from "@/api/compound";
 
-
 export default {
   name: "home",
   data() {
     return {
       type: "none",
-      compound: {},
+      compound: {}
     };
   },
   computed: {
@@ -45,16 +44,19 @@ export default {
 
     options: function() {
       return this.buildOptions(this.qstList);
-    },
+    }
   },
   watch: {
     substance: function() {
-      this.fetchCompound(this.substance?.relationships.associatedCompound.data?.id)
+      if (this.substance?.relationships.associatedCompound.data?.id)
+        this.fetchCompound(
+          this.substance?.relationships.associatedCompound.data?.id
+        );
     }
   },
   methods: {
     fetchCompound: async function(cid) {
-      this.compound = await compoundApi.fetchCompound(cid)
+      this.compound = await compoundApi.fetchCompound(cid);
     },
     buildOptions: function(list) {
       let item;

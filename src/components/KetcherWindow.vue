@@ -20,9 +20,6 @@ import { mapActions, mapState } from "vuex";
 
 export default {
   name: "KetcherWindow",
-  props: {
-    initialMolfile: String
-  },
   data() {
     return {
       ketcherURL: process.env.VUE_APP_KETCHER_URL,
@@ -36,7 +33,7 @@ export default {
         "M  V30 END BOND\n" +
         "M  V30 END CTAB\n" +
         "M  END",
-      molfile: "",
+      molfile: ""
     };
   },
   methods: {
@@ -70,7 +67,7 @@ export default {
         .split("\n")
         .slice(3, -1)
         .join("\n");
-    },
+    }
   },
   computed: {
     ...mapState("compound/definedcompound", ["data"]),
@@ -80,7 +77,7 @@ export default {
   },
   watch: {
     molfile: async function() {
-      this.$emit("molfileUpdate", this.molfile)
+      this.$emit("molfileUpdate", this.molfile);
 
       // let temp = this.removeHeader(this.molfile);
       // if (temp !== this.initial_molfile) {
@@ -88,10 +85,6 @@ export default {
       // } else {
       //   this.$store.dispatch("compound/definedcompound/updateChanged", false);
       // }
-    },
-    initialMolfile: function() {
-      this.molfile = this.initialMolfile
-      this.loadMolfile(this.molfile)
     }
   },
   mounted() {

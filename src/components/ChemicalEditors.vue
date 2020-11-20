@@ -40,10 +40,10 @@
           <dd class="col-lg-4 overflow-auto">{{ inchikey }}</dd>
         </dl>
       </div>
-      <KetcherWindow ref="ketcher" :initial-molfile="molfile" @molfileUpdate="fetchByMolfile($event)" />
+      <KetcherWindow ref="ketcher" @molfileUpdate="fetchByMolfile($event)" />
     </div>
     <div v-show="type !== 'definedCompound' && type !== 'none'">
-      <MarvinWindow ref="marvin" :initial-mrvfile="mrvfile" />
+      <MarvinWindow ref="marvin" />
     </div>
     <div class="my-3">
       <b-button
@@ -75,44 +75,46 @@ export default {
   },
   data() {
     return {
-      type: 'none',
-      compound: {}
-    }
+      type: "none",
+      definedCompound: {},
+      illDefinedCompound: {}
+    };
   },
   watch: {
     initialCompound: function() {
-      this.compound = this.initialCompound
-
-      if (!this.compound?.id)  this.type = "none"
-      else if (this.compound?.type === "definedCompound") {
-        this.type = "definedCompound"
+      if (!this.initialCompound?.id) this.type = "none";
+      else if (this.initialCompound?.type === "definedCompound") {
+        this.definedCompound = this.initialCompound;
+        this.type = "definedCompound";
+        this.$refs["ketcher"].loadMolfile(
+          this.initialCompound?.attributes?.molfileV3000
+        );
+      } else {
+        this.illDefinedCompound = this.initialCompound;
+        this.type = this.illDefinedCompound?.relationships?.queryStructureType?.data?.id;
+        this.$refs["marvin"].loadMrvfile(
+          this.initialCompound?.attributes?.mrvfile
+        );
       }
-      else
-        this.type = this.compound?.relationships?.queryStructureType?.data?.id
-    },
+    }
   },
   computed: {
     molecularWeight: function() {
-      return this.compound?.attributes?.molecularWeight ?? "-";
+      return this.definedCompound?.attributes?.molecularWeight ?? "-";
     },
     molecularFormula: function() {
-      return this.compound?.attributes?.molecularFormula ?? "-";
+      return this.definedCompound?.attributes?.molecularFormula ?? "-";
     },
     smiles: function() {
-      return this.compound?.attributes?.smiles ?? "-";
+      return this.definedCompound?.attributes?.smiles ?? "-";
     },
     inchikey: function() {
-      return this.compound?.attributes?.inchikey ?? "-";
+      return this.definedCompound?.attributes?.inchikey ?? "-";
     },
     cid: function() {
-      console.log(this.compound)
-      return this.compound?.id ?? "";
-    },
-    molfile: function() {
-      return this.initialCompound?.attributes?.molfileV3000 ?? ""
-    },
-    mrvfile: function() {
-      return this.initialCompound?.attributes?.mrvfile ?? ""
+      return this.type === "definedCompound"
+        ? this.definedCompound?.id
+        : this.illDefinedCompound?.id;
     },
     editorChanged: function() {
       if (
@@ -131,13 +133,9 @@ export default {
     async fetchByMolfile(molfile) {
       if (molfile) {
         let fetchedCompound = await compoundApi.fetchByMolfile(molfile);
-        if (fetchedCompound)
-          this.compound = fetchedCompound
-        else
-          this.compound = {}
+        if (fetchedCompound) this.definedCompound = fetchedCompound;
+        else this.definedCompound = {};
       }
-      else
-        this.compound = {}
     },
     saveCompound(type) {
       if (type === "definedCompound") {
