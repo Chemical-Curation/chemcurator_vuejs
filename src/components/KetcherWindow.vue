@@ -6,7 +6,7 @@
         class="ketcher flex-fill"
         data-cy="ketcher"
         :src="ketcherURL"
-        @load="loadMolfile(molfile)"
+        @load="loadMolfile(initialMolfile)"
         height="600"
         ref="ketcher"
         >ketcher</iframe
@@ -20,6 +20,9 @@ import { mapState } from "vuex";
 
 export default {
   name: "KetcherWindow",
+  props: {
+    initialMolfile: String
+  },
   data() {
     return {
       ketcherURL: process.env.VUE_APP_KETCHER_URL,

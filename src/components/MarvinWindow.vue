@@ -19,17 +19,20 @@
 
 export default {
   name: "MarvinWindow",
+  props: {
+    initialMrvfile: String
+  },
   data() {
     return {
       marvinURL: process.env.VUE_APP_MARVIN_URL + "/editorws.html",
       localMrvfile: "",
       blankMrvfile: "<MDocument/>",
-      initialMrvfile: "<MDocument/>"
+      loadedMrvfile: "<MDocument/>"
     };
   },
   methods: {
     loadMrvfile: function(mrvfile) {
-      this.initialMrvfile = "";
+      this.loadedMrvfile = "";
       this.marvinFrame.contentWindow.postMessage(
         {
           type: "importMrvfile",
@@ -49,10 +52,13 @@ export default {
     },
     marvinMessageListeners: function(event) {
       if (event.data.type === "returnMrvfile") {
-        if (!this.initialMrvfile) {
-          this.initialMrvfile = event.data.mrvfile;
+        if (!this.loadedMrvfile) {
+          this.loadedMrvfile = event.data.mrvfile;
         }
         this.localMrvfile = event.data.mrvfile;
+      }
+      if (event.data === "marvinLoaded") {
+        this.loadMrvfile(this.initialMrvfile);
       }
     },
     removeTags: function(str) {
@@ -78,12 +84,12 @@ export default {
     mrvfileChanged: function() {
       return (
         this.removeTags(this.localMrvfile) !==
-          this.removeTags(this.initialMrvfile) &&
+          this.removeTags(this.loadedMrvfile) &&
         this.removeTags(this.localMrvfile) !== this.blankMrvfile
       );
     }
   },
-  mounted() {
+  beforeMount() {
     window.addEventListener("message", this.marvinMessageListeners, false);
   },
   destroyed() {

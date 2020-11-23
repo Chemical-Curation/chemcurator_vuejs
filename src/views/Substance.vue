@@ -8,7 +8,6 @@
       <b-col>
         <ChemicalEditors
           :initial-compound="compound"
-          :options="options"
           :editable="isAuthenticated"
           @change="changed = $event"
         />
@@ -41,7 +40,7 @@ export default {
   computed: {
     ...mapGetters("auth", ["isAuthenticated"]),
     ...mapState("substance", { substance: "detail" }),
-    ...mapState("queryStructureType", { qstList: "list" }),
+    ...mapState("queryStructureType", { qstList: "list" })
   },
   watch: {
     substance: function() {

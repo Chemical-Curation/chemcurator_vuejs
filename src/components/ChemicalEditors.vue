@@ -47,6 +47,7 @@
       </div>
       <KetcherWindow
         ref="ketcher"
+        :initial-molfile="initialMolfile"
         @molfileUpdate="
           fetchByMolfile($event.molfileV3000);
           ketcherChanged = $event.changed;
@@ -55,6 +56,7 @@
     </div>
     <div v-show="type !== 'definedCompound' && type !== 'none'">
       <MarvinWindow
+        :initial-mrvfile="initialMrvfile"
         ref="marvin"
         @mrvfileUpdate="marvinChanged = $event.changed"
       />
@@ -75,7 +77,7 @@
 import KetcherWindow from "@/components/KetcherWindow";
 import MarvinWindow from "@/components/MarvinWindow";
 import compoundApi from "@/api/compound";
-import {mapGetters} from "vuex";
+import { mapGetters } from "vuex";
 
 export default {
   name: "ChemicalEditors",
@@ -85,8 +87,7 @@ export default {
   },
   props: {
     initialCompound: Object,
-    editable: Boolean,
-    options: Array
+    editable: Boolean
   },
   data() {
     return {
@@ -103,10 +104,12 @@ export default {
       else if (this.initialCompound?.type === "definedCompound") {
         this.definedCompound = this.initialCompound;
         this.type = "definedCompound";
+        // Attempt to load the new molfile
         this.$refs["ketcher"].loadMolfile(this.initialMolfile);
       } else {
         this.illDefinedCompound = this.initialCompound;
         this.type = this.illDefinedCompound?.relationships?.queryStructureType?.data?.id;
+        // Attempt to load the new mrvfile
         this.$refs["marvin"].loadMrvfile(this.initialMrvfile);
       }
     },
@@ -121,7 +124,7 @@ export default {
       return this.initialCompound?.attributes?.molfileV3000 ?? "";
     },
     initialMrvfile: function() {
-      return this.initialCompound?.attributes?.mrvfile ?? "";
+      return this.initialCompound?.attributes?.mrvfile ?? "<MDocument/>";
     },
     molecularWeight: function() {
       return this.definedCompound?.attributes?.molecularWeight ?? "-";
