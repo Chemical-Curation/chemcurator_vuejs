@@ -102,6 +102,9 @@ export default {
           this.initialCompound?.attributes?.mrvfile
         );
       }
+    },
+    editorChanged: function() {
+      this.$emit("change", this.editorChanged);
     }
   },
   computed: {

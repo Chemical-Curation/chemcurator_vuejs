@@ -10,6 +10,7 @@
           :initial-compound="compound"
           :options="options"
           :editable="isAuthenticated"
+          @change="changed = $event"
         />
       </b-col>
     </b-row>
@@ -34,7 +35,8 @@ export default {
   data() {
     return {
       type: "none",
-      compound: {}
+      compound: {},
+      changed: false
     };
   },
   computed: {
@@ -69,10 +71,7 @@ export default {
       return options;
     },
     checkChanged: function(event) {
-      if (
-        this.$store.state.compound.illdefinedcompound.changed ||
-        this.$store.state.compound.definedcompound.changed
-      ) {
+      if (this.changed) {
         // below only needs to eval to a truthy value
         event.returnValue = "lose your changes?";
       }
@@ -102,10 +101,7 @@ export default {
     });
   },
   beforeRouteLeave(to, from, next) {
-    if (
-      this.$store.state.compound.illdefinedcompound.changed ||
-      this.$store.state.compound.definedcompound.changed
-    ) {
+    if (this.changed) {
       this.$bvModal
         .msgBoxConfirm(
           "Unsaved changes exist on the compound in the editor, are you okay with losing the changes?",
@@ -116,14 +112,6 @@ export default {
         )
         .then(value => {
           if (value) {
-            this.$store.dispatch(
-              "compound/definedcompound/updateChanged",
-              false
-            );
-            this.$store.dispatch(
-              "compound/illdefinedcompound/updateChanged",
-              false
-            );
             next();
           } else {
             next(false);
