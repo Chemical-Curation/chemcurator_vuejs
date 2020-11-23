@@ -23,7 +23,8 @@ export default {
     return {
       marvinURL: process.env.VUE_APP_MARVIN_URL + "/editorws.html",
       localMrvfile: "",
-      initialMrvfile: ""
+      blankMrvfile: "<MDocument/>",
+      initialMrvfile: "<MDocument/>"
     };
   },
   methods: {
@@ -77,7 +78,8 @@ export default {
     mrvfileChanged: function() {
       return (
         this.removeTags(this.localMrvfile) !==
-        this.removeTags(this.initialMrvfile)
+          this.removeTags(this.initialMrvfile) &&
+        this.removeTags(this.localMrvfile) !== this.blankMrvfile
       );
     }
   },
