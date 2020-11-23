@@ -27,7 +27,6 @@ const actions = {
       .then(response => {
         commit(`storeIncluded`, response.data.included);
         let obj = response.data.data.shift();
-        let inc = response.data?.included;
 
         // TODO: The following action is because of the difference in what is returned
         //       by the list and detail serializers.  If the compound is a defined compound
@@ -36,7 +35,6 @@ const actions = {
         //       or if the json:api id is the same as the cid being passed in.
         if (obj) {
           dispatch("getFetch", obj.id);
-          if (inc) commit("substance/loadDetail", inc.shift(), { root: true });
         }
       })
       .catch(err => {
