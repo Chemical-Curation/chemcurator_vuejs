@@ -34,7 +34,6 @@ export default {
   name: "home",
   data() {
     return {
-      type: "none",
       compound: {},
       changed: false
     };
@@ -43,10 +42,6 @@ export default {
     ...mapGetters("auth", ["isAuthenticated"]),
     ...mapState("substance", { substance: "detail" }),
     ...mapState("queryStructureType", { qstList: "list" }),
-
-    options: function() {
-      return this.buildOptions(this.qstList);
-    }
   },
   watch: {
     substance: function() {
@@ -59,16 +54,6 @@ export default {
   methods: {
     fetchCompound: async function(cid) {
       this.compound = await compoundApi.fetchCompound(cid);
-    },
-    buildOptions: function(list) {
-      let item;
-      let options = [
-        { value: "none", text: "None" },
-        { value: "definedCompound", text: "Defined Compound" }
-      ];
-      for (item of list)
-        options.push({ value: item.id, text: item.attributes.label });
-      return options;
     },
     checkChanged: function(event) {
       if (this.changed) {

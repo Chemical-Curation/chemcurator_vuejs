@@ -20,8 +20,13 @@
         <b-form-select
           id="compound-type-dropdown"
           v-model="type"
-          :options="options"
-        />
+          :options="options(type)"
+        >
+          <template #first>
+            <option value="none">None</option>
+            <option value="definedCompound">Defined Compound</option>
+          </template>
+        </b-form-select>
       </b-form-group>
     </div>
     <div v-show="type === 'definedCompound'">
@@ -70,6 +75,7 @@
 import KetcherWindow from "@/components/KetcherWindow";
 import MarvinWindow from "@/components/MarvinWindow";
 import compoundApi from "@/api/compound";
+import {mapGetters} from "vuex";
 
 export default {
   name: "ChemicalEditors",
@@ -109,6 +115,8 @@ export default {
     }
   },
   computed: {
+    ...mapGetters("queryStructureType", { options: "getOptions" }),
+
     initialMolfile: function() {
       return this.initialCompound?.attributes?.molfileV3000 ?? "";
     },
