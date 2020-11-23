@@ -22,11 +22,13 @@ export default {
   data() {
     return {
       marvinURL: process.env.VUE_APP_MARVIN_URL + "/editorws.html",
-      localMrvfile: ""
+      localMrvfile: "",
+      initialMrvfile: ""
     };
   },
   methods: {
     loadMrvfile: function(mrvfile) {
+      this.initialMrvfile = "";
       this.marvinFrame.contentWindow.postMessage(
         {
           type: "importMrvfile",
@@ -46,45 +48,44 @@ export default {
     },
     marvinMessageListeners: function(event) {
       if (event.data.type === "returnMrvfile") {
-        // if (
-        //   this.initialMrvfile === "<MDocument/>" &&
-        //   this.data?.attributes?.mrvfile
-        // ) {
-        //   this.initialMrvfile = this.removeTags(event.data.mrvfile);
-        // }
-        // this.updateLocalMrvfile(event.data.mrvfile);
+        if (!this.initialMrvfile) {
+          this.initialMrvfile = event.data.mrvfile;
+        }
+        this.localMrvfile = event.data.mrvfile;
       }
+    },
+    removeTags: function(str) {
+      let serializer = new XMLSerializer();
+      let tree = new window.DOMParser().parseFromString(str, "text/xml");
+      let node = tree.getElementsByTagName("MDocument")[0];
+      return serializer.serializeToString(node);
     }
-    // updateLocalMrvfile: function(mrvfile) {
-    //   // Save the external mrvfile to the local vue instance
-    //   this.localMrvfile = mrvfile;
-    //   let strippedMrv = this.removeTags(mrvfile);
-    //   if (strippedMrv === this.initialMrvfile)
-    //     this.$store.dispatch(
-    //       "compound/illdefinedcompound/updateChanged",
-    //       false
-    //     );
-    //   else
-    //     this.$store.dispatch("compound/illdefinedcompound/updateChanged", true);
-    // },
-    // removeTags: function(str) {
-    //   let serializer = new XMLSerializer();
-    //   let tree = new window.DOMParser().parseFromString(str, "text/xml");
-    //   let node = tree.getElementsByTagName("MDocument")[0];
-    //   return serializer.serializeToString(node);
-    // }
+  },
+  watch: {
+    localMrvfile: function() {
+      // Save the external mrvfile to the local vue instance
+      this.$emit("mrvfileUpdate", {
+        mrvfile: this.localMrvfile,
+        changed: this.mrvfileChanged
+      });
+    }
   },
   computed: {
-    // ...mapState("compound/illdefinedcompound", ["data"]),
     marvinFrame: function() {
       return this.$refs.marvin;
+    },
+    mrvfileChanged: function() {
+      return (
+        this.removeTags(this.localMrvfile) !==
+        this.removeTags(this.initialMrvfile)
+      );
     }
   },
   mounted() {
-    // window.addEventListener("message", this.marvinMessageListeners, false);
+    window.addEventListener("message", this.marvinMessageListeners, false);
   },
   destroyed() {
-    // window.removeEventListener("message", this.marvinMessageListeners);
+    window.removeEventListener("message", this.marvinMessageListeners);
   }
 };
 </script>

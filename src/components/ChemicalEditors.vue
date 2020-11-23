@@ -49,7 +49,10 @@
       />
     </div>
     <div v-show="type !== 'definedCompound' && type !== 'none'">
-      <MarvinWindow ref="marvin" />
+      <MarvinWindow
+        ref="marvin"
+        @mrvfileUpdate="marvinChanged = $event.changed"
+      />
     </div>
     <div class="my-3">
       <b-button
@@ -98,9 +101,7 @@ export default {
       } else {
         this.illDefinedCompound = this.initialCompound;
         this.type = this.illDefinedCompound?.relationships?.queryStructureType?.data?.id;
-        this.$refs["marvin"].loadMrvfile(
-          this.initialCompound?.attributes?.mrvfile
-        );
+        this.$refs["marvin"].loadMrvfile(this.initialMrvfile);
       }
     },
     editorChanged: function() {
@@ -110,6 +111,9 @@ export default {
   computed: {
     initialMolfile: function() {
       return this.initialCompound?.attributes?.molfileV3000 ?? "";
+    },
+    initialMrvfile: function() {
+      return this.initialCompound?.attributes?.mrvfile ?? "";
     },
     molecularWeight: function() {
       return this.definedCompound?.attributes?.molecularWeight ?? "-";
