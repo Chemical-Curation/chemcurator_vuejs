@@ -262,8 +262,8 @@ describe("The substance page anonymous access", () => {
     // Check compound loaded
     cy.get("#recordCompoundID").should("have.value", "DTXCID502000024");
 
-    // Check substance loaded
-    cy.get("#id").should("have.value", "DTXSID202000002");
+    // Check substance not loaded
+    cy.get("#id").should("have.value", "");
   });
 
   it("should load substances without compounds", () => {
