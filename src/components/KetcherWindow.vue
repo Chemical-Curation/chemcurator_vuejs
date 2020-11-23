@@ -16,7 +16,7 @@
 </template>
 
 <script>
-import { mapActions, mapState } from "vuex";
+import { mapState } from "vuex";
 
 export default {
   name: "KetcherWindow",
@@ -33,13 +33,15 @@ export default {
         "M  V30 END BOND\n" +
         "M  V30 END CTAB\n" +
         "M  END",
-      molfile: ""
+      molfile: "",
+      loadedMolfile: ""
     };
   },
   methods: {
-    ...mapActions("compound/definedcompound", ["fetchByMolfile"]),
     loadMolfile: function(molfile) {
       if (molfile) {
+        this.loadedMolfile = "";
+
         this.ketcherFrame.contentWindow.postMessage(
           {
             type: "importMolfile",
@@ -47,7 +49,6 @@ export default {
           },
           "*"
         );
-        this.exportMolfile();
       } else this.clearMolfile();
     },
     exportMolfile: function() {
@@ -73,18 +74,21 @@ export default {
     ...mapState("compound/definedcompound", ["data"]),
     ketcherFrame: function() {
       return this.$refs.ketcher;
+    },
+    molfileChanged: function() {
+      return (
+        this.removeHeader(this.molfile) !==
+          this.removeHeader(this.loadedMolfile) &&
+        this.removeHeader(this.molfile) !== this.blank
+      );
     }
   },
   watch: {
-    molfile: async function() {
-      this.$emit("molfileUpdate", this.molfile);
-
-      // let temp = this.removeHeader(this.molfile);
-      // if (temp !== this.initial_molfile) {
-      //   this.$store.dispatch("compound/definedcompound/updateChanged", true);
-      // } else {
-      //   this.$store.dispatch("compound/definedcompound/updateChanged", false);
-      // }
+    molfile: function() {
+      this.$emit("molfileUpdate", {
+        molfileV3000: this.molfile,
+        changed: this.molfileChanged
+      });
     }
   },
   mounted() {
@@ -92,19 +96,8 @@ export default {
       "message",
       event => {
         if (event.data.type === "returnMolfile") {
+          if (!this.loadedMolfile) this.loadedMolfile = event.data.molfile;
           this.molfile = event.data.molfile;
-          let init = this.removeHeader(event.data.molfile);
-          if (
-            this.data?.attributes?.molfileV3000 &&
-            this.initial_molfile === this.blank
-          ) {
-            // update for search
-            this.initial_molfile = init;
-          }
-          if (init === this.blank) {
-            // update if cleared while editing
-            this.initial_molfile = init;
-          }
         }
       },
       false

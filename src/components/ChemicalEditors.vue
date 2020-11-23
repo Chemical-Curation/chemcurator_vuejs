@@ -40,7 +40,13 @@
           <dd class="col-lg-4 overflow-auto">{{ inchikey }}</dd>
         </dl>
       </div>
-      <KetcherWindow ref="ketcher" @molfileUpdate="fetchByMolfile($event)" />
+      <KetcherWindow
+        ref="ketcher"
+        @molfileUpdate="
+          fetchByMolfile($event.molfileV3000);
+          ketcherChanged = $event.changed;
+        "
+      />
     </div>
     <div v-show="type !== 'definedCompound' && type !== 'none'">
       <MarvinWindow ref="marvin" />
@@ -77,7 +83,9 @@ export default {
     return {
       type: "none",
       definedCompound: {},
-      illDefinedCompound: {}
+      illDefinedCompound: {},
+      ketcherChanged: false,
+      marvinChanged: false
     };
   },
   watch: {
@@ -86,9 +94,7 @@ export default {
       else if (this.initialCompound?.type === "definedCompound") {
         this.definedCompound = this.initialCompound;
         this.type = "definedCompound";
-        this.$refs["ketcher"].loadMolfile(
-          this.initialCompound?.attributes?.molfileV3000
-        );
+        this.$refs["ketcher"].loadMolfile(this.initialMolfile);
       } else {
         this.illDefinedCompound = this.initialCompound;
         this.type = this.illDefinedCompound?.relationships?.queryStructureType?.data?.id;
@@ -99,6 +105,9 @@ export default {
     }
   },
   computed: {
+    initialMolfile: function() {
+      return this.initialCompound?.attributes?.molfileV3000 ?? "";
+    },
     molecularWeight: function() {
       return this.definedCompound?.attributes?.molecularWeight ?? "-";
     },
@@ -117,16 +126,10 @@ export default {
         : this.illDefinedCompound?.id;
     },
     editorChanged: function() {
-      if (
-        (this.$store.state.compound.illdefinedcompound.changed &&
-          this.type !== "definedCompound") ||
-        (this.$store.state.compound.definedcompound.changed &&
-          this.type === "definedCompound")
-      ) {
-        return true;
-      } else {
-        return false;
-      }
+      return (
+        (this.marvinChanged && this.type !== "definedCompound") ||
+        (this.ketcherChanged && this.type === "definedCompound")
+      );
     }
   },
   methods: {
