@@ -14,9 +14,9 @@
         />
       </b-col>
     </b-row>
-    <SynonymTable :substance-id="substanceId" :editable="isAuthenticated" />
-    <SubstanceRelationshipTable class="mb-5" :substance-id="substanceId" />
-    <ListTable class="mb-5" :substance-id="substanceId" />
+    <SynonymTable :substance-id="substance.id" :editable="isAuthenticated" />
+    <SubstanceRelationshipTable class="mb-5" :substance-id="substance.id" />
+    <ListTable class="mb-5" :substance-id="substance.id" />
   </b-container>
 </template>
 
@@ -41,7 +41,7 @@ export default {
   },
   computed: {
     ...mapGetters("auth", ["isAuthenticated"]),
-    ...mapState("substance", { substanceId: "form.id", substance: "detail" }),
+    ...mapState("substance", { substance: "detail" }),
     ...mapState("queryStructureType", { qstList: "list" }),
 
     options: function() {
