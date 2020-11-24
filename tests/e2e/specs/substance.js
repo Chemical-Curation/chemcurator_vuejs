@@ -3,21 +3,21 @@ import valid_casrns from "../../valid_casrns.js";
 let qstResponse = {
   data: [
     {
-      id: "1",
+      id: "markush-query",
       type: "queryStructureType",
       attributes: {
-        label: "Markush"
+        label: "Markush-Query"
       }
     },
     {
-      id: "2",
+      id: "ill-defined",
       type: "queryStructureType",
       attributes: {
         label: "Ill Defined"
       }
     },
     {
-      id: "4",
+      id: "deprecated",
       type: "queryStructureType",
       attributes: {
         name: "deprecated",
