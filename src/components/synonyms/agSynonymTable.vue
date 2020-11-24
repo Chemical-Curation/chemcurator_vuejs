@@ -32,6 +32,14 @@
         >Reset</b-button
       >
       <b-button
+        id="synonym-add-button"
+        class="ml-1"
+        variant="success"
+        @click="addSynonym"
+      >
+        Add Synonym
+      </b-button>
+      <b-button
         id="synonym-save-button"
         class="ml-1"
         variant="primary"
@@ -139,6 +147,10 @@ export default {
         // background danger any rows where the id is within the errorRows object
         "bg-danger": params => {
           return this.errorRows.hasOwnProperty(params.data.id);
+        },
+        // background info any rows where there is no id
+        "new-ag-row": params => {
+          return !params.data.id;
         }
       };
     },
@@ -234,6 +246,48 @@ export default {
         force: true,
         suppressFlash: false
       });
+    },
+
+
+    /**
+     * Adds a synonym.
+     *
+     */
+    addSynonym: function() {
+      if (!this.rowData)
+        this.rowData = []
+      this.rowData.push({
+        attributes:{
+          identifier: "",
+          qcNotes: "",
+        },
+        relationships: {
+          source: {
+            data: {
+              type: "source"
+              , id: 0
+            }
+          },
+          synonymQuality: {
+            data: {
+              type: "synonymQuality"
+              , id: 0
+            }
+          },
+          synonymType: {
+            data: {
+              type: "synonymType"
+              , id: 0
+            }
+          },
+          substance: {
+            data: {
+              type: "substance"
+              , id: this.substanceId
+            }
+          },
+        }
+      })
     },
 
     /**
@@ -428,4 +482,8 @@ export default {
 };
 </script>
 
-<style scoped></style>
+<style>
+.ag-row.new-ag-row {
+  background-color: #def2ff !important;
+}
+</style>
