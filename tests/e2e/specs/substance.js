@@ -118,7 +118,7 @@ describe("The substance page anonymous access", () => {
 
     cy.get("#compound-type-dropdown").should("contain", "Deprecated");
     cy.get("#compound-type-dropdown")
-      .find("[value=4]")
+      .find("[value=deprecated]")
       .should("be.selected")
       .should("have.attr", "disabled");
   });
@@ -139,9 +139,9 @@ describe("The substance page anonymous access", () => {
     cy.get("#id").should("have.value", "DTXSID502000000");
     cy.get("#preferredName").should("have.value", "Sample Substance");
     cy.get("#casrn").should("have.value", "1234567-89-5");
-    cy.get("#qcLevel").should("have.value", "1");
-    cy.get("#source").should("have.value", "1");
-    cy.get("#substanceType").should("have.value", "1");
+    cy.get("#qcLevel").should("have.value", "qc-level-1");
+    cy.get("#source").should("have.value", "source-1");
+    cy.get("#substanceType").should("have.value", "substance-type-1");
     cy.get("#description").should(
       "have.value",
       "This is the description for the test substance"
@@ -158,9 +158,9 @@ describe("The substance page anonymous access", () => {
     cy.get("#id").should("have.value", "DTXSID502000000");
     cy.get("#preferredName").should("have.value", "Sample Substance");
     cy.get("#casrn").should("have.value", "1234567-89-5");
-    cy.get("#qcLevel").should("have.value", "1");
-    cy.get("#source").should("have.value", "1");
-    cy.get("#substanceType").should("have.value", "1");
+    cy.get("#qcLevel").should("have.value", "qc-level-1");
+    cy.get("#source").should("have.value", "source-1");
+    cy.get("#substanceType").should("have.value", "substance-type-1");
     cy.get("#description").should(
       "have.value",
       "This is the description for the test substance"
@@ -301,13 +301,13 @@ describe("The substance page authenticated access", () => {
 
     // Build assertion info
     let test_data = [
-      { htmlID: "#qcLevel", name: "Deprecated QC Levels", id: 12 },
+      { htmlID: "#qcLevel", name: "Deprecated QC Levels", id: "deprecated-qc-levels" },
       {
         htmlID: "#source",
         name: "Deprecated Source",
-        id: 9
+        id: "deprecated-source"
       },
-      { htmlID: "#substanceType", name: "Deprecated Substance Type", id: 8 }
+      { htmlID: "#substanceType", name: "Deprecated Substance Type", id: "deprecated-substance-type" }
     ];
 
     // Test Dropdowns

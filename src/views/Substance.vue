@@ -72,7 +72,6 @@ export default {
     ...mapState("compound/illdefinedcompound", {
       illDefinedCompoundData: "data"
     }),
-    ...mapState("queryStructureType", { qstList: "list" }),
 
     cid: function() {
       if (this.type === "definedCompound") return this.definedCompoundData.id;
