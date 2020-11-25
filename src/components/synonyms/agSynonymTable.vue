@@ -35,6 +35,7 @@
         id="synonym-add-button"
         class="ml-1"
         variant="success"
+        :disabled="!substanceId"
         @click="addSynonym"
       >
         Add Synonym
@@ -241,6 +242,7 @@ export default {
      * (the synonym store should never be updated by this table)
      */
     resetRowData: function() {
+      this.buttonsEnabled = false
       this.rowData = _.cloneDeep(this.list);
       this.gridOptions.api.refreshCells({
         force: true,
@@ -254,6 +256,17 @@ export default {
      *
      */
     addSynonym: function() {
+      if (!this.substanceId){
+        this.alert({
+          message: "Please load a substance",
+          color: "warning",
+          dismissCountDown: 15
+        });
+        window.scrollTo(0, 0);
+        return;
+      }
+
+      this.buttonsEnabled = true
       if (!this.rowData)
         this.rowData = []
       this.rowData.push({

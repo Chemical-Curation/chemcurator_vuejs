@@ -42,9 +42,9 @@
         />
       </b-col>
     </b-row>
-    <SynonymTable :substance-id="substanceId" :editable="isAuthenticated" />
-    <SubstanceRelationshipTable class="mb-5" :substance-id="substanceId" />
-    <ListTable class="mb-5" :substance-id="substanceId" />
+    <SynonymTable :substance-id="substance.id" :editable="isAuthenticated" />
+    <SubstanceRelationshipTable class="mb-5" :substance-id="substance.id" />
+    <ListTable class="mb-5" :substance-id="substance.id" />
   </b-container>
 </template>
 
@@ -67,6 +67,7 @@ export default {
   computed: {
     ...mapGetters("auth", ["isAuthenticated"]),
     ...mapGetters("queryStructureType", { options: "getOptions" }),
+    ...mapState("substance", { substance: "detail" }),
     ...mapState("compound", { compoundType: "type" }),
     ...mapState("compound/definedcompound", { definedCompoundData: "data" }),
     ...mapState("compound/illdefinedcompound", {
@@ -79,16 +80,6 @@ export default {
       else if (this.type === "none") return "";
       return this.illDefinedCompoundData.id;
     },
-    substanceId: function() {
-      if (
-        this.type === "definedCompound" &&
-        this.definedCompoundData.relationships?.substance
-      )
-        return this.definedCompoundData.relationships?.substance?.data?.id;
-      else if (this.illDefinedCompoundData.relationships?.substance)
-        return this.illDefinedCompoundData.relationships?.substance?.data?.id;
-      return "";
-    }
   },
   watch: {
     compoundType: function() {
