@@ -79,7 +79,7 @@ export default {
       if (this.type === "definedCompound") return this.definedCompoundData.id;
       else if (this.type === "none") return "";
       return this.illDefinedCompoundData.id;
-    },
+    }
   },
   watch: {
     compoundType: function() {

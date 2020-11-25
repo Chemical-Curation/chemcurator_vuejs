@@ -147,11 +147,17 @@ export default {
       return {
         // background danger any rows where the id is within the errorRows object
         "bg-danger": params => {
-          return this.errorRows.hasOwnProperty(params.data.id);
+          return (
+            this.errorRows.hasOwnProperty(params.data.id) ||
+            this.errorRows.hasOwnProperty(params.data.errorId)
+          );
         },
         // background info any rows where there is no id
         "new-ag-row": params => {
-          return !params.data.id;
+          return (
+            !this.errorRows.hasOwnProperty(params.data.errorId) &&
+            !params.data.id
+          );
         }
       };
     },
@@ -202,10 +208,14 @@ export default {
       buttonsEnabled: false,
       // Rows that returned errors on save
       errorRows: {},
+      // Rows that failed to create
+      failedCreates: [],
       // Currently selected error row.  Null if no errors
       selectedError: null,
       // Display options for error table.
-      errorFields: [{ label: "Errors", key: "detail" }]
+      errorFields: [
+        { label: "Errors", key: "detail" },
+      ]
     };
   },
   watch: {
@@ -232,7 +242,7 @@ export default {
   },
   methods: {
     ...mapActions("alert", ["alert"]),
-    ...mapActions("synonym", ["getList", "patch"]),
+    ...mapActions("synonym", ["getList", "patch", "post"]),
     ...mapActions("synonymQuality", { loadQualityList: "getList" }),
     ...mapActions("synonymType", { loadTypeList: "getList" }),
     ...mapActions("source", { loadSourceList: "getList" }),
@@ -242,21 +252,28 @@ export default {
      * (the synonym store should never be updated by this table)
      */
     resetRowData: function() {
-      this.buttonsEnabled = false
+      this.buttonsEnabled = false;
       this.rowData = _.cloneDeep(this.list);
+
+      for (let failedCreate of this.failedCreates) {
+        this.rowData.push({ ...failedCreate });
+      }
+
+      // todo: this is brittle
+      this.failedCreates = [];
+
       this.gridOptions.api.refreshCells({
         force: true,
         suppressFlash: false
       });
     },
 
-
     /**
      * Adds a synonym.
      *
      */
     addSynonym: function() {
-      if (!this.substanceId){
+      if (!this.substanceId) {
         this.alert({
           message: "Please load a substance",
           color: "warning",
@@ -266,41 +283,42 @@ export default {
         return;
       }
 
-      this.buttonsEnabled = true
-      if (!this.rowData)
-        this.rowData = []
+      this.buttonsEnabled = true;
+      if (!this.rowData) this.rowData = [];
+
       this.rowData.push({
-        attributes:{
+        type: "synonym",
+        attributes: {
           identifier: "",
-          qcNotes: "",
+          qcNotes: ""
         },
         relationships: {
           source: {
             data: {
-              type: "source"
-              , id: 0
+              type: "source",
+              id: null
             }
           },
           synonymQuality: {
             data: {
-              type: "synonymQuality"
-              , id: 0
+              type: "synonymQuality",
+              id: null
             }
           },
           synonymType: {
             data: {
-              type: "synonymType"
-              , id: 0
+              type: "synonymType",
+              id: null
             }
           },
           substance: {
             data: {
-              type: "substance"
-              , id: this.substanceId
+              type: "substance",
+              id: this.substanceId
             }
-          },
+          }
         }
-      })
+      });
     },
 
     /**
@@ -337,17 +355,34 @@ export default {
 
       for (let row of this.rowData) {
         if (!_.isEqual(row, this.synonymListMap[row.id])) {
-          // Patch this object and save the response to the response promise array.
-          // If the patch fails, catch the failure and return information regarding why.
-          responses.push(
-            this.patch({ id: row.id, body: row }).catch(err => {
-              return {
-                failed: true,
-                body: row,
-                errors: err.response.data.errors
-              };
-            })
-          );
+          delete row.errorId;
+          let sendableRow = this.removedUnassignedRelationships(row);
+          if (!row.id) {
+            responses.push(
+              this.post(sendableRow).catch(err => {
+                return {
+                  failed: true,
+                  errorId: _.uniqueId("error_row_"),
+                  body: row,
+                  errors: err.response.data.errors
+                };
+              })
+            );
+          } else {
+            // Patch this object and save the response to the response promise array.
+            // If the patch fails, catch the failure and return information regarding why.
+            responses.push(
+              this.patch({ id: sendableRow.id, body: sendableRow }).catch(
+                err => {
+                  return {
+                    failed: true,
+                    body: row,
+                    errors: err.response.data.errors
+                  };
+                }
+              )
+            );
+          }
         }
       }
 
@@ -371,7 +406,15 @@ export default {
         else {
           // Update error rows object with an { id: error }
           for (let reject of rejected) {
-            this.errorRows[reject.value.body.id] = reject.value.errors;
+            if (reject?.value?.body?.id)
+              this.errorRows[reject.value.body.id] = reject.value.errors;
+            else {
+              this.errorRows[reject.value.errorId] = reject.value.errors;
+              this.failedCreates.push({
+                ...reject.value.body,
+                errorId: reject.value.errorId
+              });
+            }
           }
           // Alert the user that some errors happened
           this.alert({
@@ -418,8 +461,20 @@ export default {
      * Sets the selected error to the selected row's error.  Otherwise returns null
      */
     getSelectedError: function() {
-      this.selectedError =
-        this.errorRows[this.gridOptions.api.getSelectedRows()[0].id] ?? null;
+      let rowId =
+        this.gridOptions.api.getSelectedRows()[0]?.id ??
+        this.gridOptions.api.getSelectedRows()[0]?.errorId;
+      this.selectedError = this.errorRows[rowId] ?? null;
+    },
+
+    removedUnassignedRelationships: function(row) {
+      let parsedRow = _.cloneDeep(row);
+      for (let relationship in parsedRow.relationships) {
+        if (!parsedRow.relationships[relationship].data?.id) {
+          delete parsedRow.relationships[relationship];
+        }
+      }
+      return parsedRow;
     },
 
     /**
