@@ -87,10 +87,10 @@ export default {
      */
     columnDefs: function() {
       return [
-        { headerName: "Identifier", field: "attributes.identifier" },
+        { headerName: "Identifier", field: "data.identifier" },
         {
           headerName: "Source",
-          field: "relationships.source.data.id",
+          field: "data.source",
           comparator: this.sourceMapCompare,
           cellRenderer: "mappableCellRenderer",
           cellRendererParams: {
@@ -104,7 +104,7 @@ export default {
         },
         {
           headerName: "Quality",
-          field: "relationships.synonymQuality.data.id",
+          field: "data.synonymQuality",
           comparator: this.qualityMapCompare,
           cellRenderer: "mappableCellRenderer",
           cellRendererParams: {
@@ -120,7 +120,7 @@ export default {
         },
         {
           headerName: "Type",
-          field: "relationships.synonymType.data.id",
+          field: "data.synonymType",
           comparator: this.typeMapCompare,
           cellRenderer: "mappableCellRenderer",
           cellRendererParams: {
@@ -134,7 +134,7 @@ export default {
         },
         {
           headerName: "QC Notes",
-          field: "attributes.qcNotes",
+          field: "data.qcNotes",
           cellEditor: "agLargeTextCellEditor"
         }
       ];
@@ -147,17 +147,11 @@ export default {
       return {
         // background danger any rows where the id is within the errorRows object
         "bg-danger": params => {
-          return (
-            this.errorRows.hasOwnProperty(params.data.id) ||
-            this.errorRows.hasOwnProperty(params.data.errorId)
-          );
+          return params.data.errors.length;
         },
         // background info any rows where there is no id
         "new-ag-row": params => {
-          return (
-            !this.errorRows.hasOwnProperty(params.data.errorId) &&
-            !params.data.id
-          );
+          return params.data.created && !params.data.errors.length;
         }
       };
     },
@@ -213,9 +207,7 @@ export default {
       // Currently selected error row.  Null if no errors
       selectedError: null,
       // Display options for error table.
-      errorFields: [
-        { label: "Errors", key: "detail" },
-      ]
+      errorFields: [{ label: "Errors", key: "detail" }]
     };
   },
   watch: {
@@ -253,19 +245,47 @@ export default {
      */
     resetRowData: function() {
       this.buttonsEnabled = false;
-      this.rowData = _.cloneDeep(this.list);
+      this.rowData = this.buildRowData(this.list);
 
-      for (let failedCreate of this.failedCreates) {
-        this.rowData.push({ ...failedCreate });
-      }
-
-      // todo: this is brittle
-      this.failedCreates = [];
+      // for (let failedCreate of this.failedCreates) {
+      //   this.rowData.push({ ...failedCreate });
+      // }
+      //
+      // // todo: this is brittle
+      // this.failedCreates = [];
 
       this.gridOptions.api.refreshCells({
         force: true,
         suppressFlash: false
       });
+    },
+
+    buildRowData: function(synonyms) {
+      let rowData = [];
+
+      for (let synonym of synonyms) {
+        rowData.push({
+          id: synonym.id,
+          data: {
+            identifier: synonym.attributes.identifier,
+            qcNotes: synonym.attributes.qcNotes,
+            synonymType: synonym.relationships.synonymType.data.id,
+            synonymQuality: synonym.relationships.synonymQuality.data.id,
+            source: synonym.relationships.source.data.id
+          },
+          initialData: {
+            identifier: synonym.attributes.identifier,
+            qcNotes: synonym.attributes.qcNotes,
+            synonymType: synonym.relationships.synonymType.data.id,
+            synonymQuality: synonym.relationships.synonymQuality.data.id,
+            source: synonym.relationships.source.data.id
+          },
+          errors: [],
+          created: false
+        });
+      }
+
+      return rowData;
     },
 
     /**
@@ -287,38 +307,63 @@ export default {
       if (!this.rowData) this.rowData = [];
 
       this.rowData.push({
-        type: "synonym",
-        attributes: {
+        id: null,
+        data: {
           identifier: "",
-          qcNotes: ""
+          qcNotes: "",
+          synonymType: null,
+          synonymQuality: null,
+          source: null
         },
-        relationships: {
-          source: {
-            data: {
-              type: "source",
-              id: null
-            }
-          },
-          synonymQuality: {
-            data: {
-              type: "synonymQuality",
-              id: null
-            }
-          },
-          synonymType: {
-            data: {
-              type: "synonymType",
-              id: null
-            }
-          },
-          substance: {
-            data: {
-              type: "substance",
-              id: this.substanceId
-            }
+        initialData: {
+          identifier: "",
+          qcNotes: "",
+          synonymType: null,
+          synonymQuality: null,
+          source: null
+        },
+        errors: [],
+        created: true
+      });
+    },
+
+    buildSaveRequests: function() {
+      let responses = [];
+
+      for (let row of this.rowData) {
+        if (!_.isEqual(row.data, row.initialData)) {
+          let requestBody = this.buildRequestBody(row.data);
+
+          if (row.created) {
+            responses.push(
+              this.post(requestBody).catch(err => {
+                row["errors"] = err.response.data.errors;
+                row["hasErrors"] = Boolean(err.response.data.errors.length);
+                return {
+                  failed: true
+                };
+              })
+            );
+          } else {
+            // Patch this object and save the response to the response promise array.
+            // If the patch fails, catch the failure and return information regarding why.
+            responses.push(
+              this.patch({
+                id: row.id,
+                body: { ...requestBody, id: row.id }
+              }).catch(err => {
+                row["errors"] = err.response.data.errors;
+                row["hasErrors"] = Boolean(err.response.data.errors.length);
+                return {
+                  failed: true
+                };
+              })
+            );
           }
         }
-      });
+      }
+
+      return responses;
     },
 
     /**
@@ -349,42 +394,7 @@ export default {
       this.gridOptions.api.stopEditing();
       // Responses is an array of promises from the patch requests.
       // We need these all to finish before we can proceed.
-      let responses = [];
-
-      this.selectedError = null;
-
-      for (let row of this.rowData) {
-        if (!_.isEqual(row, this.synonymListMap[row.id])) {
-          delete row.errorId;
-          let sendableRow = this.removedUnassignedRelationships(row);
-          if (!row.id) {
-            responses.push(
-              this.post(sendableRow).catch(err => {
-                return {
-                  failed: true,
-                  errorId: _.uniqueId("error_row_"),
-                  body: row,
-                  errors: err.response.data.errors
-                };
-              })
-            );
-          } else {
-            // Patch this object and save the response to the response promise array.
-            // If the patch fails, catch the failure and return information regarding why.
-            responses.push(
-              this.patch({ id: sendableRow.id, body: sendableRow }).catch(
-                err => {
-                  return {
-                    failed: true,
-                    body: row,
-                    errors: err.response.data.errors
-                  };
-                }
-              )
-            );
-          }
-        }
-      }
+      let responses = this.buildSaveRequests(this.rowData);
 
       // Wait for all patches to finish
       await Promise.allSettled(responses).then(responses => {
@@ -392,7 +402,6 @@ export default {
         let rejected = responses.filter(obj => {
           return obj.value.failed;
         });
-        this.errorRows = {};
         // If there are none,
         if (rejected.length === 0) {
           // update the user with the success
@@ -401,21 +410,12 @@ export default {
             color: "success",
             dismissCountDown: 15
           });
+
+          // todo : Fragile.
+          this.loadSynonyms();
         }
         // if there are errors
         else {
-          // Update error rows object with an { id: error }
-          for (let reject of rejected) {
-            if (reject?.value?.body?.id)
-              this.errorRows[reject.value.body.id] = reject.value.errors;
-            else {
-              this.errorRows[reject.value.errorId] = reject.value.errors;
-              this.failedCreates.push({
-                ...reject.value.body,
-                errorId: reject.value.errorId
-              });
-            }
-          }
           // Alert the user that some errors happened
           this.alert({
             message: "Some synonyms could not be saved",
@@ -424,11 +424,12 @@ export default {
           });
         }
       });
+
+      // Redraw rows to render error rows
+      this.gridOptions.api.redrawRows();
+
       // scroll to the top of the page so the user sees the alert
       window.scrollTo(0, 0);
-
-      // Reload the updated data from the DB.
-      this.loadSynonyms();
     },
 
     /**
@@ -461,20 +462,33 @@ export default {
      * Sets the selected error to the selected row's error.  Otherwise returns null
      */
     getSelectedError: function() {
-      let rowId =
-        this.gridOptions.api.getSelectedRows()[0]?.id ??
-        this.gridOptions.api.getSelectedRows()[0]?.errorId;
-      this.selectedError = this.errorRows[rowId] ?? null;
+      let errorList = this.gridOptions.api.getSelectedRows()[0]?.errors;
+      this.selectedError = errorList.length ? errorList : null;
     },
 
-    removedUnassignedRelationships: function(row) {
-      let parsedRow = _.cloneDeep(row);
-      for (let relationship in parsedRow.relationships) {
-        if (!parsedRow.relationships[relationship].data?.id) {
-          delete parsedRow.relationships[relationship];
+    buildRequestBody: function(data) {
+      let requestBody = {
+        type: "synonym",
+        attributes: {
+          identifier: data.identifier,
+          qcNotes: data.qcNotes
+        },
+        relationships: {
+          substance: {
+            data: {
+              id: this.substanceId,
+              type: "substance"
+            }
+          }
         }
+      };
+      for (let relationship of ["source", "synonymType", "synonymQuality"]) {
+        if (data[relationship])
+          requestBody["relationships"][relationship] = {
+            data: { type: relationship, id: data[relationship] }
+          };
       }
-      return parsedRow;
+      return requestBody;
     },
 
     /**
