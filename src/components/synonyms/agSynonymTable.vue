@@ -151,11 +151,19 @@ export default {
         },
         // background info any rows where there is no id
         "new-ag-row": params => {
+          // new-ag-row is currently an unscoped style.
+          // It naturally takes a position below ag-grid's row style
+          // and thus needs an important tag.
           return params.data.created && !params.data.errors;
         }
       };
     },
 
+    /**
+     * Checks for any row additions/edits and returns a bool
+     *
+     * @return {boolean} - True if any row has changed, false if not.
+     */
     buttonsEnabled: function() {
       for (let row of this.rowData) {
         if (!_.isEqual(row.data, row.initialData) || row.created) return true;
@@ -196,7 +204,6 @@ export default {
       defaultColDef: null,
       gridOptions: null,
       loading: false,
-      // Currently selected error row.
       selectedError: null,
       // Display options for error table.
       errorFields: [{ label: "Errors", key: "detail" }]
@@ -224,6 +231,10 @@ export default {
     ...mapActions("synonymType", { loadTypeList: "getList" }),
     ...mapActions("source", { loadSourceList: "getList" }),
 
+    /**
+     * Adds an alert to the page and scrolls the user to the top of the page
+     * so they can see it.
+     */
     addAlert(message, color) {
       this.alert({
         message: message,
@@ -233,12 +244,18 @@ export default {
       window.scrollTo(0, 0);
     },
 
+    /**
+     * Sets this.selectedError to the currently selected row.
+     */
     onRowSelected: function(event) {
       if (event.node.isSelected()) {
         this.selectedError = event.data.errors;
       }
     },
 
+    /**
+     * Clears the selected row.
+     */
     clearSelected: function() {
       this.gridOptions.api.deselectAll();
       this.selectedError = null;
@@ -267,6 +284,12 @@ export default {
       });
     },
 
+    /**
+     * Rebuilds rowData with a provided array of jsonapi compliant synonyms
+     *
+     * @param synonyms {array} - Array of jsonapi Synonym objects
+     * @returns {array} - Array of agGrid rowData nodes.
+     */
     buildRowData: function(synonyms) {
       let rowData = [];
       let data;
@@ -293,8 +316,7 @@ export default {
     },
 
     /**
-     * Adds a synonym.
-     *
+     * Adds a new synonym to this.rowData
      */
     addSynonym: function() {
       if (!this.substanceId) {
@@ -319,6 +341,12 @@ export default {
       });
     },
 
+    /**
+     * Loops through all rows, checks for changes, and returns promises
+     * to attempt to update each changed row.
+     *
+     * @returns {Array} - Array of promises corresponding to each updated/created row
+     */
     buildSaveRequests: function() {
       let responses = [];
 
@@ -333,6 +361,15 @@ export default {
       return responses;
     },
 
+    /**
+     * Builds an update/save request for a single row
+     *
+     * @param row {obj} - rowData object
+     * @returns {Promise} - API request for a single row.
+     *    - On success the row will have created set to false and
+     *      initialData updated to reflect the current data.
+     *    - On failure the errors will be added to the row.
+     */
     saveRequest: function(row) {
       // Local functions to deal with successful saves and failures
       function onSuccess(res) {
@@ -377,6 +414,7 @@ export default {
         return;
       }
 
+      // Clear selection for the sake of reloading error table
       this.clearSelected();
 
       // Stop editing (if a dropdown is selected but has not blurred,
@@ -435,6 +473,12 @@ export default {
       }
     },
 
+    /**
+     * Transforms rowData.data into a jsonapi compliant body.
+     *
+     * @param data - rowData.data object
+     * @returns {obj} - Jsonapi formatted create request body
+     */
     buildRequestBody: function(data) {
       let requestBody = {
         type: "synonym",
