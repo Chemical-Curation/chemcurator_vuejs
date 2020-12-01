@@ -12,7 +12,7 @@
       :rowData="rowData"
       :gridOptions="gridOptions"
       :rowClassRules="rowClassRules"
-      @selection-changed="getSelectedError"
+      @row-selected="onRowSelected"
       rowSelection="single"
     />
     <div v-show="selectedError" class="mt-3 text-left">
@@ -61,6 +61,7 @@ import {
   MappableCellRenderer,
   SelectObjectCellEditor
 } from "@/ag-grid-components/custom-renderers";
+import { HTTP } from "@/store/http-common";
 
 export default {
   name: "agSynonymTable",
@@ -77,7 +78,6 @@ export default {
     ...mapGetters("synonymQuality", { qualityListOptions: "getOptions" }),
     ...mapGetters("source", { sourceListOptions: "getOptions" }),
     ...mapGetters("synonymType", { typeListOptions: "getOptions" }),
-    ...mapState("synonym", ["list", "loading"]),
     ...mapState("source", { sourceList: "list" }),
     ...mapState("synonymQuality", { qualityList: "list" }),
     ...mapState("synonymType", { typeList: "list" }),
@@ -147,11 +147,11 @@ export default {
       return {
         // background danger any rows have errors
         "bg-danger": params => {
-          return params.data.errors.length;
+          return params.data.errors;
         },
         // background info any rows where there is no id
         "new-ag-row": params => {
-          return params.data.created && !params.data.errors.length;
+          return params.data.created && !params.data.errors;
         }
       };
     },
@@ -161,15 +161,6 @@ export default {
         if (!_.isEqual(row.data, row.initialData) || row.created) return true;
       }
       return false;
-    },
-
-    /**
-     * Synonym objects to be looked up by id.  (used to verify changes)
-     */
-    synonymListMap: function() {
-      let map = {};
-      for (let synonym of this.list) map[synonym.id] = synonym;
-      return map;
     },
 
     /**
@@ -204,6 +195,7 @@ export default {
       rowData: [],
       defaultColDef: null,
       gridOptions: null,
+      loading: false,
       // Currently selected error row.
       selectedError: null,
       // Display options for error table.
@@ -212,17 +204,10 @@ export default {
   },
   watch: {
     /**
-     * Resets row data on Synonym List update
-     */
-    list: function() {
-      this.resetRowData();
-    },
-
-    /**
      * Loads the synonyms for the currently loaded substance
      */
     substanceId: function() {
-      if (this.substanceId) this.loadSynonyms();
+      this.loadSynonyms(this.substanceId);
     },
 
     /**
@@ -248,12 +233,33 @@ export default {
       window.scrollTo(0, 0);
     },
 
+    onRowSelected: function(event) {
+      if (event.node.isSelected()) {
+        this.selectedError = event.data.errors;
+      }
+    },
+
+    clearSelected: function() {
+      this.gridOptions.api.deselectAll();
+      this.selectedError = null;
+    },
+
     /**
      * Resets the row data to whatever is in the synonym store.
      * (the synonym store should never be updated by this table)
      */
     resetRowData: function() {
-      this.rowData = this.buildRowData(this.list);
+      this.clearSelected();
+
+      // Reset created rows
+      this.rowData = this.rowData.filter(row => {
+        return !row.created;
+      });
+
+      // Reset modified rows
+      for (let row of this.rowData) {
+        row.data = { ...row.initialData };
+      }
 
       this.gridOptions.api.refreshCells({
         force: true,
@@ -278,7 +284,7 @@ export default {
           id: synonym.id,
           data: { ...data },
           initialData: { ...data },
-          errors: [],
+          errors: null,
           created: false
         });
       }
@@ -308,7 +314,7 @@ export default {
         id: null,
         data: { ...data },
         initialData: { ...data },
-        errors: [],
+        errors: null,
         created: true
       });
     },
@@ -317,39 +323,40 @@ export default {
       let responses = [];
 
       for (let row of this.rowData) {
+        // Clear previous errors
+        row.errors = null;
         if (!_.isEqual(row.data, row.initialData)) {
-          let requestBody = this.buildRequestBody(row.data);
-
-          if (row.created) {
-            responses.push(
-              this.post(requestBody).catch(err => {
-                row["errors"] = err.response.data.errors;
-                row["hasErrors"] = Boolean(err.response.data.errors.length);
-                return {
-                  failed: true
-                };
-              })
-            );
-          } else {
-            // Patch this object and save the response to the response promise array.
-            // If the patch fails, catch the failure and return information regarding why.
-            responses.push(
-              this.patch({
-                id: row.id,
-                body: { ...requestBody, id: row.id }
-              }).catch(err => {
-                row["errors"] = err.response.data.errors;
-                row["hasErrors"] = Boolean(err.response.data.errors.length);
-                return {
-                  failed: true
-                };
-              })
-            );
-          }
+          responses.push(this.saveRequest(row));
         }
       }
 
       return responses;
+    },
+
+    saveRequest: function(row) {
+      // Local functions to deal with successful saves and failures
+      function onSuccess(res) {
+        row.created = false;
+        row.initialData = { ...row.data };
+        return res;
+      }
+
+      function onFailure(err) {
+        row.errors = err.response.data.errors;
+        return {
+          failed: true
+        };
+      }
+
+      let requestBody = this.buildRequestBody(row.data);
+
+      return row.created
+        ? this.post(requestBody)
+            .then(onSuccess)
+            .catch(onFailure)
+        : this.patch({ id: row.id, body: { ...requestBody, id: row.id } })
+            .then(onSuccess)
+            .catch(onFailure);
     },
 
     /**
@@ -370,10 +377,13 @@ export default {
         return;
       }
 
+      this.clearSelected();
+
       // Stop editing (if a dropdown is selected but has not blurred,
       //               those changes should be considered valid)
       this.gridOptions.api.stopEditing();
-      // Responses is an array of promises from the patch requests.
+
+      // Responses is an array of promises from the saved requests.
       // We need these all to finish before we can proceed.
       let responses = this.buildSaveRequests(this.rowData);
 
@@ -383,19 +393,10 @@ export default {
         let rejected = responses.filter(obj => {
           return obj.value.failed;
         });
-        // If there are none,
-        if (rejected.length === 0) {
-          // update the user with the success
-          this.addAlert("All synonyms saved successfully", "success");
 
-          // todo : Fragile.
-          this.loadSynonyms();
-        }
-        // if there are errors
-        else {
-          // Alert the user that some errors happened
-          this.addAlert("Some synonyms could not be saved", "warning");
-        }
+        rejected.length === 0
+          ? this.addAlert("All synonyms saved successfully", "success")
+          : this.addAlert("Some synonyms could not be saved", "warning");
       });
 
       // Redraw rows to render error rows
@@ -405,10 +406,19 @@ export default {
     /**
      * Loads synonyms by substance id.
      */
-    loadSynonyms: function() {
-      this.getList({
-        params: [{ key: "filter[substance.id]", value: this.substanceId }]
-      });
+    loadSynonyms: async function(substanceId) {
+      this.loading = true;
+
+      let synonyms = [];
+      if (substanceId)
+        synonyms = await HTTP.get(
+          `/synonyms?filter[substance.id]=${substanceId}`
+        ).then(response => {
+          return response.data.data;
+        });
+
+      this.loading = false;
+      this.rowData = this.buildRowData(synonyms);
     },
 
     /**
@@ -418,19 +428,11 @@ export default {
     manageOverlay: function() {
       if (this.loading) {
         this.gridOptions.api.showLoadingOverlay();
-      } else if (!this.loading && _.isEqual(this.list, [])) {
+      } else if (!this.loading && _.isEqual(this.rowData, [])) {
         this.gridOptions.api.showNoRowsOverlay();
       } else {
         this.gridOptions.api.hideOverlay();
       }
-    },
-
-    /**
-     * Sets the selected error to the selected row's error.  Otherwise returns null
-     */
-    getSelectedError: function() {
-      let errorList = this.gridOptions.api.getSelectedRows()[0]?.errors;
-      this.selectedError = errorList.length ? errorList : null;
     },
 
     buildRequestBody: function(data) {
@@ -518,13 +520,12 @@ export default {
     };
   },
   mounted() {
-    // if (this.list !== [])
-    //   this.rowData = this.buildRowData(this.list);
-    // if (this.gridOptions.api)
-    //   this.gridOptions.api.refreshCells({
-    //     force: true,
-    //     suppressFlash: false
-    //   });
+    this.loadSynonyms(this.substanceId);
+    if (this.gridOptions.api)
+      this.gridOptions.api.refreshCells({
+        force: true,
+        suppressFlash: false
+      });
 
     // set the overlay based on the mounted state
     this.manageOverlay();
