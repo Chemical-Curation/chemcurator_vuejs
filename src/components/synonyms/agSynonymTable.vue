@@ -145,7 +145,7 @@ export default {
      */
     rowClassRules: function() {
       return {
-        // background danger any rows where the id is within the errorRows object
+        // background danger any rows have errors
         "bg-danger": params => {
           return params.data.errors.length;
         },
@@ -154,6 +154,13 @@ export default {
           return params.data.created && !params.data.errors.length;
         }
       };
+    },
+
+    buttonsEnabled: function() {
+      for (let row of this.rowData) {
+        if (!_.isEqual(row.data, row.initialData) || row.created) return true;
+      }
+      return false;
     },
 
     /**
@@ -194,17 +201,10 @@ export default {
   },
   data() {
     return {
-      originalData: null,
-      rowData: null,
+      rowData: [],
       defaultColDef: null,
       gridOptions: null,
-      // Whether the save / reset buttons are enabled
-      buttonsEnabled: false,
-      // Rows that returned errors on save
-      errorRows: {},
-      // Rows that failed to create
-      failedCreates: [],
-      // Currently selected error row.  Null if no errors
+      // Currently selected error row.
       selectedError: null,
       // Display options for error table.
       errorFields: [{ label: "Errors", key: "detail" }]
@@ -239,20 +239,21 @@ export default {
     ...mapActions("synonymType", { loadTypeList: "getList" }),
     ...mapActions("source", { loadSourceList: "getList" }),
 
+    addAlert(message, color) {
+      this.alert({
+        message: message,
+        color: color,
+        dismissCountDown: 15
+      });
+      window.scrollTo(0, 0);
+    },
+
     /**
      * Resets the row data to whatever is in the synonym store.
      * (the synonym store should never be updated by this table)
      */
     resetRowData: function() {
-      this.buttonsEnabled = false;
       this.rowData = this.buildRowData(this.list);
-
-      // for (let failedCreate of this.failedCreates) {
-      //   this.rowData.push({ ...failedCreate });
-      // }
-      //
-      // // todo: this is brittle
-      // this.failedCreates = [];
 
       this.gridOptions.api.refreshCells({
         force: true,
@@ -262,24 +263,21 @@ export default {
 
     buildRowData: function(synonyms) {
       let rowData = [];
+      let data;
 
       for (let synonym of synonyms) {
+        data = {
+          identifier: synonym.attributes.identifier,
+          qcNotes: synonym.attributes.qcNotes,
+          synonymType: synonym.relationships.synonymType.data.id,
+          synonymQuality: synonym.relationships.synonymQuality.data.id,
+          source: synonym.relationships.source.data.id
+        };
+
         rowData.push({
           id: synonym.id,
-          data: {
-            identifier: synonym.attributes.identifier,
-            qcNotes: synonym.attributes.qcNotes,
-            synonymType: synonym.relationships.synonymType.data.id,
-            synonymQuality: synonym.relationships.synonymQuality.data.id,
-            source: synonym.relationships.source.data.id
-          },
-          initialData: {
-            identifier: synonym.attributes.identifier,
-            qcNotes: synonym.attributes.qcNotes,
-            synonymType: synonym.relationships.synonymType.data.id,
-            synonymQuality: synonym.relationships.synonymQuality.data.id,
-            source: synonym.relationships.source.data.id
-          },
+          data: { ...data },
+          initialData: { ...data },
           errors: [],
           created: false
         });
@@ -294,34 +292,22 @@ export default {
      */
     addSynonym: function() {
       if (!this.substanceId) {
-        this.alert({
-          message: "Please load a substance",
-          color: "warning",
-          dismissCountDown: 15
-        });
-        window.scrollTo(0, 0);
+        this.addAlert("Please load a substance", "warning");
         return;
       }
 
-      this.buttonsEnabled = true;
-      if (!this.rowData) this.rowData = [];
+      let data = {
+        identifier: "",
+        qcNotes: "",
+        synonymType: null,
+        synonymQuality: null,
+        source: null
+      };
 
       this.rowData.push({
         id: null,
-        data: {
-          identifier: "",
-          qcNotes: "",
-          synonymType: null,
-          synonymQuality: null,
-          source: null
-        },
-        initialData: {
-          identifier: "",
-          qcNotes: "",
-          synonymType: null,
-          synonymQuality: null,
-          source: null
-        },
+        data: { ...data },
+        initialData: { ...data },
         errors: [],
         created: true
       });
@@ -380,12 +366,7 @@ export default {
      */
     save: async function() {
       if (!this.editable) {
-        this.alert({
-          message: "This table cannot be edited",
-          color: "warning",
-          dismissCountDown: 15
-        });
-        window.scrollTo(0, 0);
+        this.addAlert("This table cannot be edited", "warning");
         return;
       }
 
@@ -396,7 +377,7 @@ export default {
       // We need these all to finish before we can proceed.
       let responses = this.buildSaveRequests(this.rowData);
 
-      // Wait for all patches to finish
+      // Wait for all save requests to finish
       await Promise.allSettled(responses).then(responses => {
         // Find failures
         let rejected = responses.filter(obj => {
@@ -405,11 +386,7 @@ export default {
         // If there are none,
         if (rejected.length === 0) {
           // update the user with the success
-          this.alert({
-            message: "All synonyms saved successfully",
-            color: "success",
-            dismissCountDown: 15
-          });
+          this.addAlert("All synonyms saved successfully", "success");
 
           // todo : Fragile.
           this.loadSynonyms();
@@ -417,19 +394,12 @@ export default {
         // if there are errors
         else {
           // Alert the user that some errors happened
-          this.alert({
-            message: "Some synonyms could not be saved",
-            color: "warning",
-            dismissCountDown: 15
-          });
+          this.addAlert("Some synonyms could not be saved", "warning");
         }
       });
 
       // Redraw rows to render error rows
       this.gridOptions.api.redrawRows();
-
-      // scroll to the top of the page so the user sees the alert
-      window.scrollTo(0, 0);
     },
 
     /**
@@ -448,13 +418,10 @@ export default {
     manageOverlay: function() {
       if (this.loading) {
         this.gridOptions.api.showLoadingOverlay();
-        this.buttonsEnabled = false;
       } else if (!this.loading && _.isEqual(this.list, [])) {
         this.gridOptions.api.showNoRowsOverlay();
-        this.buttonsEnabled = false;
       } else {
         this.gridOptions.api.hideOverlay();
-        this.buttonsEnabled = true;
       }
     },
 
@@ -551,6 +518,14 @@ export default {
     };
   },
   mounted() {
+    // if (this.list !== [])
+    //   this.rowData = this.buildRowData(this.list);
+    // if (this.gridOptions.api)
+    //   this.gridOptions.api.refreshCells({
+    //     force: true,
+    //     suppressFlash: false
+    //   });
+
     // set the overlay based on the mounted state
     this.manageOverlay();
 
