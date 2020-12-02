@@ -1,17 +1,72 @@
 <template>
   <div>
-    <div v-show="type === 'definedCompound'">
-      <KetcherWindow ref="ketcher" />
+    <div class="row mb-3">
+      <b-form-group
+        label="Record Compound ID:"
+        label-align="left"
+        label-cols="4"
+        label-for="recordCompoundID"
+        class="col"
+      >
+        <b-form-input id="recordCompoundID" :value="cid" disabled />
+      </b-form-group>
+      <b-form-group
+        label="Structure Type:"
+        label-align="left"
+        label-cols="4"
+        label-for="compound-type-dropdown"
+        class="col"
+      >
+        <b-form-select
+          id="compound-type-dropdown"
+          v-model="type"
+          :options="options(type)"
+        >
+          <template #first>
+            <option value="none">None</option>
+            <option value="definedCompound">Defined Compound</option>
+          </template>
+        </b-form-select>
+      </b-form-group>
     </div>
-    <div v-show="type !== 'definedCompound'">
-      <MarvinWindow ref="marvin" />
+    <div v-show="type === 'definedCompound'">
+      <div id="substanceInfoPanel" class="border rounded mb-3">
+        <dl class="row my-1 p-2">
+          <dt class="col-lg-2">Molecular Weight</dt>
+          <dd class="col-lg-4 overflow-auto">{{ molecularWeight }}</dd>
+
+          <dt class="col-lg-2">Molecular Formula</dt>
+          <dd class="col-lg-4 overflow-auto">{{ molecularFormula }}</dd>
+
+          <dt class="col-lg-2">SMILES</dt>
+          <dd class="col-lg-4 overflow-auto">{{ smiles }}</dd>
+
+          <dt class="col-lg-2">Inchikey</dt>
+          <dd class="col-lg-4 overflow-auto">{{ inchikey }}</dd>
+        </dl>
+      </div>
+      <KetcherWindow
+        ref="ketcher"
+        :initial-molfile="initialMolfile"
+        @molfileUpdate="
+          fetchByMolfile($event.molfileV3000);
+          ketcherChanged = $event.changed;
+        "
+      />
+    </div>
+    <div v-show="type !== 'definedCompound' && type !== 'none'">
+      <MarvinWindow
+        :initial-mrvfile="initialMrvfile"
+        ref="marvin"
+        @mrvfileUpdate="marvinChanged = $event.changed"
+      />
     </div>
     <div class="my-3">
       <b-button
         @click="saveCompound(type)"
         variant="primary"
         :disabled="!editorChanged"
-        v-if="editable"
+        v-if="editable && type !== 'none'"
         >Save Compound</b-button
       >
     </div>
@@ -21,6 +76,8 @@
 <script>
 import KetcherWindow from "@/components/KetcherWindow";
 import MarvinWindow from "@/components/MarvinWindow";
+import compoundApi from "@/api/compound";
+import { mapGetters } from "vuex";
 
 export default {
   name: "ChemicalEditors",
@@ -29,24 +86,78 @@ export default {
     MarvinWindow
   },
   props: {
-    type: String,
+    initialCompound: Object,
     editable: Boolean
   },
-  computed: {
-    editorChanged: function() {
-      if (
-        (this.$store.state.compound.illdefinedcompound.changed &&
-          this.type !== "definedCompound") ||
-        (this.$store.state.compound.definedcompound.changed &&
-          this.type === "definedCompound")
-      ) {
-        return true;
+  data() {
+    return {
+      type: "none",
+      definedCompound: {},
+      illDefinedCompound: {},
+      ketcherChanged: false,
+      marvinChanged: false
+    };
+  },
+  watch: {
+    initialCompound: function() {
+      if (!this.initialCompound?.id) this.type = "none";
+      else if (this.initialCompound?.type === "definedCompound") {
+        this.definedCompound = this.initialCompound;
+        this.type = "definedCompound";
+        // Attempt to load the new molfile
+        this.$refs["ketcher"].loadMolfile(this.initialMolfile);
       } else {
-        return false;
+        this.illDefinedCompound = this.initialCompound;
+        this.type = this.illDefinedCompound?.relationships?.queryStructureType?.data?.id;
+        // Attempt to load the new mrvfile
+        this.$refs["marvin"].loadMrvfile(this.initialMrvfile);
       }
+    },
+    editorChanged: function() {
+      this.$emit("change", this.editorChanged);
+    }
+  },
+  computed: {
+    ...mapGetters("queryStructureType", { options: "getOptions" }),
+
+    initialMolfile: function() {
+      return this.initialCompound?.attributes?.molfileV3000 ?? "";
+    },
+    initialMrvfile: function() {
+      return this.initialCompound?.attributes?.mrvfile ?? "<MDocument/>";
+    },
+    molecularWeight: function() {
+      return this.definedCompound?.attributes?.molecularWeight ?? "-";
+    },
+    molecularFormula: function() {
+      return this.definedCompound?.attributes?.molecularFormula ?? "-";
+    },
+    smiles: function() {
+      return this.definedCompound?.attributes?.smiles ?? "-";
+    },
+    inchikey: function() {
+      return this.definedCompound?.attributes?.inchikey ?? "-";
+    },
+    cid: function() {
+      return this.type === "definedCompound"
+        ? this.definedCompound?.id
+        : this.illDefinedCompound?.id;
+    },
+    editorChanged: function() {
+      return (
+        (this.marvinChanged && this.type !== "definedCompound") ||
+        (this.ketcherChanged && this.type === "definedCompound")
+      );
     }
   },
   methods: {
+    async fetchByMolfile(molfile) {
+      if (molfile) {
+        let fetchedCompound = await compoundApi.fetchByMolfile(molfile);
+        if (fetchedCompound) this.definedCompound = fetchedCompound;
+        else this.definedCompound = {};
+      }
+    },
     saveCompound(type) {
       if (type === "definedCompound") {
         this.saveDefinedCompound();
@@ -55,7 +166,6 @@ export default {
       }
     },
     saveDefinedCompound() {
-      let compoundId = this.$store.state.compound.definedcompound.data.id;
       // replace is used to escape "\" so that the JSON is parsable
       let requestBody = {
         type: "definedCompound",
@@ -63,12 +173,12 @@ export default {
           molfileV3000: this.$refs["ketcher"].molfile.replace(/\\/g, "\\\\")
         }
       };
-      if (compoundId) {
+      if (this.cid) {
         // if there is an id, patch the currently loaded defined compound.
         this.$store
           .dispatch("compound/definedcompound/patch", {
-            id: compoundId,
-            body: { ...requestBody, id: compoundId }
+            id: this.cid,
+            body: { ...requestBody, id: this.cid }
           })
           // Handle the errors
           .catch(err => this.handleError(err));
