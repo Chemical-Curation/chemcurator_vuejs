@@ -43,12 +43,18 @@ describe("The substance form", () => {
   });
   it("should validate nonFieldErrors", () => {
     let casrn = valid_casrns[Math.floor(Math.random() * valid_casrns.length)];
+    cy.get("#displayName").type(casrn);
     cy.get("#preferredName").type(casrn);
     cy.get("#casrn").type(casrn);
     cy.get("#qcLevel").select("QC Level 1");
     cy.get("#source").select("Source 1");
     cy.get("#substanceType").select("Substance Type 1");
     cy.get("#save-substance-btn").click();
+    cy.get("[data-cy=alert-box]").should(
+      "contain",
+      `${casrn} is not unique in ['display_name', 'casrn']`
+    );
+    cy.get("#feedback-displayName").contains("not unique");
     cy.get("[data-cy=alert-box]").should(
       "contain",
       `${casrn} is not unique in ['preferred_name', 'casrn']`
@@ -68,6 +74,7 @@ describe("The substance form", () => {
       }
     }).as("post");
     let casrn = valid_casrns[Math.floor(Math.random() * valid_casrns.length)];
+    cy.get("#displayName").type("substance display name");
     cy.get("#preferredName").type("preferred substance name");
     cy.get("#casrn").type(casrn);
     cy.get("#qcLevel").select("QC Level 1");
@@ -79,6 +86,9 @@ describe("The substance form", () => {
       "Substance 'DTXSID502000000' created successfully"
     );
     cy.get("@post").should("have.property", "status", 201);
+    cy.get("@post")
+      .its("request.body.data.attributes.displayName")
+      .should("contain", "substance display name");
     cy.get("@post")
       .its("request.body.data.attributes.preferredName")
       .should("contain", "preferred substance name");
@@ -137,6 +147,7 @@ describe("The substance page anonymous access", () => {
 
     cy.get("#recordCompoundID").should("have.value", "DTXCID302000003");
     cy.get("#id").should("have.value", "DTXSID502000000");
+    cy.get("#displayName").should("have.value", "Display Sample Substance");
     cy.get("#preferredName").should("have.value", "Sample Substance");
     cy.get("#casrn").should("have.value", "1234567-89-5");
     cy.get("#qcLevel").should("have.value", "qc-level-1");
@@ -156,6 +167,7 @@ describe("The substance page anonymous access", () => {
     // below isn't implemented yet
     // cy.get("#recordCompoundID").should("have.value", "DTXCID302000003");
     cy.get("#id").should("have.value", "DTXSID502000000");
+    cy.get("#displayName").should("have.value", "Display Sample Substance");
     cy.get("#preferredName").should("have.value", "Sample Substance");
     cy.get("#casrn").should("have.value", "1234567-89-5");
     cy.get("#qcLevel").should("have.value", "qc-level-1");
@@ -301,13 +313,21 @@ describe("The substance page authenticated access", () => {
 
     // Build assertion info
     let test_data = [
-      { htmlID: "#qcLevel", name: "Deprecated QC Levels", id: "deprecated-qc-levels" },
+      {
+        htmlID: "#qcLevel",
+        name: "Deprecated QC Levels",
+        id: "deprecated-qc-levels"
+      },
       {
         htmlID: "#source",
         name: "Deprecated Source",
         id: "deprecated-source"
       },
-      { htmlID: "#substanceType", name: "Deprecated Substance Type", id: "deprecated-substance-type" }
+      {
+        htmlID: "#substanceType",
+        name: "Deprecated Substance Type",
+        id: "deprecated-substance-type"
+      }
     ];
 
     // Test Dropdowns
@@ -345,6 +365,7 @@ describe("The substance page authenticated access", () => {
       .find("button")
       .eq(3)
       .click();
+    z;
 
     cy.get("iframe[id=ketcher]")
       .its("0.contentDocument.body")
