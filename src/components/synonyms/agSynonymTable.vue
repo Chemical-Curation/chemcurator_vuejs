@@ -35,7 +35,7 @@
         id="synonym-add-button"
         class="ml-1"
         variant="success"
-        :disabled="!substanceId"
+        :disabled="!substanceId || loading"
         @click="addSynonym"
       >
         Add Synonym
