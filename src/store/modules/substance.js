@@ -8,8 +8,8 @@ const defaultDetail = () => {
     id: null,
     type: "",
     attributes: {
-      displayName: null,
       preferredName: null,
+      displayName: null,
       casrn: null,
       description: null,
       privateQCNote: null,
@@ -115,8 +115,8 @@ const getters = {
     let { detail } = state;
     return {
       id: detail.id, // sid
-      displayName: detail.attributes.displayName,
       preferredName: detail.attributes.preferredName,
+      displayName: detail.attributes.displayName,
       casrn: detail.attributes.casrn,
       qcLevel: detail.relationships.qcLevel.data.id,
       source: detail.relationships.source.data.id,

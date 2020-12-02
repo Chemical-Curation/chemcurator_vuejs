@@ -43,8 +43,8 @@ describe("The substance form", () => {
   });
   it("should validate nonFieldErrors", () => {
     let casrn = valid_casrns[Math.floor(Math.random() * valid_casrns.length)];
-    cy.get("#displayName").type(casrn);
     cy.get("#preferredName").type(casrn);
+    cy.get("#displayName").type(casrn);
     cy.get("#casrn").type(casrn);
     cy.get("#qcLevel").select("QC Level 1");
     cy.get("#source").select("Source 1");
@@ -52,14 +52,10 @@ describe("The substance form", () => {
     cy.get("#save-substance-btn").click();
     cy.get("[data-cy=alert-box]").should(
       "contain",
-      `${casrn} is not unique in ['display_name', 'casrn']`
-    );
-    cy.get("#feedback-displayName").contains("not unique");
-    cy.get("[data-cy=alert-box]").should(
-      "contain",
-      `${casrn} is not unique in ['preferred_name', 'casrn']`
+      `${casrn} is not unique in ['preferred_name', 'display_name', 'casrn']`
     );
     cy.get("#feedback-preferredName").contains("not unique");
+    cy.get("#feedback-displayName").contains("not unique");
     cy.get("#feedback-casrn").contains("not unique");
   });
   it("should save valid substance", () => {
@@ -74,8 +70,8 @@ describe("The substance form", () => {
       }
     }).as("post");
     let casrn = valid_casrns[Math.floor(Math.random() * valid_casrns.length)];
-    cy.get("#displayName").type("substance display name");
     cy.get("#preferredName").type("preferred substance name");
+    cy.get("#displayName").type("substance display name");
     cy.get("#casrn").type(casrn);
     cy.get("#qcLevel").select("QC Level 1");
     cy.get("#source").select("Source 1");
@@ -87,11 +83,11 @@ describe("The substance form", () => {
     );
     cy.get("@post").should("have.property", "status", 201);
     cy.get("@post")
-      .its("request.body.data.attributes.displayName")
-      .should("contain", "substance display name");
-    cy.get("@post")
       .its("request.body.data.attributes.preferredName")
       .should("contain", "preferred substance name");
+    cy.get("@post")
+      .its("request.body.data.attributes.displayName")
+      .should("contain", "substance display name");
     cy.get("@post")
       .its("request.body.data.attributes.casrn")
       .should("contain", casrn);
@@ -147,8 +143,8 @@ describe("The substance page anonymous access", () => {
 
     cy.get("#recordCompoundID").should("have.value", "DTXCID302000003");
     cy.get("#id").should("have.value", "DTXSID502000000");
-    cy.get("#displayName").should("have.value", "Display Sample Substance");
     cy.get("#preferredName").should("have.value", "Sample Substance");
+    cy.get("#displayName").should("have.value", "Display Sample Substance");
     cy.get("#casrn").should("have.value", "1234567-89-5");
     cy.get("#qcLevel").should("have.value", "qc-level-1");
     cy.get("#source").should("have.value", "source-1");
@@ -167,8 +163,8 @@ describe("The substance page anonymous access", () => {
     // below isn't implemented yet
     // cy.get("#recordCompoundID").should("have.value", "DTXCID302000003");
     cy.get("#id").should("have.value", "DTXSID502000000");
-    cy.get("#displayName").should("have.value", "Display Sample Substance");
     cy.get("#preferredName").should("have.value", "Sample Substance");
+    cy.get("#displayName").should("have.value", "Display Sample Substance");
     cy.get("#casrn").should("have.value", "1234567-89-5");
     cy.get("#qcLevel").should("have.value", "qc-level-1");
     cy.get("#source").should("have.value", "source-1");

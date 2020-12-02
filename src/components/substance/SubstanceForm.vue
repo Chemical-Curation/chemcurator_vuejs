@@ -67,8 +67,8 @@ export default {
       dropdowns: ["qcLevel", "source", "substanceType"],
       labels: {
         id: "Substance ID:",
-        displayName: "Display Name:",
         preferredName: "Preferred Name:",
+        displayName: "Display Name:",
         casrn: "CAS-RN:",
         description: "Substance Description:",
         privateQCNote: "Private QC Notes:",
@@ -128,8 +128,8 @@ export default {
       return {
         id: { ...clean },
         casrn: { ...clean },
-        displayName: { ...clean },
         preferredName: { ...clean },
+        displayName: { ...clean },
         privateQCNote: { ...clean },
         publicQCNote: { ...clean },
         qcLevel: { ...clean },
@@ -145,8 +145,8 @@ export default {
       let pickAttributes = (...props) => o =>
         props.reduce((a, e) => ({ ...a, [e]: o[e] }), {});
       let attrs = pickAttributes(
-        "displayName",
         "preferredName",
+        "displayName",
         "casrn",
         "description",
         "publicQCNote",
@@ -258,8 +258,6 @@ export default {
           color: "warning",
           dismissCountDown: 5
         });
-        this.$set(this.validationState["displayName"], "state", false);
-        this.$set(this.validationState["displayName"], "message", "not unique");
         // hard-coding this for now as we might need to make some adjustments
         // to the API to get these fields in the response in a cleaner way
         // I think this is the only nonField Error that we have for the moment
@@ -269,6 +267,8 @@ export default {
           "message",
           "not unique"
         );
+        this.$set(this.validationState["displayName"], "state", false);
+        this.$set(this.validationState["displayName"], "message", "not unique");
         this.$set(this.validationState["casrn"], "state", false);
         this.$set(this.validationState["casrn"], "message", "not unique");
       }
