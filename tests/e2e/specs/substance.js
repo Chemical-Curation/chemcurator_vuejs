@@ -365,7 +365,6 @@ describe("The substance page authenticated access", () => {
       .find("button")
       .eq(3)
       .click();
-    z;
 
     cy.get("iframe[id=ketcher]")
       .its("0.contentDocument.body")
