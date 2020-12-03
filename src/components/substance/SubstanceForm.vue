@@ -68,6 +68,7 @@ export default {
       labels: {
         id: "Substance ID:",
         preferredName: "Preferred Name:",
+        displayName: "Display Name:",
         casrn: "CAS-RN:",
         description: "Substance Description:",
         privateQCNote: "Private QC Notes:",
@@ -128,6 +129,7 @@ export default {
         id: { ...clean },
         casrn: { ...clean },
         preferredName: { ...clean },
+        displayName: { ...clean },
         privateQCNote: { ...clean },
         publicQCNote: { ...clean },
         qcLevel: { ...clean },
@@ -144,6 +146,7 @@ export default {
         props.reduce((a, e) => ({ ...a, [e]: o[e] }), {});
       let attrs = pickAttributes(
         "preferredName",
+        "displayName",
         "casrn",
         "description",
         "publicQCNote",
@@ -264,6 +267,8 @@ export default {
           "message",
           "not unique"
         );
+        this.$set(this.validationState["displayName"], "state", false);
+        this.$set(this.validationState["displayName"], "message", "not unique");
         this.$set(this.validationState["casrn"], "state", false);
         this.$set(this.validationState["casrn"], "message", "not unique");
       }
