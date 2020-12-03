@@ -1,5 +1,6 @@
 import router from "@/router";
 import { HTTP } from "../http-common";
+import VueCookies from "vue-cookies";
 
 const state = {
   email: "",
@@ -18,14 +19,24 @@ const getters = {
 
 // actions
 const actions = {
-  fetchUser: async ({ commit }) => {
+  fetchUser: async ({ commit, dispatch }) => {
     await HTTP.get("/login/")
       .then(response => {
         commit("setUser", response.data);
         commit("authenticate", true);
       })
       .catch(() => {
-        commit("authenticate", false);
+        let username = VueCookies.get("username");
+        let password = VueCookies.get("password");
+        if (username && password) {
+          let form = {
+            username: username,
+            password: password
+          };
+          dispatch("login", form);
+        } else {
+          commit("authenticate", false);
+        }
       });
   },
   login: async ({ commit }, { username, password }) => {

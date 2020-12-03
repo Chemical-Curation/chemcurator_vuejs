@@ -301,13 +301,21 @@ describe("The substance page authenticated access", () => {
 
     // Build assertion info
     let test_data = [
-      { htmlID: "#qcLevel", name: "Deprecated QC Levels", id: "deprecated-qc-levels" },
+      {
+        htmlID: "#qcLevel",
+        name: "Deprecated QC Levels",
+        id: "deprecated-qc-levels"
+      },
       {
         htmlID: "#source",
         name: "Deprecated Source",
         id: "deprecated-source"
       },
-      { htmlID: "#substanceType", name: "Deprecated Substance Type", id: "deprecated-substance-type" }
+      {
+        htmlID: "#substanceType",
+        name: "Deprecated Substance Type",
+        id: "deprecated-substance-type"
+      }
     ];
 
     // Test Dropdowns

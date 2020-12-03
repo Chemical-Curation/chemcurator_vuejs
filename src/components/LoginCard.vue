@@ -27,6 +27,15 @@
           v-model="form.password"
         />
       </b-input-group>
+      <b-form-group class="pt-3" id="remember-check">
+        <b-form-checkbox
+          v-model="remember"
+          value="true"
+          unchecked-value="false"
+        >
+          Remember me
+        </b-form-checkbox>
+      </b-form-group>
       <b-button block variant="primary" class="my-3" type="submit"
         >Submit</b-button
       >
@@ -43,16 +52,44 @@ export default {
         username: "",
         password: ""
       },
+      remember: false,
       error: ""
     };
   },
+  watch: {
+    remember: function(newValue) {
+      if (newValue === "false") {
+        this.$cookies.remove("username");
+        this.$cookies.remove("password");
+        this.form.username = "";
+        this.form.password = "";
+      }
+    }
+  },
   methods: {
     onSubmit: function() {
-      this.$store.dispatch("auth/login", this.form).catch(error => {
-        this.error = error.response.data.detail;
-        this.form.password = "";
-        this.$refs["password"].focus();
-      });
+      this.$store
+        .dispatch("auth/login", this.form)
+        .then(() => {
+          if (this.remember) {
+            this.$cookies.set("username", this.form.username);
+            this.$cookies.set("password", this.form.password);
+          }
+        })
+        .catch(error => {
+          this.error = error.response.data.detail;
+          this.form.password = "";
+          this.$refs["password"].focus();
+        });
+    }
+  },
+  mounted() {
+    let username = this.$cookies.get("username");
+    let password = this.$cookies.get("password");
+    if (username && password) {
+      this.form.username = username;
+      this.form.password = password;
+      this.remember = true;
     }
   }
 };

@@ -2,10 +2,12 @@ import Home from "@/views/Home.vue";
 import { createLocalVue, mount } from "@vue/test-utils";
 import BootstrapVue from "bootstrap-vue";
 import Vuex from "vuex";
+import VueCookies from "vue-cookies";
 
 const localVue = createLocalVue();
 localVue.use(BootstrapVue);
 localVue.use(Vuex);
+localVue.use(VueCookies);
 
 // Fake Vuex
 let state = {
