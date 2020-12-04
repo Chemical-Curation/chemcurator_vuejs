@@ -25,13 +25,34 @@ describe("KetcherWindow.vue", () => {
 
   beforeEach(() => {
     state = {
-      compound: {
-        molfile: ""
+      compound: {}
+    };
+
+    let dcState = {
+      data: {
+        attributes: {
+          molfile: ""
+        }
       }
     };
 
     store = new Vuex.Store({
-      state
+      modules: {
+        compound: {
+          namespaced: true,
+          state,
+          modules: {
+            definedcompound: {
+              namespaced: true,
+              state: dcState,
+              actions: {
+                fetchByMolfile: jest.fn(),
+                updateChanged: jest.fn()
+              }
+            }
+          }
+        }
+      }
     });
 
     iframe = document.createElement("iframe");
@@ -48,20 +69,6 @@ describe("KetcherWindow.vue", () => {
     });
   });
 
-  it("updates textarea with molfile", () => {
-    expect(wrapper.find("#ketcher-import-textarea").props().value).toBe("");
-    wrapper.setData({ molfile: sampleMolfile });
-    expect(wrapper.find("#ketcher-import-textarea").props().value).toBe(
-      sampleMolfile
-    );
-  });
-
-  it("loads compound from store", () => {
-    expect(wrapper.vm.compound).toBe("");
-    wrapper.vm.$store.state.compound.molfile = sampleMolfile;
-    expect(wrapper.vm.compound).toBe(sampleMolfile);
-  });
-
   it("updates molfile when ketcher posts a returnMolfile message", async () => {
     // Fake the iframe message and wait for async handling
     window.postMessage({ type: "returnMolfile", molfile: sampleMolfile }, "*");
@@ -70,29 +77,10 @@ describe("KetcherWindow.vue", () => {
     expect(wrapper.vm.molfile).toBe(sampleMolfile);
   });
 
-  it("posts Molfile to iframe when loadMolfile is called", async () => {
-    wrapper.vm.$store.state.compound.molfile = sampleMolfile;
-    const spy = jest.fn();
-    iframe.contentWindow.addEventListener(
-      "message",
-      function(event) {
-        if (event.data.type === "importMolfile") {
-          expect(event.data.molfile).toBe(sampleMolfile);
-          spy();
-        }
-      },
-      false
-    );
-
-    wrapper.vm.loadMolfile();
-
-    //wait for message to be received
-    await new Promise(resolve => setTimeout(resolve, 100));
-    expect(spy).toBeCalled();
-  });
-
   it("requests Molfile from iframe when exportMolfile is called", async () => {
-    expect(wrapper.vm.$store.state.compound.molfile).toBe("");
+    expect(
+      wrapper.vm.$store.state.compound.definedcompound.data.attributes.molfile
+    ).toBe("");
     const spy = jest.fn();
     iframe.contentWindow.addEventListener(
       "message",

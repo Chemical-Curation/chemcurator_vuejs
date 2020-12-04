@@ -1,33 +1,26 @@
 <template>
   <b-navbar toggleable="lg" type="dark" variant="primary" class="shadow mb-2">
-    <component
-      :is="isAuthenticated ? 'router-link' : 'span'"
-      :to="{ name: 'home' }"
-    >
+    <router-link :to="{ name: 'home' }">
       <b-navbar-brand>
         <ChemregLogo color="white" size="35px" />
       </b-navbar-brand>
-    </component>
+    </router-link>
     <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
     <b-collapse id="nav-collapse" is-nav>
       <b-navbar-nav>
         <b-nav-item
           :to="{ name: 'controlled-vocabularies' }"
-          v-if="isAuthenticated"
+          v-if="isAuthenticated && isSuperuser"
           >Vocabularies</b-nav-item
         >
-      </b-navbar-nav>
-      <b-navbar-nav>
-        <b-nav-item :to="{ name: 'about' }" v-if="isAuthenticated"
-          >About</b-nav-item
-        >
+        <b-nav-item :to="{ name: 'substance' }">Substances</b-nav-item>
+        <b-nav-item :to="{ name: 'lists' }">Lists</b-nav-item>
       </b-navbar-nav>
       <b-navbar-nav class="ml-auto">
         <b-form-input
           class="mr-2 search"
           v-model="searchString"
-          v-if="username"
-          placeholder="Search Compounds (cid or inchikey)"
+          placeholder="Search Substances"
           data-cy="search-box"
           @keyup.enter="searchCompound"
         />
@@ -35,7 +28,6 @@
           class="mr-2"
           variant="dark"
           @click="searchCompound"
-          v-if="username"
           :disabled="searchString.length == 0"
           data-cy="search-button"
         >
@@ -46,7 +38,7 @@
         <b-nav-item-dropdown
           name="user-profile"
           right
-          v-if="username"
+          v-if="isAuthenticated"
           data-cy="user-dropdown"
         >
           <template v-slot:button-content>
@@ -77,14 +69,18 @@ export default {
   },
   computed: {
     ...mapState("auth", ["username"]),
-    ...mapGetters("auth", ["isAuthenticated"])
+    ...mapGetters("auth", ["isAuthenticated"]),
+    ...mapGetters("auth", ["isSuperuser"])
   },
   methods: {
     logout: function() {
       this.$store.dispatch("auth/logout");
     },
     searchCompound: function() {
-      this.$store.dispatch("compound/fetchCompound", this.searchString);
+      this.$store.dispatch("substance/substanceSearch", {
+        searchString: this.searchString,
+        push: true
+      });
     }
   },
   components: {

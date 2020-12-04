@@ -1,70 +1,97 @@
 <template>
   <div>
-    <br />
-    <iframe
-      id="ketcher"
-      class="ketcher"
-      data-cy="ketcher"
-      :src="ketcherURL"
-      @load="loadMolfile"
-      width="800"
-      height="600"
-      ref="ketcher"
-      >ketcher</iframe
-    >
-    <b-form-textarea
-      id="ketcher-import-textarea"
-      v-model="molfile"
-      rows="3"
-      max-rows="6"
-      placeholder="Edit the above window to generate a Molfile..."
-      class="mx-auto mt-5"
-      style="width:800px"
-      disabled
-    ></b-form-textarea>
+    <div class="d-flex">
+      <iframe
+        id="ketcher"
+        class="ketcher flex-fill"
+        data-cy="ketcher"
+        :src="ketcherURL"
+        @load="loadMolfile(initialMolfile)"
+        height="600"
+        ref="ketcher"
+        >ketcher</iframe
+      >
+    </div>
   </div>
 </template>
 
 <script>
+import { mapState } from "vuex";
+
 export default {
   name: "KetcherWindow",
+  props: {
+    initialMolfile: String
+  },
   data() {
     return {
       ketcherURL: process.env.VUE_APP_KETCHER_URL,
-      molfile: ""
+      blank:
+        "  0  0  0     0  0            999 V3000\n" +
+        "M  V30 BEGIN CTAB\n" +
+        "M  V30 COUNTS 0 0 0 0 0\n" +
+        "M  V30 BEGIN ATOM\n" +
+        "M  V30 END ATOM\n" +
+        "M  V30 BEGIN BOND\n" +
+        "M  V30 END BOND\n" +
+        "M  V30 END CTAB\n" +
+        "M  END",
+      molfile: "",
+      loadedMolfile: ""
     };
   },
   methods: {
-    loadMolfile: function() {
-      if (this.compound !== "") {
+    loadMolfile: function(molfile) {
+      if (molfile) {
+        this.loadedMolfile = "";
+
         this.ketcherFrame.contentWindow.postMessage(
           {
             type: "importMolfile",
-            molfile: this.compound
+            molfile: molfile
           },
           "*"
         );
-        this.exportMolfile();
-      }
+      } else this.clearMolfile();
     },
     exportMolfile: function() {
       this.ketcherFrame.contentWindow.postMessage(
         { type: "exportMolfile" },
         "*"
       );
+    },
+    clearMolfile: function() {
+      this.ketcherFrame.contentWindow.postMessage(
+        { type: "clearMolfile" },
+        "*"
+      );
+    },
+    removeHeader: function(str) {
+      return str
+        .split("\n")
+        .slice(3, -1)
+        .join("\n");
     }
   },
   computed: {
-    compound: function() {
-      return this.$store.state.compound.molfile;
-    },
+    ...mapState("compound/definedcompound", ["data"]),
     ketcherFrame: function() {
       return this.$refs.ketcher;
+    },
+    molfileChanged: function() {
+      return (
+        this.removeHeader(this.molfile) !==
+          this.removeHeader(this.loadedMolfile) &&
+        this.removeHeader(this.molfile) !== this.blank
+      );
     }
   },
   watch: {
-    compound: function() {
-      this.loadMolfile();
+    molfile: function() {
+      this.$emit("molfileUpdate", {
+        molfileV3000: this.molfile,
+        changed: this.molfileChanged
+      });
     }
   },
   mounted() {
@@ -72,6 +99,7 @@ export default {
       "message",
       event => {
         if (event.data.type === "returnMolfile") {
+          if (!this.loadedMolfile) this.loadedMolfile = event.data.molfile;
           this.molfile = event.data.molfile;
         }
       },

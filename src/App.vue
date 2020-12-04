@@ -22,6 +22,9 @@ export default {
 </script>
 
 <style>
+@import "../node_modules/ag-grid-community/dist/styles/ag-grid.css";
+@import "../node_modules/ag-grid-community/dist/styles/ag-theme-alpine.css";
+
 body {
   background-color: #f0f0f0;
 }
@@ -33,7 +36,6 @@ h1 {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  text-align: center;
 }
 .slide-enter-active,
 .slide-leave-active {

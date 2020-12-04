@@ -21,8 +21,12 @@ export default {
     return {
       sourceTableFields: [
         {
-          key: "attributes.label",
+          key: "attributes.name",
           label: "Name"
+        },
+        {
+          key: "attributes.label",
+          label: "Label"
         },
         {
           key: "attributes.shortDescription",

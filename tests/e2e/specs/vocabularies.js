@@ -99,9 +99,6 @@ describe("The vocabularies page", () => {
     cy.adminLogin();
     cy.visit("/vocabularies");
   });
-  it("should have title", () => {
-    cy.contains("h1", "Controlled Vocabularies");
-  });
   it("should load all types", () => {
     cy.wrap(TYPES).each(type => {
       cy.server();
@@ -115,6 +112,7 @@ describe("The vocabularies page", () => {
           cy.get("#vocabulary-list-table").contains(
             type.response.data[0].attributes.label
           );
+          cy.contains("h1", type.text);
         });
     });
   });

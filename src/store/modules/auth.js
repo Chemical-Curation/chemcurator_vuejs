@@ -5,31 +5,27 @@ const state = {
   email: "",
   firstName: "",
   lastName: "",
-  username: ""
+  username: "",
+  is_superuser: "",
+  authenticated: false
 };
 
 // getters
 const getters = {
-  isAuthenticated: state => !(state.username === "")
+  isAuthenticated: state => state.authenticated,
+  isSuperuser: state => state.is_superuser === true
 };
 
 // actions
 const actions = {
-  fetchUser: async ({ commit, dispatch }) => {
+  fetchUser: async ({ commit }) => {
     await HTTP.get("/login/")
-      .then(response => commit("setUser", response.data))
+      .then(response => {
+        commit("setUser", response.data);
+        commit("authenticate", true);
+      })
       .catch(() => {
-        const b = state.username.length === 0;
-        const alert = {
-          message: b
-            ? "Please log in..."
-            : `${state.username}, you are no longer logged in!`,
-          color: b ? "success" : "danger",
-          dismissCountDown: 4
-        };
-        commit("setUser", {});
-        router.push("login");
-        dispatch("alert/alert", alert, { root: true });
+        commit("authenticate", false);
       });
   },
   login: async ({ commit }, { username, password }) => {
@@ -37,11 +33,15 @@ const actions = {
       "/login/",
       {},
       {
-        auth: { username: username, password: password }
+        auth: {
+          username: username,
+          password: password
+        }
       }
     );
     commit("setUser", response.data);
-    router.push("/");
+    commit("authenticate", true);
+    router.push("/").catch(() => {});
   },
   logout: async ({ commit, dispatch }) => {
     const alert = {
@@ -52,13 +52,27 @@ const actions = {
     await HTTP.delete("/login/")
       .then(() => {
         commit("setUser", {});
-        router.push("login");
-        dispatch("alert/alert", alert, { root: true });
+        commit("authenticate", false);
+        router
+          .push({
+            name: "home"
+          })
+          .catch(() => {});
+        dispatch("alert/alert", alert, {
+          root: true
+        });
       })
       .catch(() => {
         commit("setUser", {});
-        router.push("login");
-        dispatch("alert/alert", alert, { root: true });
+        commit("authenticate", false);
+        router
+          .push({
+            name: "home"
+          })
+          .catch(() => {});
+        dispatch("alert/alert", alert, {
+          root: true
+        });
       });
   }
 };
@@ -70,6 +84,10 @@ const mutations = {
     state.firstName = user.first_name || "";
     state.lastName = user.last_name || "";
     state.username = user.username || "";
+    state.is_superuser = user.is_superuser || "";
+  },
+  authenticate(state, authenticated) {
+    state.authenticated = authenticated;
   }
 };
 

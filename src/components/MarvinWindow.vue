@@ -1,101 +1,99 @@
 <template>
   <div>
-    <br />
-    <iframe id="marvin" class="marvin" data-cy="marvin" v-bind:src="marvinURL"
-      >marvin</iframe
-    >
-    <br />
-    <b-button
-      variant="secondary"
-      v-on:click="exportMrvfile"
-      style="width:800px"
-      id="marvin-export-button"
-    >
-      <b-icon-file-arrow-down></b-icon-file-arrow-down>Export
-    </b-button>
-    <b-form-textarea
-      id="marvin-import-textarea"
-      v-model="mrvfile"
-      rows="3"
-      max-rows="6"
-      placeholder="Paste mrvfile to import..."
-      class="mx-auto mt-5"
-      style="width:800px"
-    ></b-form-textarea>
-    <b-button
-      variant="primary"
-      v-on:click="importMrvfile"
-      class="mt-2"
-      style="width:800px"
-      id="marvin-import-button"
-    >
-      <b-icon-file-arrow-up></b-icon-file-arrow-up>Import
-    </b-button>
+    <div class="d-flex">
+      <iframe
+        id="marvin"
+        class="marvin flex-fill"
+        data-cy="marvin"
+        v-bind:src="marvinURL"
+        ref="marvin"
+      >
+        marvin
+      </iframe>
+    </div>
   </div>
 </template>
 
 <script>
+// import { mapState } from "vuex";
+
 export default {
   name: "MarvinWindow",
+  props: {
+    initialMrvfile: String
+  },
   data() {
     return {
       marvinURL: process.env.VUE_APP_MARVIN_URL + "/editorws.html",
-      mrvfile: ""
+      localMrvfile: "",
+      blankMrvfile: "<MDocument/>",
+      loadedMrvfile: "<MDocument/>"
     };
   },
   methods: {
-    importMrvfile: function() {
-      document
-        .getElementById("marvin")
-        .contentWindow.postMessage(
-          { type: "importMrvfile", mrvfile: this.mrvfile },
-          "*"
-        );
-    },
-    loadMrvfile: function() {
-      document.getElementById("marvin").contentWindow.postMessage(
+    loadMrvfile: function(mrvfile) {
+      this.loadedMrvfile = "";
+      this.marvinFrame.contentWindow.postMessage(
         {
           type: "importMrvfile",
-          mrvfile: this.$store.state.compound.mrvfile
+          mrvfile: mrvfile
         },
         "*"
       );
-      this.exportMrvfile();
     },
     exportMrvfile: function() {
-      document
-        .getElementById("marvin")
-        .contentWindow.postMessage({ type: "exportMrvfile" }, "*");
-    }
-  },
-  computed: {
-    compound: function() {
-      return this.$store.state.compound.mrvfile;
+      this.marvinFrame.contentWindow.postMessage(
+        { type: "exportMrvfile" },
+        "*"
+      );
+    },
+    clearMarvin: function() {
+      this.marvinFrame.contentWindow.postMessage({ type: "clearMrvfile" }, "*");
+    },
+    marvinMessageListeners: function(event) {
+      if (event.data.type === "returnMrvfile") {
+        if (!this.loadedMrvfile) {
+          this.loadedMrvfile = event.data.mrvfile;
+        }
+        this.localMrvfile = event.data.mrvfile;
+      }
+      if (event.data === "marvinLoaded") {
+        this.loadMrvfile(this.initialMrvfile);
+      }
+    },
+    removeTags: function(str) {
+      let serializer = new XMLSerializer();
+      let tree = new window.DOMParser().parseFromString(str, "text/xml");
+      let node = tree.getElementsByTagName("MDocument")[0];
+      return serializer.serializeToString(node);
     }
   },
   watch: {
-    compound: function() {
-      this.loadMrvfile();
+    localMrvfile: function() {
+      // Save the external mrvfile to the local vue instance
+      this.$emit("mrvfileUpdate", {
+        mrvfile: this.localMrvfile,
+        changed: this.mrvfileChanged
+      });
     }
   },
-  mounted() {
-    let self = this;
-    window.addEventListener(
-      "message",
-      function(event) {
-        if (
-          event.data === "marvinLoaded" &&
-          self.$store.state.compound.mrvfile
-        ) {
-          self.loadMrvfile();
-        }
-        if (event.data.type == "returnMrvfile") {
-          self.mrvfile = event.data.mrvfile;
-          this.mrvfile = self.$store.state.compound.mrvfile;
-        }
-      },
-      false
-    );
+  computed: {
+    marvinFrame: function() {
+      return this.$refs.marvin;
+    },
+    mrvfileChanged: function() {
+      return (
+        this.removeTags(this.localMrvfile) !==
+          this.removeTags(this.loadedMrvfile) &&
+        this.removeTags(this.localMrvfile) !== this.blankMrvfile
+      );
+    }
+  },
+  beforeMount() {
+    window.addEventListener("message", this.marvinMessageListeners, false);
+  },
+  destroyed() {
+    window.removeEventListener("message", this.marvinMessageListeners);
   }
 };
 </script>
@@ -103,7 +101,6 @@ export default {
 <style scoped>
 #marvin {
   overflow: hidden;
-  width: 800px;
   height: 600px;
 }
 </style>

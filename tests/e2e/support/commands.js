@@ -21,6 +21,19 @@ Cypress.Commands.add("adminLogin", () => {
     }
   });
 });
+
+Cypress.Commands.add("nonAdminLogin", () => {
+  cy.request({
+    method: "POST",
+    url: Cypress.env("VUE_APP_API_URL") + "/login/",
+    auth: {
+      user: Cypress.env("VUE_APP_TEST_USER"),
+      pass: Cypress.env("VUE_APP_TEST_PASS"),
+      sendImmediately: true
+    }
+  });
+});
+
 //
 //
 // -- This is a child command --
