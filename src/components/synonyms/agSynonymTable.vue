@@ -12,7 +12,7 @@
       :rowData="rowData"
       :gridOptions="gridOptions"
       :rowClassRules="rowClassRules"
-      @selection-changed="getSelectedError"
+      @row-selected="onRowSelected"
       rowSelection="single"
     />
     <div v-show="selectedError" class="mt-3 text-left">
@@ -31,6 +31,15 @@
         :disabled="!buttonsEnabled"
         >Reset</b-button
       >
+      <b-button
+        id="synonym-add-button"
+        class="ml-1"
+        variant="success"
+        :disabled="!substanceId || loading"
+        @click="addSynonym"
+      >
+        Add Synonym
+      </b-button>
       <b-button
         id="synonym-save-button"
         class="ml-1"
@@ -52,6 +61,7 @@ import {
   MappableCellRenderer,
   SelectObjectCellEditor
 } from "@/ag-grid-components/custom-renderers";
+import { HTTP } from "@/store/http-common";
 
 export default {
   name: "agSynonymTable",
@@ -68,7 +78,6 @@ export default {
     ...mapGetters("synonymQuality", { qualityListOptions: "getOptions" }),
     ...mapGetters("source", { sourceListOptions: "getOptions" }),
     ...mapGetters("synonymType", { typeListOptions: "getOptions" }),
-    ...mapState("synonym", ["list", "loading"]),
     ...mapState("source", { sourceList: "list" }),
     ...mapState("synonymQuality", { qualityList: "list" }),
     ...mapState("synonymType", { typeList: "list" }),
@@ -78,10 +87,10 @@ export default {
      */
     columnDefs: function() {
       return [
-        { headerName: "Identifier", field: "attributes.identifier" },
+        { headerName: "Identifier", field: "data.identifier" },
         {
           headerName: "Source",
-          field: "relationships.source.data.id",
+          field: "data.source",
           comparator: this.sourceMapCompare,
           cellRenderer: "mappableCellRenderer",
           cellRendererParams: {
@@ -95,7 +104,7 @@ export default {
         },
         {
           headerName: "Quality",
-          field: "relationships.synonymQuality.data.id",
+          field: "data.synonymQuality",
           comparator: this.qualityMapCompare,
           cellRenderer: "mappableCellRenderer",
           cellRendererParams: {
@@ -111,7 +120,7 @@ export default {
         },
         {
           headerName: "Type",
-          field: "relationships.synonymType.data.id",
+          field: "data.synonymType",
           comparator: this.typeMapCompare,
           cellRenderer: "mappableCellRenderer",
           cellRendererParams: {
@@ -125,7 +134,7 @@ export default {
         },
         {
           headerName: "QC Notes",
-          field: "attributes.qcNotes",
+          field: "data.qcNotes",
           cellEditor: "agLargeTextCellEditor"
         }
       ];
@@ -136,20 +145,30 @@ export default {
      */
     rowClassRules: function() {
       return {
-        // background danger any rows where the id is within the errorRows object
+        // background danger any rows have errors
         "bg-danger": params => {
-          return this.errorRows.hasOwnProperty(params.data.id);
+          return params.data.errors;
+        },
+        // background info any rows where there is no id
+        "new-ag-row": params => {
+          // new-ag-row is currently an unscoped style.
+          // It naturally takes a position below ag-grid's row style
+          // and thus needs an important tag.
+          return params.data.created && !params.data.errors;
         }
       };
     },
 
     /**
-     * Synonym objects to be looked up by id.  (used to verify changes)
+     * Checks for any row additions/edits and returns a bool
+     *
+     * @return {boolean} - True if any row has changed, false if not.
      */
-    synonymListMap: function() {
-      let map = {};
-      for (let synonym of this.list) map[synonym.id] = synonym;
-      return map;
+    buttonsEnabled: function() {
+      for (let row of this.rowData) {
+        if (!_.isEqual(row.data, row.initialData) || row.created) return true;
+      }
+      return false;
     },
 
     /**
@@ -181,15 +200,10 @@ export default {
   },
   data() {
     return {
-      originalData: null,
-      rowData: null,
+      rowData: [],
       defaultColDef: null,
       gridOptions: null,
-      // Whether the save / reset buttons are enabled
-      buttonsEnabled: false,
-      // Rows that returned errors on save
-      errorRows: {},
-      // Currently selected error row.  Null if no errors
+      loading: false,
       selectedError: null,
       // Display options for error table.
       errorFields: [{ label: "Errors", key: "detail" }]
@@ -197,17 +211,10 @@ export default {
   },
   watch: {
     /**
-     * Resets row data on Synonym List update
-     */
-    list: function() {
-      this.resetRowData();
-    },
-
-    /**
      * Loads the synonyms for the currently loaded substance
      */
     substanceId: function() {
-      if (this.substanceId) this.loadSynonyms();
+      this.loadSynonyms(this.substanceId);
     },
 
     /**
@@ -219,21 +226,174 @@ export default {
   },
   methods: {
     ...mapActions("alert", ["alert"]),
-    ...mapActions("synonym", ["getList", "patch"]),
+    ...mapActions("synonym", ["getList", "patch", "post"]),
     ...mapActions("synonymQuality", { loadQualityList: "getList" }),
     ...mapActions("synonymType", { loadTypeList: "getList" }),
     ...mapActions("source", { loadSourceList: "getList" }),
+
+    /**
+     * Adds an alert to the page and scrolls the user to the top of the page
+     * so they can see it.
+     */
+    addAlert(message, color) {
+      this.alert({
+        message: message,
+        color: color,
+        dismissCountDown: 15
+      });
+      window.scrollTo(0, 0);
+    },
+
+    /**
+     * Sets this.selectedError to the currently selected row.
+     */
+    onRowSelected: function(event) {
+      if (event.node.isSelected()) {
+        this.selectedError = event.data.errors;
+      }
+    },
+
+    /**
+     * Clears the selected row.
+     */
+    clearSelected: function() {
+      this.gridOptions.api.deselectAll();
+      this.selectedError = null;
+    },
 
     /**
      * Resets the row data to whatever is in the synonym store.
      * (the synonym store should never be updated by this table)
      */
     resetRowData: function() {
-      this.rowData = _.cloneDeep(this.list);
+      this.clearSelected();
+
+      // Reset created rows
+      this.rowData = this.rowData.filter(row => {
+        return !row.created;
+      });
+
+      // Reset modified rows
+      for (let row of this.rowData) {
+        row.data = { ...row.initialData };
+      }
+
       this.gridOptions.api.refreshCells({
         force: true,
         suppressFlash: false
       });
+    },
+
+    /**
+     * Rebuilds rowData with a provided array of jsonapi compliant synonyms
+     *
+     * @param synonyms {array} - Array of jsonapi Synonym objects
+     * @returns {array} - Array of agGrid rowData nodes.
+     */
+    buildRowData: function(synonyms) {
+      let rowData = [];
+      let data;
+
+      for (let synonym of synonyms) {
+        data = {
+          identifier: synonym.attributes.identifier,
+          qcNotes: synonym.attributes.qcNotes,
+          synonymType: synonym.relationships.synonymType.data.id,
+          synonymQuality: synonym.relationships.synonymQuality.data.id,
+          source: synonym.relationships.source.data.id
+        };
+
+        rowData.push({
+          id: synonym.id,
+          data: { ...data },
+          initialData: { ...data },
+          errors: null,
+          created: false
+        });
+      }
+
+      return rowData;
+    },
+
+    /**
+     * Adds a new synonym to this.rowData
+     */
+    addSynonym: function() {
+      if (!this.substanceId) {
+        this.addAlert("Please load a substance", "warning");
+        return;
+      }
+
+      let data = {
+        identifier: "",
+        qcNotes: "",
+        synonymType: null,
+        synonymQuality: null,
+        source: null
+      };
+
+      this.rowData.push({
+        id: null,
+        data: { ...data },
+        initialData: { ...data },
+        errors: null,
+        created: true
+      });
+    },
+
+    /**
+     * Loops through all rows, checks for changes, and returns promises
+     * to attempt to update each changed row.
+     *
+     * @returns {Array} - Array of promises corresponding to each updated/created row
+     */
+    buildSaveRequests: function() {
+      let responses = [];
+
+      for (let row of this.rowData) {
+        // Clear previous errors
+        row.errors = null;
+        if (!_.isEqual(row.data, row.initialData)) {
+          responses.push(this.saveRequest(row));
+        }
+      }
+
+      return responses;
+    },
+
+    /**
+     * Builds an update/save request for a single row
+     *
+     * @param row {obj} - rowData object
+     * @returns {Promise} - API request for a single row.
+     *    - On success the row will have created set to false and
+     *      initialData updated to reflect the current data.
+     *    - On failure the errors will be added to the row.
+     */
+    saveRequest: function(row) {
+      // Local functions to deal with successful saves and failures
+      function onSuccess(res) {
+        row.created = false;
+        row.initialData = { ...row.data };
+        return res;
+      }
+
+      function onFailure(err) {
+        row.errors = err.response.data.errors;
+        return {
+          failed: true
+        };
+      }
+
+      let requestBody = this.buildRequestBody(row.data);
+
+      return row.created
+        ? this.post(requestBody)
+            .then(onSuccess)
+            .catch(onFailure)
+        : this.patch({ id: row.id, body: { ...requestBody, id: row.id } })
+            .then(onSuccess)
+            .catch(onFailure);
     },
 
     /**
@@ -250,84 +410,53 @@ export default {
      */
     save: async function() {
       if (!this.editable) {
-        this.alert({
-          message: "This table cannot be edited",
-          color: "warning",
-          dismissCountDown: 15
-        });
-        window.scrollTo(0, 0);
+        this.addAlert("This table cannot be edited", "warning");
         return;
       }
+
+      // Clear selection for the sake of reloading error table
+      this.clearSelected();
 
       // Stop editing (if a dropdown is selected but has not blurred,
       //               those changes should be considered valid)
       this.gridOptions.api.stopEditing();
-      // Responses is an array of promises from the patch requests.
+
+      // Responses is an array of promises from the saved requests.
       // We need these all to finish before we can proceed.
-      let responses = [];
+      let responses = this.buildSaveRequests(this.rowData);
 
-      this.selectedError = null;
-
-      for (let row of this.rowData) {
-        if (!_.isEqual(row, this.synonymListMap[row.id])) {
-          // Patch this object and save the response to the response promise array.
-          // If the patch fails, catch the failure and return information regarding why.
-          responses.push(
-            this.patch({ id: row.id, body: row }).catch(err => {
-              return {
-                failed: true,
-                body: row,
-                errors: err.response.data.errors
-              };
-            })
-          );
-        }
-      }
-
-      // Wait for all patches to finish
+      // Wait for all save requests to finish
       await Promise.allSettled(responses).then(responses => {
         // Find failures
         let rejected = responses.filter(obj => {
           return obj.value.failed;
         });
-        this.errorRows = {};
-        // If there are none,
-        if (rejected.length === 0) {
-          // update the user with the success
-          this.alert({
-            message: "All synonyms saved successfully",
-            color: "success",
-            dismissCountDown: 15
-          });
-        }
-        // if there are errors
-        else {
-          // Update error rows object with an { id: error }
-          for (let reject of rejected) {
-            this.errorRows[reject.value.body.id] = reject.value.errors;
-          }
-          // Alert the user that some errors happened
-          this.alert({
-            message: "Some synonyms could not be saved",
-            color: "warning",
-            dismissCountDown: 15
-          });
-        }
-      });
-      // scroll to the top of the page so the user sees the alert
-      window.scrollTo(0, 0);
 
-      // Reload the updated data from the DB.
-      this.loadSynonyms();
+        rejected.length === 0
+          ? this.addAlert("All synonyms saved successfully", "success")
+          : this.addAlert("Some synonyms could not be saved", "warning");
+      });
+
+      // Redraw rows to render error rows
+      this.gridOptions.api.redrawRows();
     },
 
     /**
      * Loads synonyms by substance id.
      */
-    loadSynonyms: function() {
-      this.getList({
-        params: [{ key: "filter[substance.id]", value: this.substanceId }]
-      });
+    loadSynonyms: async function(substanceId) {
+      this.loading = true;
+
+      let synonyms = [];
+      if (substanceId)
+        synonyms = await HTTP.get(
+          `/synonyms?filter[substance.id]=${substanceId}`
+        ).then(response => {
+          return response.data.data;
+        });
+
+      this.loading = false;
+      this.rowData = this.buildRowData(synonyms);
     },
 
     /**
@@ -337,22 +466,42 @@ export default {
     manageOverlay: function() {
       if (this.loading) {
         this.gridOptions.api.showLoadingOverlay();
-        this.buttonsEnabled = false;
-      } else if (!this.loading && _.isEqual(this.list, [])) {
+      } else if (!this.loading && _.isEqual(this.rowData, [])) {
         this.gridOptions.api.showNoRowsOverlay();
-        this.buttonsEnabled = false;
       } else {
         this.gridOptions.api.hideOverlay();
-        this.buttonsEnabled = true;
       }
     },
 
     /**
-     * Sets the selected error to the selected row's error.  Otherwise returns null
+     * Transforms rowData.data into a jsonapi compliant body.
+     *
+     * @param data - rowData.data object
+     * @returns {obj} - Jsonapi formatted create request body
      */
-    getSelectedError: function() {
-      this.selectedError =
-        this.errorRows[this.gridOptions.api.getSelectedRows()[0].id] ?? null;
+    buildRequestBody: function(data) {
+      let requestBody = {
+        type: "synonym",
+        attributes: {
+          identifier: data.identifier,
+          qcNotes: data.qcNotes
+        },
+        relationships: {
+          substance: {
+            data: {
+              id: this.substanceId,
+              type: "substance"
+            }
+          }
+        }
+      };
+      for (let relationship of ["source", "synonymType", "synonymQuality"]) {
+        if (data[relationship])
+          requestBody["relationships"][relationship] = {
+            data: { type: relationship, id: data[relationship] }
+          };
+      }
+      return requestBody;
     },
 
     /**
@@ -415,6 +564,13 @@ export default {
     };
   },
   mounted() {
+    this.loadSynonyms(this.substanceId);
+    if (this.gridOptions.api)
+      this.gridOptions.api.refreshCells({
+        force: true,
+        suppressFlash: false
+      });
+
     // set the overlay based on the mounted state
     this.manageOverlay();
 
@@ -428,4 +584,8 @@ export default {
 };
 </script>
 
-<style scoped></style>
+<style>
+.ag-row.new-ag-row {
+  background-color: #def2ff !important;
+}
+</style>
