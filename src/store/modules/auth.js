@@ -52,7 +52,8 @@ const actions = {
     );
     commit("setUser", response.data);
     commit("authenticate", true);
-    router.push("/").catch(() => {});
+    router.push(sessionStorage.getItem('redirectPath') || "/").catch(() => {});
+    sessionStorage.removeItem('redirectPath');
   },
   logout: async ({ commit, dispatch }) => {
     const alert = {
@@ -64,6 +65,8 @@ const actions = {
       .then(() => {
         commit("setUser", {});
         commit("authenticate", false);
+        VueCookies.remove("username");
+        VueCookies.remove("password");
         router
           .push({
             name: "home"

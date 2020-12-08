@@ -52,6 +52,7 @@ const router = new VueRouter({
 
 router.beforeEach(async (to, from, next) => {
   // validate and wait for every navigation.  This should probably be done in the background
+  sessionStorage.setItem('redirectPath', to.path);
   await store.dispatch("auth/fetchUser");
   if (to.meta.requiresAuth) {
     if (to.meta.requiresSuperuser && !store.getters["auth/isSuperuser"]) {
