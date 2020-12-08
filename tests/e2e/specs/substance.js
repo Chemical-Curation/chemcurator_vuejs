@@ -160,8 +160,7 @@ describe("The substance page anonymous access", () => {
   it("should load the substance form from tree", () => {
     // Search
     cy.get("#DTXSID502000000").click({ force: true });
-    // below isn't implemented yet
-    // cy.get("#recordCompoundID").should("have.value", "DTXCID302000003");
+    cy.get("#recordCompoundID").should("have.value", "DTXCID302000003");
     cy.get("#id").should("have.value", "DTXSID502000000");
     cy.get("#preferredName").should("have.value", "Sample Substance");
     cy.get("#displayName").should("have.value", "Display Sample Substance");
