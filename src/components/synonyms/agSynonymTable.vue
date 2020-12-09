@@ -12,6 +12,7 @@
       :rowData="rowData"
       :gridOptions="gridOptions"
       :rowClassRules="rowClassRules"
+      :frameworkComponents="frameworkComponents"
       @row-selected="onRowSelected"
       rowSelection="single"
     />
@@ -60,7 +61,8 @@ import { AgGridVue } from "ag-grid-vue";
 import {
   MappableCellRenderer,
   SelectObjectCellEditor
-} from "@/ag-grid-components/custom-renderers";
+} from "@/components/ag-grid/custom-renderers";
+import BtnCellRenderer from "@/components/ag-grid/BtnCellRenderer"
 import { HTTP } from "@/store/http-common";
 
 export default {
@@ -136,6 +138,15 @@ export default {
           headerName: "QC Notes",
           field: "data.qcNotes",
           cellEditor: "agLargeTextCellEditor"
+        },
+        {
+          field: "data",
+          cellRenderer: "btnCellRenderer",
+          cellRendererParams: {
+            clicked: function(value) {
+              console.log(value);
+            }
+          },
         }
       ];
     },
@@ -205,6 +216,7 @@ export default {
       gridOptions: null,
       loading: false,
       selectedError: null,
+      frameworkComponents: null,
       // Display options for error table.
       errorFields: [{ label: "Errors", key: "detail" }]
     };
@@ -249,6 +261,7 @@ export default {
      */
     onRowSelected: function(event) {
       if (event.node.isSelected()) {
+        // todo: load pointer values
         this.selectedError = event.data.errors;
       }
     },
@@ -554,6 +567,9 @@ export default {
         selectObjectCellEditor: SelectObjectCellEditor
       }
     };
+    this.frameworkComponents = {
+      btnCellRenderer: BtnCellRenderer
+    }
 
     // Load grid styling
     this.defaultColDef = {

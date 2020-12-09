@@ -22,7 +22,7 @@ import { AgGridVue } from "ag-grid-vue";
 import {
   MappableCellRenderer,
   SelectObjectCellEditor
-} from "@/ag-grid-components/custom-renderers";
+} from "@/components/ag-grid/custom-renderers";
 
 export default {
   name: "agSubstanceRelationshipTable",
