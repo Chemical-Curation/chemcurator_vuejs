@@ -41,15 +41,6 @@
       >
         Add Synonym
       </b-button>
-      <b-button
-        id="synonym-save-button"
-        class="ml-1"
-        variant="primary"
-        @click="save"
-        :disabled="!buttonsEnabled"
-      >
-        Save Synonyms
-      </b-button>
     </div>
   </div>
 </template>
@@ -141,6 +132,7 @@ export default {
         },
       ];
       if (this.editable){
+        // Add the save button
         colDefs.push({
           flex: 0,
           width: 75,
@@ -314,6 +306,7 @@ export default {
      * Rebuilds rowData with a provided array of jsonapi compliant synonyms
      *
      * @param synonyms {array} - Array of jsonapi Synonym objects
+     * // todo: explain jsonapi synonym object
      * @returns {array} - Array of agGrid rowData nodes.
      */
     buildRowData: function(synonyms) {
@@ -321,6 +314,7 @@ export default {
       let data;
 
       for (let synonym of synonyms) {
+        // todo: make "toRowData" function
         data = {
           identifier: synonym.attributes.identifier,
           qcNotes: synonym.attributes.qcNotes,
@@ -350,6 +344,7 @@ export default {
         return;
       }
 
+      // todo: make "toRowData" function
       let data = {
         identifier: "",
         qcNotes: "",
@@ -428,57 +423,13 @@ export default {
     },
 
     /**
-     * Saves all updated rows.
-     *
-     * If all rows update correctly alerts the user with a success prompt.
-     *
-     * If some rows fail to update, those object ids are added to an object.
-     * with their error details.  The app can then display those errors when
-     * the failing row is selected
-     *
-     * todo: This function is asynchronous.  If we had a loading overlay it would
-     * work well here.
-     */
-    save: async function() {
-      if (!this.editable) {
-        this.addAlert("This table cannot be edited", "warning");
-        return;
-      }
-
-      // Clear selection for the sake of reloading error table
-      this.clearSelected();
-
-      // Stop editing (if a dropdown is selected but has not blurred,
-      //               those changes should be considered valid)
-      this.gridOptions.api.stopEditing();
-
-      // Responses is an array of promises from the saved requests.
-      // We need these all to finish before we can proceed.
-      let responses = this.buildSaveRequests(this.rowData);
-
-      // Wait for all save requests to finish
-      await Promise.allSettled(responses).then(responses => {
-        // Find failures
-        let rejected = responses.filter(obj => {
-          return obj.value.failed;
-        });
-
-        rejected.length === 0
-          ? this.addAlert("All synonyms saved successfully", "success")
-          : this.addAlert("Some synonyms could not be saved", "warning");
-      });
-
-      // Redraw rows to render error rows
-      this.gridOptions.api.redrawRows();
-    },
-
-    /**
      * Loads synonyms by substance id.
      */
     loadSynonyms: async function(substanceId) {
       this.loading = true;
 
       let synonyms = [];
+      // TODO: Move to api
       if (substanceId)
         synonyms = await HTTP.get(
           `/synonyms?filter[substance.id]=${substanceId}`
