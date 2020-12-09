@@ -16,7 +16,7 @@
     name: "BtnCellRenderer",
     methods: {
       btnClickedHandler() {
-        this.params.clicked(this.params.value);
+        this.params.clicked(this.params.data);
       }
     }
   });

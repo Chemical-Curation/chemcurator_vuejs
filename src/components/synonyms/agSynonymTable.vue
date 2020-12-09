@@ -88,7 +88,7 @@ export default {
      * Defines the columns to be used in ag grid table
      */
     columnDefs: function() {
-      return [
+      let colDefs = [
         { headerName: "Identifier", field: "data.identifier" },
         {
           headerName: "Source",
@@ -139,16 +139,23 @@ export default {
           field: "data.qcNotes",
           cellEditor: "agLargeTextCellEditor"
         },
-        {
-          field: "data",
+      ];
+      if (this.editable){
+        colDefs.push({
+          flex: 0,
+          width: 75,
+          resizable: false,
+          sortable: false,
+          editable: false,
+          headerName: "",
+          type: 'rightAligned',
           cellRenderer: "btnCellRenderer",
           cellRendererParams: {
-            clicked: function(value) {
-              console.log(value);
-            }
+            clicked: this.saveRow,
           },
-        }
-      ];
+        })
+      }
+      return colDefs
     },
 
     /**
@@ -169,6 +176,13 @@ export default {
         }
       };
     },
+
+    selectedError: function() {
+      if (this.selectedRow)
+        return this.selectedRow.errors
+      return null
+    },
+
 
     /**
      * Checks for any row additions/edits and returns a bool
@@ -215,7 +229,7 @@ export default {
       defaultColDef: null,
       gridOptions: null,
       loading: false,
-      selectedError: null,
+      selectedRow: null,
       frameworkComponents: null,
       // Display options for error table.
       errorFields: [{ label: "Errors", key: "detail" }]
@@ -261,8 +275,7 @@ export default {
      */
     onRowSelected: function(event) {
       if (event.node.isSelected()) {
-        // todo: load pointer values
-        this.selectedError = event.data.errors;
+        this.selectedRow = event.data;
       }
     },
 
@@ -271,7 +284,6 @@ export default {
      */
     clearSelected: function() {
       this.gridOptions.api.deselectAll();
-      this.selectedError = null;
     },
 
     /**
@@ -289,6 +301,7 @@ export default {
       // Reset modified rows
       for (let row of this.rowData) {
         row.data = { ...row.initialData };
+        row.errors = null
       }
 
       this.gridOptions.api.refreshCells({
@@ -365,7 +378,6 @@ export default {
 
       for (let row of this.rowData) {
         // Clear previous errors
-        row.errors = null;
         if (!_.isEqual(row.data, row.initialData)) {
           responses.push(this.saveRequest(row));
         }
@@ -388,6 +400,7 @@ export default {
       function onSuccess(res) {
         row.created = false;
         row.initialData = { ...row.data };
+        row.errors = null;
         return res;
       }
 
@@ -407,6 +420,11 @@ export default {
         : this.patch({ id: row.id, body: { ...requestBody, id: row.id } })
             .then(onSuccess)
             .catch(onFailure);
+    },
+
+    saveRow: async function(row) {
+      await this.saveRequest(row)
+      this.gridOptions.api.redrawRows()
     },
 
     /**
