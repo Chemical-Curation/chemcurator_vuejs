@@ -5,7 +5,7 @@ import router from "@/router";
 
 const defaultDetail = () => {
   return {
-    id: null,
+    id: "",
     type: "",
     attributes: {
       preferredName: null,

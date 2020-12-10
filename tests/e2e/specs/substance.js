@@ -160,8 +160,7 @@ describe("The substance page anonymous access", () => {
   it("should load the substance form from tree", () => {
     // Search
     cy.get("#DTXSID502000000").click({ force: true });
-    // below isn't implemented yet
-    // cy.get("#recordCompoundID").should("have.value", "DTXCID302000003");
+    cy.get("#recordCompoundID").should("have.value", "DTXCID302000003");
     cy.get("#id").should("have.value", "DTXSID502000000");
     cy.get("#preferredName").should("have.value", "Sample Substance");
     cy.get("#displayName").should("have.value", "Display Sample Substance");
@@ -595,6 +594,85 @@ describe("The substance page's Synonym Table", () => {
     cy.get("#synonym-save-button").click();
 
     cy.get("body").should("contain.text", "All synonyms saved successfully");
+  });
+
+  it("should allow adding new synonyms", () => {
+    // Queue a simple success message (actual response is not currently used)
+    cy.route({
+      method: "POST",
+      url: "/synonyms",
+      status: 201,
+      response: {} // currently unneeded
+    }).as("post");
+
+    cy.get("[data-cy=search-box]").type("Sample Substance 2");
+    cy.get("[data-cy=search-button]").click();
+
+    // Click the add button
+    cy.get("#synonym-add-button")
+      .should("be.enabled")
+      .click();
+
+    // Find the newly added row's first cell and type
+    cy.get("#substanceTable")
+      .find("div.ag-center-cols-clipper")
+      .find("div.ag-row[role=row].new-ag-row")
+      .first()
+      .within($newRow => {
+        cy.wrap($newRow)
+          .find("div[col-id='data.identifier_1']")
+          .type("Synonym 9");
+        cy.wrap($newRow)
+          .find("div[col-id='data.source_1']")
+          .type("1");
+        cy.wrap($newRow)
+          .find("div[col-id='data.synonymQuality_1']")
+          .type("1");
+        cy.wrap($newRow)
+          .find("div[col-id='data.synonymType_1']")
+          .type("1");
+      });
+
+    // Save the cell edit
+    cy.get("#synonym-save-button").click();
+
+    cy.get("body").should("contain.text", "All synonyms saved successfully");
+
+    cy.get("@post")
+      .its("request.body.data")
+      .should("deep.eq", {
+        type: "synonym",
+        attributes: {
+          identifier: "Synonym 9",
+          qcNotes: ""
+        },
+        relationships: {
+          source: {
+            data: {
+              type: "source",
+              id: "down-indeed-other-4"
+            }
+          },
+          synonymType: {
+            data: {
+              type: "synonymType",
+              id: "capital-performance-4"
+            }
+          },
+          synonymQuality: {
+            data: {
+              type: "synonymQuality",
+              id: "area-professor-fromage"
+            }
+          },
+          substance: {
+            data: {
+              type: "substance",
+              id: "DTXSID602000001"
+            }
+          }
+        }
+      });
   });
 
   it("should not show deprecated data", () => {
