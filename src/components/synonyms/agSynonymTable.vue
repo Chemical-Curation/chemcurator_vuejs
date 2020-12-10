@@ -305,33 +305,33 @@ export default {
     /**
      * Rebuilds rowData with a provided array of jsonapi compliant synonyms
      *
-     * @param synonyms {array} - Array of jsonapi Synonym objects
-     * // todo: explain jsonapi synonym object
+     * @param synonyms {array} - Array of JsonAPI Synonym objects
+     *     Sample JsonAPI Synonym
+     *     {
+     *       id: "string"
+     *       attributes: { identifier: "string", qcNotes: "string" },
+     *       relationships: {
+     *         substance: {
+     *           data: { type: "substance", id: "string" }
+     *         },
+     *         source: {
+     *           data: { type: "source", id: "string" }
+     *         },
+     *         synonymQuality: {
+     *           data: { type: "synonymQuality", id: "string" }
+     *         },
+     *         synonymType: {
+     *           data: { type: "synonymType", id: "string" }
+     *         },
+     *       }
+     *     }
      * @returns {array} - Array of agGrid rowData nodes.
      */
     buildRowData: function(synonyms) {
       let rowData = [];
-      let data;
-
       for (let synonym of synonyms) {
-        // todo: make "toRowData" function
-        data = {
-          identifier: synonym.attributes.identifier,
-          qcNotes: synonym.attributes.qcNotes,
-          synonymType: synonym.relationships.synonymType.data.id,
-          synonymQuality: synonym.relationships.synonymQuality.data.id,
-          source: synonym.relationships.source.data.id
-        };
-
-        rowData.push({
-          id: synonym.id,
-          data: { ...data },
-          initialData: { ...data },
-          errors: null,
-          created: false
-        });
+        rowData.push(this.toRowData(synonym))
       }
-
       return rowData;
     },
 
@@ -343,23 +343,58 @@ export default {
         this.addAlert("Please load a substance", "warning");
         return;
       }
+      this.rowData.push(this.toRowData(null));
+    },
 
-      // todo: make "toRowData" function
+    /**
+     * Rebuilds rowData with a provided array of jsonapi compliant synonyms
+     *
+     * @param synonym {Object} - JsonAPI formatted synonym or null
+     *     Sample JsonAPI Synonym
+     *     {
+     *       id: "string"
+     *       attributes: { identifier: "string", qcNotes: "string" },
+     *       relationships: {
+     *         substance: {
+     *           data: { type: "substance", id: "string" }
+     *         },
+     *         source: {
+     *           data: { type: "source", id: "string" }
+     *         },
+     *         synonymQuality: {
+     *           data: { type: "synonymQuality", id: "string" }
+     *         },
+     *         synonymType: {
+     *           data: { type: "synonymType", id: "string" }
+     *         },
+     *       }
+     *     }
+     * @returns {Object} - agGrid rowData node.
+     *     Sample rowData node
+     *     {
+     *       id: "string",  The synonym's id or null
+     *       data: { identifier, qcNotes, synonymType, synonymQuality, source }, The synonyms rendered field data
+     *       initialData: { identifier, qcNotes, synonymType, synonymQuality, source }, The synonyms initial field data
+     *       errors: {detail, status, source: { pointer: "string"}, code },  Any save errors as error objects
+     *       created: Boolean(synonym?.id)  // True if this is a new, unsaved row
+     *     }
+     */
+    toRowData: function(synonym) {
       let data = {
-        identifier: "",
-        qcNotes: "",
-        synonymType: null,
-        synonymQuality: null,
-        source: null
-      };
+          identifier: synonym?.attributes?.identifier ?? "",
+          qcNotes: synonym?.attributes?.qcNotes ?? "",
+          synonymType: synonym?.relationships?.synonymType?.data?.id ?? null,
+          synonymQuality: synonym?.relationships?.synonymQuality?.data?.id ?? null,
+          source: synonym?.relationships?.source?.data?.id ?? null
+        };
 
-      this.rowData.push({
-        id: null,
+      return {
+        id: synonym?.id ?? null,
         data: { ...data },
         initialData: { ...data },
         errors: null,
-        created: true
-      });
+        created: !synonym?.id  // if there is no id, this row is considered "new".
+      }
     },
 
     /**
@@ -393,6 +428,8 @@ export default {
     saveRequest: function(row) {
       // Local functions to deal with successful saves and failures
       function onSuccess(res) {
+        console.log(res)
+        // row.id = res.id
         row.created = false;
         row.initialData = { ...row.data };
         row.errors = null;
