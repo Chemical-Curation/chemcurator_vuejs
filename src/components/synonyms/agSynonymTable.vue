@@ -170,11 +170,13 @@ export default {
     },
 
     selectedError: function() {
-      if (this.selectedRow)
-        return this.selectedRow.errors
+      if (this.selectedRow?.errors)
+        return this.selectedRow.errors.map((error) => {
+          error.modifiedDetail = this.buildErrorString(error)
+          return error
+        })
       return null
     },
-
 
     /**
      * Checks for any row additions/edits and returns a bool
@@ -224,7 +226,7 @@ export default {
       selectedRow: null,
       frameworkComponents: null,
       // Display options for error table.
-      errorFields: [{ label: "Errors", key: "detail" }]
+      errorFields: [{ label: "Errors", key: "modifiedDetail" }]
     };
   },
   watch: {
@@ -269,6 +271,35 @@ export default {
       if (event.node.isSelected()) {
         this.selectedRow = event.data;
       }
+    },
+
+    /**
+     * Turns a row specific error into readable text
+     *
+     * Prepends a title case of the pointer's attribute to the error string if the error is
+     * field specific.  Pointer values of "nonFieldErrors" will be ignored.
+     *
+     * @param error {Object}: JsonAPI error object containing error detail string and a source.pointer
+     *     Example JsonAPI error
+     *     {
+     *       detail: "This field is required"
+     *       status: "400"
+     *       source: { pointer: "data/attributes/synonymQuality" }
+     *       code: "required"
+     *     }
+     * @returns {string}: Modified error string.
+     *     From above example "Synonym Quality: This field is required"
+     */
+    buildErrorString: function(error) {
+      let readableDetails = error.detail
+
+      let pointerField = error.source.pointer.split("/").slice(-1).shift()
+      if (pointerField !== "nonFieldErrors") {
+        let result = pointerField.replace( /([A-Z])/g, " $1" );
+        let finalResult = result.charAt(0).toUpperCase() + result.slice(1);
+        readableDetails = finalResult + ": " + readableDetails
+      }
+      return readableDetails
     },
 
     /**
