@@ -9,6 +9,7 @@
         <ChemicalEditors
           :initial-compound="compound"
           :editable="isAuthenticated"
+          :substance="substance"
           @change="changed = $event"
         />
       </b-col>
@@ -44,7 +45,7 @@ export default {
   },
   watch: {
     substance: function() {
-      if (this.substance?.relationships.associatedCompound.data?.id)
+      if (this.substance?.relationships?.associatedCompound?.data?.id)
         this.fetchCompound(
           this.substance?.relationships.associatedCompound.data?.id
         );

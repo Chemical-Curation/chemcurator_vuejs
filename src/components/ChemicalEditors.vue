@@ -88,7 +88,7 @@
 import KetcherWindow from "@/components/KetcherWindow";
 import MarvinWindow from "@/components/MarvinWindow";
 import compoundApi from "@/api/compound";
-import { mapGetters, mapState } from "vuex";
+import { mapGetters } from "vuex";
 
 export default {
   name: "ChemicalEditors",
@@ -98,7 +98,8 @@ export default {
   },
   props: {
     initialCompound: Object,
-    editable: Boolean
+    editable: Boolean,
+    substance: Object
   },
   data() {
     return {
@@ -130,7 +131,6 @@ export default {
   },
   computed: {
     ...mapGetters("queryStructureType", { options: "getOptions" }),
-    ...mapState("substance", { substance: "detail" }),
 
     initialMolfile: function() {
       return this.initialCompound?.attributes?.molfileV3000 ?? "";
@@ -172,7 +172,8 @@ export default {
       );
     },
     showSubstanceLink: function() {
-      return this.sid !== null && this.sid !== this.substance.id;
+      console.log("yawp", typeof(this.substance.id));
+      return this.sid !== null && this.substance.id !== "" && this.sid !== this.substance.id;
     }
   },
   methods: {
