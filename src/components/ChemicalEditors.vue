@@ -172,8 +172,11 @@ export default {
       );
     },
     showSubstanceLink: function() {
-      console.log("yawp", typeof(this.substance.id));
-      return this.sid !== null && this.substance.id !== "" && this.sid !== this.substance.id;
+      return (
+        this.sid !== null &&
+        this.substance.id !== "" &&
+        this.sid !== this.substance.id
+      );
     }
   },
   methods: {
