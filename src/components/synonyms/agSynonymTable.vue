@@ -459,8 +459,8 @@ export default {
     saveRequest: function(row) {
       // Local functions to deal with successful saves and failures
       function onSuccess(res) {
-        console.log(res)
-        // row.id = res.id
+        // Save the id of the potentially newly minted row.
+        row.id = res.data.data.id
         row.created = false;
         row.initialData = { ...row.data };
         row.errors = null;
