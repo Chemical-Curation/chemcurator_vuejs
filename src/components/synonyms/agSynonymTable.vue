@@ -53,8 +53,8 @@ import {
   MappableCellRenderer,
   SelectObjectCellEditor
 } from "@/components/ag-grid/custom-renderers";
-import BtnCellRenderer from "@/components/ag-grid/BtnCellRenderer"
-import { HTTP } from "@/store/http-common";
+import BtnCellRenderer from "@/components/ag-grid/BtnCellRenderer";
+import api from "@/api/base.js";
 
 export default {
   name: "agSynonymTable",
@@ -129,9 +129,9 @@ export default {
           headerName: "QC Notes",
           field: "data.qcNotes",
           cellEditor: "agLargeTextCellEditor"
-        },
+        }
       ];
-      if (this.editable){
+      if (this.editable) {
         // Add the save button
         colDefs.push({
           flex: 0,
@@ -140,14 +140,14 @@ export default {
           sortable: false,
           editable: false,
           headerName: "",
-          type: 'rightAligned',
+          type: "rightAligned",
           cellRenderer: "btnCellRenderer",
           cellRendererParams: {
-            clicked: this.saveRow,
-          },
-        })
+            clicked: this.saveRow
+          }
+        });
       }
-      return colDefs
+      return colDefs;
     },
 
     /**
@@ -171,11 +171,11 @@ export default {
 
     selectedError: function() {
       if (this.selectedRow?.errors)
-        return this.selectedRow.errors.map((error) => {
-          error.modifiedDetail = this.buildErrorString(error)
-          return error
-        })
-      return null
+        return this.selectedRow.errors.map(error => {
+          error.modifiedDetail = this.buildErrorString(error);
+          return error;
+        });
+      return null;
     },
 
     /**
@@ -246,7 +246,6 @@ export default {
   },
   methods: {
     ...mapActions("alert", ["alert"]),
-    ...mapActions("synonym", ["getList", "patch", "post"]),
     ...mapActions("synonymQuality", { loadQualityList: "getList" }),
     ...mapActions("synonymType", { loadTypeList: "getList" }),
     ...mapActions("source", { loadSourceList: "getList" }),
@@ -291,15 +290,18 @@ export default {
      *     From above example "Synonym Quality: This field is required"
      */
     buildErrorString: function(error) {
-      let readableDetails = error.detail
+      let readableDetails = error.detail;
 
-      let pointerField = error.source.pointer.split("/").slice(-1).shift()
+      let pointerField = error.source.pointer
+        .split("/")
+        .slice(-1)
+        .shift();
       if (pointerField !== "nonFieldErrors") {
-        let result = pointerField.replace( /([A-Z])/g, " $1" );
+        let result = pointerField.replace(/([A-Z])/g, " $1");
         let finalResult = result.charAt(0).toUpperCase() + result.slice(1);
-        readableDetails = finalResult + ": " + readableDetails
+        readableDetails = finalResult + ": " + readableDetails;
       }
-      return readableDetails
+      return readableDetails;
     },
 
     /**
@@ -324,7 +326,7 @@ export default {
       // Reset modified rows
       for (let row of this.rowData) {
         row.data = { ...row.initialData };
-        row.errors = null
+        row.errors = null;
       }
 
       this.gridOptions.api.refreshCells({
@@ -361,7 +363,7 @@ export default {
     buildRowData: function(synonyms) {
       let rowData = [];
       for (let synonym of synonyms) {
-        rowData.push(this.toRowData(synonym))
+        rowData.push(this.toRowData(synonym));
       }
       return rowData;
     },
@@ -412,20 +414,21 @@ export default {
      */
     toRowData: function(synonym) {
       let data = {
-          identifier: synonym?.attributes?.identifier ?? "",
-          qcNotes: synonym?.attributes?.qcNotes ?? "",
-          synonymType: synonym?.relationships?.synonymType?.data?.id ?? null,
-          synonymQuality: synonym?.relationships?.synonymQuality?.data?.id ?? null,
-          source: synonym?.relationships?.source?.data?.id ?? null
-        };
+        identifier: synonym?.attributes?.identifier ?? "",
+        qcNotes: synonym?.attributes?.qcNotes ?? "",
+        synonymType: synonym?.relationships?.synonymType?.data?.id ?? null,
+        synonymQuality:
+          synonym?.relationships?.synonymQuality?.data?.id ?? null,
+        source: synonym?.relationships?.source?.data?.id ?? null
+      };
 
       return {
         id: synonym?.id ?? null,
         data: { ...data },
         initialData: { ...data },
         errors: null,
-        created: !synonym?.id  // if there is no id, this row is considered "new".
-      }
+        created: !synonym?.id // if there is no id, this row is considered "new".
+      };
     },
 
     /**
@@ -460,7 +463,7 @@ export default {
       // Local functions to deal with successful saves and failures
       function onSuccess(res) {
         // Save the id of the potentially newly minted row.
-        row.id = res.data.data.id
+        row.id = res.data.data.id;
         row.created = false;
         row.initialData = { ...row.data };
         row.errors = null;
@@ -477,17 +480,17 @@ export default {
       let requestBody = this.buildRequestBody(row.data);
 
       return row.created
-        ? this.post(requestBody)
+        ? api.post("synonyms", requestBody)
             .then(onSuccess)
             .catch(onFailure)
-        : this.patch({ id: row.id, body: { ...requestBody, id: row.id } })
+        : api.patch("synonyms", { id: row.id, body: { ...requestBody, id: row.id } })
             .then(onSuccess)
             .catch(onFailure);
     },
 
     saveRow: async function(row) {
-      await this.saveRequest(row)
-      this.gridOptions.api.redrawRows()
+      await this.saveRequest(row);
+      this.gridOptions.api.redrawRows();
     },
 
     /**
@@ -497,16 +500,13 @@ export default {
       this.loading = true;
 
       let synonyms = [];
-      // TODO: Move to api
       if (substanceId)
-        synonyms = await HTTP.get(
-          `/synonyms?filter[substance.id]=${substanceId}`
-        ).then(response => {
-          return response.data.data;
+        synonyms = await api.list("synonyms", {
+          params: [{ key: "filter[substance.id]", value: substanceId }]
         });
 
+      this.rowData = this.buildRowData(synonyms.data);
       this.loading = false;
-      this.rowData = this.buildRowData(synonyms);
     },
 
     /**
@@ -606,7 +606,7 @@ export default {
     };
     this.frameworkComponents = {
       btnCellRenderer: BtnCellRenderer
-    }
+    };
 
     // Load grid styling
     this.defaultColDef = {
