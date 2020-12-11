@@ -1,7 +1,11 @@
 import { HTTP } from "@/store/http-common";
 
-export default {
-  list: async function(resource, request_details) {
+class API {
+  constructor(resourceURI) {
+    this.resourceURI = resourceURI;
+  }
+
+  list(request_details) {
     let params_string = "?";
 
     if (request_details && request_details.params) {
@@ -11,14 +15,16 @@ export default {
       }
     }
 
-    return await HTTP.get("/" + resource + params_string).then(res => {
-      return res.data;
-    });
-  },
-  patch: async (resource, { id, body }) => {
-    return HTTP.patch(`/${resource}/${id}`, { data: { ...body } });
-  },
-  post: async (resource, body) => {
-    return HTTP.post(`/${resource}`, { data: { ...body } });
-  },
-};
+    return HTTP.get("/" + this.resourceURI + params_string);
+  }
+
+  patch({ id, body }) {
+    return HTTP.patch(`/${this.resourceURI}/${id}`, { data: { ...body } });
+  }
+
+  post(body) {
+    return HTTP.post(`/${this.resourceURI}`, { data: { ...body } });
+  }
+}
+
+export default API;

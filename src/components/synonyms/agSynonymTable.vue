@@ -54,7 +54,7 @@ import {
   SelectObjectCellEditor
 } from "@/components/ag-grid/custom-renderers";
 import BtnCellRenderer from "@/components/ag-grid/BtnCellRenderer";
-import api from "@/api/base.js";
+import SynonymApi from "@/api/synonym.js";
 
 export default {
   name: "agSynonymTable",
@@ -480,10 +480,10 @@ export default {
       let requestBody = this.buildRequestBody(row.data);
 
       return row.created
-        ? api.post("synonyms", requestBody)
+        ? SynonymApi.post(requestBody)
             .then(onSuccess)
             .catch(onFailure)
-        : api.patch("synonyms", { id: row.id, body: { ...requestBody, id: row.id } })
+        : SynonymApi.patch({ id: row.id, body: { ...requestBody, id: row.id } })
             .then(onSuccess)
             .catch(onFailure);
     },
@@ -501,11 +501,13 @@ export default {
 
       let synonyms = [];
       if (substanceId)
-        synonyms = await api.list("synonyms", {
+        synonyms = await SynonymApi.list({
           params: [{ key: "filter[substance.id]", value: substanceId }]
+        }).then(res => {
+          return res.data.data;
         });
 
-      this.rowData = this.buildRowData(synonyms.data);
+      this.rowData = this.buildRowData(synonyms);
       this.loading = false;
     },
 
