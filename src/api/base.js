@@ -25,6 +25,10 @@ class API {
   post(body) {
     return HTTP.post(`/${this.resourceURI}`, { data: { ...body } });
   }
+
+  delete(id) {
+    return HTTP.delete(`/${this.resourceURI}/${id}`);
+  }
 }
 
 export default API;
