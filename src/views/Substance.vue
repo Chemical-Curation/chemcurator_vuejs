@@ -9,6 +9,7 @@
         <ChemicalEditors
           :initial-compound="compound"
           :editable="isAuthenticated"
+          :substance="substance"
           @change="changed = $event"
         />
       </b-col>
@@ -44,7 +45,7 @@ export default {
   },
   watch: {
     substance: function() {
-      if (this.substance?.relationships.associatedCompound.data?.id)
+      if (this.substance?.relationships?.associatedCompound?.data?.id)
         this.fetchCompound(
           this.substance?.relationships.associatedCompound.data?.id
         );
@@ -73,6 +74,12 @@ export default {
     window.addEventListener("beforeunload", this.checkChanged);
   },
   mounted() {
+    if (this.$route.params.sid) {
+      this.$store.dispatch("substance/substanceSearch", {
+        searchString: this.$route.params.sid,
+        push: false
+      });
+    }
     this.$store.dispatch("queryStructureType/getList");
     this.$store.dispatch("source/getList");
     this.$store.dispatch("qcLevel/getList");

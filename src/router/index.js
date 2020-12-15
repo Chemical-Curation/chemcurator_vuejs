@@ -18,6 +18,11 @@ const routes = [
     component: () => import("../views/Substance")
   },
   {
+    path: "/substance/:sid",
+    name: "substance_detail",
+    component: () => import("../views/Substance")
+  },
+  {
     path: "/vocabularies",
     name: "controlled-vocabularies",
     component: () => import("../views/Vocabularies"),
