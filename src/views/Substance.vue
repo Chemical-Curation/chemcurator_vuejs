@@ -1,9 +1,6 @@
 <template>
   <b-container fluid="true" class="mx-5">
-    <div 
-      id="sidebar"
-      v-show="ifNoSubstance"
-    >
+    <div id="sidebar" v-show="ifNoSubstance">
       <SubstanceSidebar />
     </div>
     <b-row>
@@ -14,6 +11,7 @@
         <ChemicalEditors
           :initial-compound="compound"
           :editable="isAuthenticated"
+          :substance="substance"
           @change="changed = $event"
         />
       </b-col>
@@ -47,12 +45,12 @@ export default {
     ...mapState("substance", { substance: "detail" }),
     ...mapState("queryStructureType", { qstList: "list" }),
     ifNoSubstance() {
-      return !this.substance?.id
+      return !this.substance?.id;
     }
   },
   watch: {
     substance: function() {
-      if (this.substance?.relationships.associatedCompound.data?.id)
+      if (this.substance?.relationships?.associatedCompound?.data?.id)
         this.fetchCompound(
           this.substance?.relationships.associatedCompound.data?.id
         );
@@ -81,6 +79,12 @@ export default {
     window.addEventListener("beforeunload", this.checkChanged);
   },
   mounted() {
+    if (this.$route.params.sid) {
+      this.$store.dispatch("substance/substanceSearch", {
+        searchString: this.$route.params.sid,
+        push: false
+      });
+    }
     this.$store.dispatch("queryStructureType/getList");
     this.$store.dispatch("source/getList");
     this.$store.dispatch("qcLevel/getList");

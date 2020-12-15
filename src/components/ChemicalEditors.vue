@@ -9,6 +9,17 @@
         class="col"
       >
         <b-form-input id="recordCompoundID" :value="cid" disabled />
+        <template v-if="showSubstanceLink">
+          <router-link
+            id="substanceLink"
+            :to="{ name: 'substance_detail', params: { sid: sid } }"
+            target="_blank"
+            title="Open substance associated with this compound in a new tab"
+          >
+            <b-icon icon="link" />
+            {{ sid }}
+          </router-link>
+        </template>
       </b-form-group>
       <b-form-group
         label="Structure Type:"
@@ -87,7 +98,8 @@ export default {
   },
   props: {
     initialCompound: Object,
-    editable: Boolean
+    editable: Boolean,
+    substance: Object
   },
   data() {
     return {
@@ -143,10 +155,27 @@ export default {
         ? this.definedCompound?.id
         : this.illDefinedCompound?.id;
     },
+    sid: function() {
+      // the sid that the loaded compound is related to
+      if (this.cid) {
+        return this.type === "definedCompound"
+          ? this.definedCompound?.relationships?.substance.data.id
+          : this.illDefinedCompound?.relationships.substance.data.id;
+      } else {
+        return null;
+      }
+    },
     editorChanged: function() {
       return (
         (this.marvinChanged && this.type !== "definedCompound") ||
         (this.ketcherChanged && this.type === "definedCompound")
+      );
+    },
+    showSubstanceLink: function() {
+      return (
+        this.sid !== null &&
+        this.substance.id !== "" &&
+        this.sid !== this.substance.id
       );
     }
   },

@@ -158,7 +158,6 @@ describe("The substance page anonymous access", () => {
   });
 
   it("should load the substance form from tree", () => {
-    // Search
     cy.get("#DTXSID502000000").click({ force: true });
     cy.get("#recordCompoundID").should("have.value", "DTXCID302000003");
     cy.get("#id").should("have.value", "DTXSID502000000");
@@ -174,6 +173,17 @@ describe("The substance page anonymous access", () => {
     );
     cy.get("#privateQCNote").should("have.value", "Private QC notes");
     cy.get("#publicQCNote").should("have.value", "Public QC notes");
+  });
+
+  it("should show substance link with mismatched DTXCID=>DTXSID", () => {
+    cy.get("#DTXSID502000000").click({ force: true });
+    cy.get("#recordCompoundID").should("have.value", "DTXCID302000003");
+    cy.get("#id").should("have.value", "DTXSID502000000");
+    cy.get("#substanceLink").should("not.exist");
+    cy.get("#DTXSID202000099").click({ force: true });
+    cy.get("#substanceLink")
+      .should("have.attr", "href")
+      .and("include", "DTXSID502000000");
   });
 
   it("should load defined compound into ketcher window", () => {
@@ -866,7 +876,7 @@ describe("The substance page's Sidebar and Tree View", () => {
       .should("be.visible")
       .click();
   });
-  
+
   it("should not have the sidebar button present", () => {
     // after loading a substance
     cy.get("[data-cy=search-box]").type("Sample Substance 2");
@@ -874,5 +884,4 @@ describe("The substance page's Sidebar and Tree View", () => {
 
     cy.get("#sidebar").should("not.be.visible");
   });
-  
-  });
+});
