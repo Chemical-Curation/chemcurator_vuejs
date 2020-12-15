@@ -1,6 +1,8 @@
 <template>
   <b-container fluid="true" class="mx-5">
-    <SubstanceSidebar />
+    <div id="sidebar" v-show="ifNoSubstance">
+      <SubstanceSidebar />
+    </div>
     <b-row>
       <b-col cols="12" order="1" lg="4" order-lg="0">
         <SubstanceForm />
@@ -41,7 +43,10 @@ export default {
   computed: {
     ...mapGetters("auth", ["isAuthenticated"]),
     ...mapState("substance", { substance: "detail" }),
-    ...mapState("queryStructureType", { qstList: "list" })
+    ...mapState("queryStructureType", { qstList: "list" }),
+    ifNoSubstance() {
+      return !this.substance?.id;
+    }
   },
   watch: {
     substance: function() {
