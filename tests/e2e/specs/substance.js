@@ -642,7 +642,7 @@ describe("The substance page's Synonym Table", () => {
       .within(row => {
         // Find the first row's save button, verify disabled
         cy.wrap(row)
-          .last()
+          .eq(5)
           .find("button")
           .should("be.disabled");
 
@@ -653,7 +653,7 @@ describe("The substance page's Synonym Table", () => {
 
         // Save the cell edit
         cy.wrap(row)
-          .last()
+          .eq(5)
           .find("button")
           .should("be.enabled")
           .click();
@@ -662,6 +662,50 @@ describe("The substance page's Synonym Table", () => {
     cy.get("@patch")
       .its("request.body.data.attributes.identifier")
       .should("eq", "Hello World");
+  });
+
+  it("should allow deleting", () => {
+    // Queue a simple success message.  Response is a template, not valid data.
+    cy.route({
+      method: "DELETE",
+      url: /synonyms\/\d+/,
+      status: 204,
+      response: ""
+    });
+
+    cy.get("[data-cy=search-box]").type("Sample Substance 2");
+    cy.get("[data-cy=search-button]").click();
+
+    // This is the number of rows before delete
+    let rowCount;
+
+    cy.get("#substanceTable")
+      .find("div.ag-center-cols-clipper")
+      .find("div.ag-row[role=row]")
+      .its("length")
+      .then($rowCount => {
+        rowCount = $rowCount;
+      });
+
+    // Find the first row's delete button, verify enabled and click
+    cy.get("#substanceTable")
+      .find("div.ag-center-cols-clipper")
+      .find("div.ag-row[role=row]")
+      .first()
+      .children()
+      .eq(6)
+      .find("button")
+      .should("be.enabled")
+      .click();
+
+    cy.get("#substanceTable")
+      .find("div.ag-center-cols-clipper")
+      .find("div.ag-row[role=row]")
+      .its("length")
+      .should($newRowCount => {
+        // Verify row count after delete is one less than the rows before change
+        expect($newRowCount).to.equal(rowCount - 1);
+      });
   });
 
   it("should allow adding new synonyms", () => {
@@ -703,7 +747,7 @@ describe("The substance page's Synonym Table", () => {
         // Click Save
         cy.wrap($newRow)
           .children()
-          .last()
+          .eq(5)
           .find("button")
           .click();
       });
@@ -814,7 +858,7 @@ describe("The substance page's Synonym Table", () => {
       .find("div.ag-row[role=row]")
       .first()
       .children()
-      .last()
+      .eq(5)
       .find("button")
       .click();
 
