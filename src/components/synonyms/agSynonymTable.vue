@@ -521,7 +521,7 @@ export default {
             this.gridOptions.rowData.splice(row.rowIndex, 1);
           })
           .catch(err => {
-            row.errors = err.response.data.errors;
+            row.data.errors = err.response.data.errors;
           });
       } else this.gridOptions.rowData.splice(row.rowIndex, 1);
 
