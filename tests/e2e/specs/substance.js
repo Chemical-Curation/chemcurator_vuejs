@@ -855,9 +855,24 @@ describe("The substance page's List Table", () => {
 });
 
 describe("The substance page's Sidebar and Tree View", () => {
+  beforeEach(() => {
+    cy.adminLogin();
+    cy.visit("/substance");
+    cy.server();
+  });
+
   it("should have the sidebar button present", () => {
-    cy.get("button:contains('Toggle Sidebar')")
-      .should("not.be.disabled")
+    cy.get("#sidebar")
+      .should("be.visible")
       .click();
   });
-});
+  
+  it("should not have the sidebar button present", () => {
+    // after loading a substance
+    cy.get("[data-cy=search-box]").type("Sample Substance 2");
+    cy.get("[data-cy=search-button]").click();
+
+    cy.get("#sidebar").should("not.be.visible");
+  });
+  
+  });
