@@ -821,32 +821,6 @@ describe("The substance page's Synonym Table", () => {
 
     cy.get("#synonym-error-table").should("contain.text", sampleErrorMessage);
   });
-
-  it("should be able to reset", () => {
-    cy.get("[data-cy=search-box]").type("Sample Substance 2");
-    cy.get("[data-cy=search-button]").click();
-
-    // Find the first row's first cell and type
-    cy.get("#substanceTable")
-      .find("div.ag-center-cols-clipper")
-      .find("div.ag-row[role=row]")
-      .first()
-      .children()
-      .first()
-      .type("Hello World\n");
-
-    // Roll back the cell edit
-    cy.get("#synonym-reset-button").click();
-
-    // Find the first row's first cell and confirm the rollback
-    cy.get("#substanceTable")
-      .find("div.ag-center-cols-clipper")
-      .find("div.ag-row[role=row]")
-      .first()
-      .children()
-      .first()
-      .should("contain.text", "Synonym 1");
-  });
 });
 
 describe("The substance page's Relationships Table", () => {

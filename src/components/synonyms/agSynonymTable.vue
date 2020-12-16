@@ -27,12 +27,6 @@
     </div>
     <div class="d-flex flex-row justify-content-end my-3" v-if="editable">
       <b-button
-        id="synonym-reset-button"
-        @click="resetRowData"
-        :disabled="!buttonsEnabled"
-        >Reset</b-button
-      >
-      <b-button
         id="synonym-add-button"
         class="ml-1"
         variant="success"
