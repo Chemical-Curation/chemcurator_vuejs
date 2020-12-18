@@ -50,6 +50,9 @@ export default {
   },
   watch: {
     substance: function() {
+      if (!this.substance?.relationships?.associatedCompound?.data) {
+        this.compound = {}
+      };
       if (this.substance?.relationships?.associatedCompound?.data?.id)
         this.fetchCompound(
           this.substance?.relationships.associatedCompound.data?.id
