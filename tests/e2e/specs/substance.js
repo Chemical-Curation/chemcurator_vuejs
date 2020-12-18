@@ -412,6 +412,12 @@ describe("The substance page authenticated access", () => {
             .join("\n")
         )
       );
+    cy.get("#recordCompoundID").should("have.value", "DTXCID902000556");
+    cy.get("#substanceInfoPanel")
+      .should("contain", "18.01528024673462")
+      .should("contain", "O")
+      .should("contain", "H2 O")
+      .should("contain", "XLYOFNOQVPJJNP-UHFFFAOYSA-N");
   });
 
   it("should post not-loaded illdefined compounds", () => {
