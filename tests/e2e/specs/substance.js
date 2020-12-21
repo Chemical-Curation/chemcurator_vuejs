@@ -176,14 +176,66 @@ describe("The substance page anonymous access", () => {
   });
 
   it("should show substance link with mismatched DTXCID=>DTXSID", () => {
-    cy.get("#DTXSID502000000").click({ force: true });
-    cy.get("#recordCompoundID").should("have.value", "DTXCID302000003");
-    cy.get("#id").should("have.value", "DTXSID502000000");
-    cy.get("#substanceLink").should("not.exist");
-    cy.get("#DTXSID202000099").click({ force: true });
+    // Search for the Solo Substance (which has no compound)
+    cy.get("[data-cy=search-box]").type("Solo Substance");
+    cy.get("[data-cy=search-button]").click();
+
+    // Verify no elements are in the iframe
+    cy.get("iframe[id=ketcher]")
+      .its("0.contentDocument.body")
+      .should("not.be.empty")
+      .then(cy.wrap)
+      .find("#canvas")
+      .children()
+      .find("text")
+      .should("not.exist");
+
+    // Create Compound - Hydrogen Peroxide
+    cy.get("#compound-type-dropdown").select("Defined Compound");
+    cy.get("iframe[id=ketcher]")
+      .its("0.contentDocument.body")
+      .should("not.be.empty")
+      .then(cy.wrap)
+      .find("#canvas")
+      .children()
+      .find("text")
+      .should("not.exist");
+
+    // Find the oxygen button
+    cy.get("iframe[id=ketcher]")
+      .its("0.contentDocument.body")
+      .should("not.be.empty")
+      .then(cy.wrap)
+      .find("#atom")
+      .find("button")
+      .eq(3)
+      .click();
+
+    // Select a point. create a H2O there, click and drag to make H2O2
+    cy.get("iframe[id=ketcher]")
+      .its("0.contentDocument.body")
+      .should("not.be.empty")
+      .then(cy.wrap)
+      .find("#canvas")
+      // create first node
+      .click()
+      .find("text")
+      .first()
+      // select first node
+      .trigger("mousedown", { button: 0 })
+      // back up to canvas
+      .parent()
+      // drag to create compound
+      .trigger("mousemove", 500, 500, { force: true })
+      .trigger("mouseup", { force: true });
+
+    // Now h202 is drawn, see if link to existing sub/comp populates
+    cy.get("#recordCompoundID").should("have.value", "DTXCID502000024");
+    cy.get("#id").should("have.value", "DTXSID202000099");
     cy.get("#substanceLink")
       .should("have.attr", "href")
-      .and("include", "DTXSID502000000");
+      // existing SID
+      .and("include", "DTXSID202000002");
   });
 
   it("should load defined compound into ketcher window", () => {
@@ -273,7 +325,7 @@ describe("The substance page anonymous access", () => {
       // back up to canvas
       .parent()
       // drag to create compound
-      .trigger("mousemove", 500, 500)
+      .trigger("mousemove", 500, 500, { force: true })
       .trigger("mouseup", { force: true });
 
     // Check compound loaded
