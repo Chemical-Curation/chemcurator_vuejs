@@ -129,7 +129,7 @@ export default {
         // Add the save button
         colDefs.push({
           flex: 0,
-          width: 75,
+          width: 85,
           resizable: false,
           sortable: false,
           editable: false,
