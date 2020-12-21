@@ -12,6 +12,7 @@
       :rowData="rowData"
       :gridOptions="gridOptions"
       :rowClassRules="rowClassRules"
+      :frameworkComponents="frameworkComponents"
       @row-selected="onRowSelected"
       rowSelection="single"
     />
@@ -26,12 +27,6 @@
     </div>
     <div class="d-flex flex-row justify-content-end my-3" v-if="editable">
       <b-button
-        id="synonym-reset-button"
-        @click="resetRowData"
-        :disabled="!buttonsEnabled"
-        >Reset</b-button
-      >
-      <b-button
         id="synonym-add-button"
         class="ml-1"
         variant="success"
@@ -39,15 +34,6 @@
         @click="addSynonym"
       >
         Add Synonym
-      </b-button>
-      <b-button
-        id="synonym-save-button"
-        class="ml-1"
-        variant="primary"
-        @click="save"
-        :disabled="!buttonsEnabled"
-      >
-        Save Synonyms
       </b-button>
     </div>
   </div>
@@ -60,8 +46,9 @@ import { AgGridVue } from "ag-grid-vue";
 import {
   MappableCellRenderer,
   SelectObjectCellEditor
-} from "@/ag-grid-components/custom-renderers";
-import { HTTP } from "@/store/http-common";
+} from "@/components/ag-grid/custom-renderers";
+import BtnCellRenderer from "@/components/ag-grid/BtnCellRenderer";
+import SynonymApi from "@/api/synonym.js";
 
 export default {
   name: "agSynonymTable",
@@ -86,7 +73,7 @@ export default {
      * Defines the columns to be used in ag grid table
      */
     columnDefs: function() {
-      return [
+      let colDefs = [
         { headerName: "Identifier", field: "data.identifier" },
         {
           headerName: "Source",
@@ -138,6 +125,23 @@ export default {
           cellEditor: "agLargeTextCellEditor"
         }
       ];
+      if (this.editable) {
+        // Add the save button
+        colDefs.push({
+          flex: 0,
+          width: 85,
+          resizable: false,
+          sortable: false,
+          editable: false,
+          headerName: "",
+          type: "rightAligned",
+          cellRenderer: "btnCellRenderer",
+          cellRendererParams: {
+            clicked: this.saveRow
+          }
+        });
+      }
+      return colDefs;
     },
 
     /**
@@ -157,6 +161,15 @@ export default {
           return params.data.created && !params.data.errors;
         }
       };
+    },
+
+    selectedError: function() {
+      if (this.selectedRow?.errors)
+        return this.selectedRow.errors.map(error => {
+          error.modifiedDetail = this.buildErrorString(error);
+          return error;
+        });
+      return null;
     },
 
     /**
@@ -204,9 +217,10 @@ export default {
       defaultColDef: null,
       gridOptions: null,
       loading: false,
-      selectedError: null,
+      selectedRow: null,
+      frameworkComponents: null,
       // Display options for error table.
-      errorFields: [{ label: "Errors", key: "detail" }]
+      errorFields: [{ label: "Errors", key: "modifiedDetail" }]
     };
   },
   watch: {
@@ -226,7 +240,6 @@ export default {
   },
   methods: {
     ...mapActions("alert", ["alert"]),
-    ...mapActions("synonym", ["getList", "patch", "post"]),
     ...mapActions("synonymQuality", { loadQualityList: "getList" }),
     ...mapActions("synonymType", { loadTypeList: "getList" }),
     ...mapActions("source", { loadSourceList: "getList" }),
@@ -249,8 +262,40 @@ export default {
      */
     onRowSelected: function(event) {
       if (event.node.isSelected()) {
-        this.selectedError = event.data.errors;
+        this.selectedRow = event.data;
       }
+    },
+
+    /**
+     * Turns a row specific error into readable text
+     *
+     * Prepends a title case of the pointer's attribute to the error string if the error is
+     * field specific.  Pointer values of "nonFieldErrors" will be ignored.
+     *
+     * @param error {Object}: JsonAPI error object containing error detail string and a source.pointer
+     *     Example JsonAPI error
+     *     {
+     *       detail: "This field is required"
+     *       status: "400"
+     *       source: { pointer: "data/attributes/synonymQuality" }
+     *       code: "required"
+     *     }
+     * @returns {string}: Modified error string.
+     *     From above example "Synonym Quality: This field is required"
+     */
+    buildErrorString: function(error) {
+      let readableDetails = error.detail;
+
+      let pointerField = error.source.pointer
+        .split("/")
+        .slice(-1)
+        .shift();
+      if (pointerField !== "nonFieldErrors") {
+        let result = pointerField.replace(/([A-Z])/g, " $1");
+        let finalResult = result.charAt(0).toUpperCase() + result.slice(1);
+        readableDetails = finalResult + ": " + readableDetails;
+      }
+      return readableDetails;
     },
 
     /**
@@ -258,7 +303,6 @@ export default {
      */
     clearSelected: function() {
       this.gridOptions.api.deselectAll();
-      this.selectedError = null;
     },
 
     /**
@@ -276,6 +320,7 @@ export default {
       // Reset modified rows
       for (let row of this.rowData) {
         row.data = { ...row.initialData };
+        row.errors = null;
       }
 
       this.gridOptions.api.refreshCells({
@@ -287,31 +332,33 @@ export default {
     /**
      * Rebuilds rowData with a provided array of jsonapi compliant synonyms
      *
-     * @param synonyms {array} - Array of jsonapi Synonym objects
+     * @param synonyms {array} - Array of JsonAPI Synonym objects
+     *     Sample JsonAPI Synonym
+     *     {
+     *       id: "string"
+     *       attributes: { identifier: "string", qcNotes: "string" },
+     *       relationships: {
+     *         substance: {
+     *           data: { type: "substance", id: "string" }
+     *         },
+     *         source: {
+     *           data: { type: "source", id: "string" }
+     *         },
+     *         synonymQuality: {
+     *           data: { type: "synonymQuality", id: "string" }
+     *         },
+     *         synonymType: {
+     *           data: { type: "synonymType", id: "string" }
+     *         },
+     *       }
+     *     }
      * @returns {array} - Array of agGrid rowData nodes.
      */
     buildRowData: function(synonyms) {
       let rowData = [];
-      let data;
-
       for (let synonym of synonyms) {
-        data = {
-          identifier: synonym.attributes.identifier,
-          qcNotes: synonym.attributes.qcNotes,
-          synonymType: synonym.relationships.synonymType.data.id,
-          synonymQuality: synonym.relationships.synonymQuality.data.id,
-          source: synonym.relationships.source.data.id
-        };
-
-        rowData.push({
-          id: synonym.id,
-          data: { ...data },
-          initialData: { ...data },
-          errors: null,
-          created: false
-        });
+        rowData.push(this.toRowData(synonym));
       }
-
       return rowData;
     },
 
@@ -323,22 +370,59 @@ export default {
         this.addAlert("Please load a substance", "warning");
         return;
       }
+      this.rowData.unshift(this.toRowData(null));
+    },
 
+    /**
+     * Rebuilds rowData with a provided array of jsonapi compliant synonyms
+     *
+     * @param synonym {Object} - JsonAPI formatted synonym or null
+     *     Sample JsonAPI Synonym
+     *     {
+     *       id: "string"
+     *       attributes: { identifier: "string", qcNotes: "string" },
+     *       relationships: {
+     *         substance: {
+     *           data: { type: "substance", id: "string" }
+     *         },
+     *         source: {
+     *           data: { type: "source", id: "string" }
+     *         },
+     *         synonymQuality: {
+     *           data: { type: "synonymQuality", id: "string" }
+     *         },
+     *         synonymType: {
+     *           data: { type: "synonymType", id: "string" }
+     *         },
+     *       }
+     *     }
+     * @returns {Object} - agGrid rowData node.
+     *     Sample rowData node
+     *     {
+     *       id: "string",  The synonym's id or null
+     *       data: { identifier, qcNotes, synonymType, synonymQuality, source }, The synonyms rendered field data
+     *       initialData: { identifier, qcNotes, synonymType, synonymQuality, source }, The synonyms initial field data
+     *       errors: {detail, status, source: { pointer: "string"}, code },  Any save errors as error objects
+     *       created: Boolean(synonym?.id)  // True if this is a new, unsaved row
+     *     }
+     */
+    toRowData: function(synonym) {
       let data = {
-        identifier: "",
-        qcNotes: "",
-        synonymType: null,
-        synonymQuality: null,
-        source: null
+        identifier: synonym?.attributes?.identifier ?? "",
+        qcNotes: synonym?.attributes?.qcNotes ?? "",
+        synonymType: synonym?.relationships?.synonymType?.data?.id ?? null,
+        synonymQuality:
+          synonym?.relationships?.synonymQuality?.data?.id ?? null,
+        source: synonym?.relationships?.source?.data?.id ?? null
       };
 
-      this.rowData.push({
-        id: null,
+      return {
+        id: synonym?.id ?? null,
         data: { ...data },
         initialData: { ...data },
         errors: null,
-        created: true
-      });
+        created: !synonym?.id // if there is no id, this row is considered "new".
+      };
     },
 
     /**
@@ -352,7 +436,6 @@ export default {
 
       for (let row of this.rowData) {
         // Clear previous errors
-        row.errors = null;
         if (!_.isEqual(row.data, row.initialData)) {
           responses.push(this.saveRequest(row));
         }
@@ -373,8 +456,11 @@ export default {
     saveRequest: function(row) {
       // Local functions to deal with successful saves and failures
       function onSuccess(res) {
+        // Save the id of the potentially newly minted row.
+        row.id = res.data.data.id;
         row.created = false;
         row.initialData = { ...row.data };
+        row.errors = null;
         return res;
       }
 
@@ -388,56 +474,16 @@ export default {
       let requestBody = this.buildRequestBody(row.data);
 
       return row.created
-        ? this.post(requestBody)
+        ? SynonymApi.post(requestBody)
             .then(onSuccess)
             .catch(onFailure)
-        : this.patch({ id: row.id, body: { ...requestBody, id: row.id } })
+        : SynonymApi.patch({ id: row.id, body: { ...requestBody, id: row.id } })
             .then(onSuccess)
             .catch(onFailure);
     },
 
-    /**
-     * Saves all updated rows.
-     *
-     * If all rows update correctly alerts the user with a success prompt.
-     *
-     * If some rows fail to update, those object ids are added to an object.
-     * with their error details.  The app can then display those errors when
-     * the failing row is selected
-     *
-     * todo: This function is asynchronous.  If we had a loading overlay it would
-     * work well here.
-     */
-    save: async function() {
-      if (!this.editable) {
-        this.addAlert("This table cannot be edited", "warning");
-        return;
-      }
-
-      // Clear selection for the sake of reloading error table
-      this.clearSelected();
-
-      // Stop editing (if a dropdown is selected but has not blurred,
-      //               those changes should be considered valid)
-      this.gridOptions.api.stopEditing();
-
-      // Responses is an array of promises from the saved requests.
-      // We need these all to finish before we can proceed.
-      let responses = this.buildSaveRequests(this.rowData);
-
-      // Wait for all save requests to finish
-      await Promise.allSettled(responses).then(responses => {
-        // Find failures
-        let rejected = responses.filter(obj => {
-          return obj.value.failed;
-        });
-
-        rejected.length === 0
-          ? this.addAlert("All synonyms saved successfully", "success")
-          : this.addAlert("Some synonyms could not be saved", "warning");
-      });
-
-      // Redraw rows to render error rows
+    saveRow: async function(row) {
+      await this.saveRequest(row);
       this.gridOptions.api.redrawRows();
     },
 
@@ -449,14 +495,14 @@ export default {
 
       let synonyms = [];
       if (substanceId)
-        synonyms = await HTTP.get(
-          `/synonyms?filter[substance.id]=${substanceId}`
-        ).then(response => {
-          return response.data.data;
+        synonyms = await SynonymApi.list({
+          params: [{ key: "filter[substance.id]", value: substanceId }]
+        }).then(res => {
+          return res.data.data;
         });
 
-      this.loading = false;
       this.rowData = this.buildRowData(synonyms);
+      this.loading = false;
     },
 
     /**
@@ -553,6 +599,9 @@ export default {
         mappableCellRenderer: MappableCellRenderer,
         selectObjectCellEditor: SelectObjectCellEditor
       }
+    };
+    this.frameworkComponents = {
+      btnCellRenderer: BtnCellRenderer
     };
 
     // Load grid styling
