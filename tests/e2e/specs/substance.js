@@ -349,6 +349,25 @@ describe("The substance page anonymous access", () => {
     cy.get("[data-cy=search-button]").click();
     cy.get("[data-cy=alert-box]").should("contain", "compound 47 not valid");
   });
+
+  it("should not have compound data persist", () => {
+    // When loading a substance that does not have an associated
+    // compound the compound window should not be populated
+
+    // load a Substance that has a Compound
+    cy.get("[data-cy=search-box]").type("Sample Substance");
+    cy.get("[data-cy=search-button]").click();
+
+    cy.get("#compound-type-dropdown").should("have.value", "definedCompound");
+
+    // load a Substance that has NO Compound
+    cy.get("[data-cy=search-box]").clear(); // clear search box
+    cy.get("[data-cy=search-box]").type("Solo Substance");
+    cy.get("[data-cy=search-button]").click();
+
+    cy.get("#compound-type-dropdown").should("not.have.value");
+  });
+
 });
 
 describe("The substance page authenticated access", () => {
