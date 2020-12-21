@@ -370,7 +370,7 @@ export default {
         this.addAlert("Please load a substance", "warning");
         return;
       }
-      this.rowData.push(this.toRowData(null));
+      this.rowData.unshift(this.toRowData(null));
     },
 
     /**
