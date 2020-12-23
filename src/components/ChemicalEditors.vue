@@ -159,7 +159,7 @@ export default {
       // the sid that the loaded compound is related to
       if (this.cid) {
         return this.type === "definedCompound"
-          ? this.definedCompound?.relationships?.substance.data.id
+          ? this.definedCompound?.relationships?.substance?.data?.id
           : this.illDefinedCompound?.relationships.substance.data.id;
       } else {
         return null;
@@ -183,8 +183,10 @@ export default {
     async fetchByMolfile(molfile) {
       if (molfile) {
         let fetchedCompound = await compoundApi.fetchByMolfile(molfile);
-        if (fetchedCompound) this.definedCompound = fetchedCompound;
-        else this.definedCompound = {};
+        if (fetchedCompound) {
+          this.definedCompound = fetchedCompound;
+          this.ketcherChanged = false;
+        } else this.definedCompound = {};
       }
     },
     saveCompound(type) {
@@ -209,21 +211,14 @@ export default {
             id: this.cid,
             body: { ...requestBody, id: this.cid }
           })
-          // Handle the errors
           .catch(err => this.handleError(err));
       } else {
         // If there is no id, save the new compound
         this.$store
           .dispatch("compound/definedcompound/post", requestBody)
           .then(response =>
-            // Load the newly created compound.  We could bypass this action by
-            // storing the response but this verifies the compound is the same and
-            // further searches will work
-            this.$store.dispatch("compound/fetchCompound", {
-              id: response.data.data.id
-            })
+            this.$emit("compoundUpdate", { data: response.data.data })
           )
-          // Handle the errors
           .catch(err => this.handleError(err));
       }
     },
@@ -251,7 +246,6 @@ export default {
             id: compoundId,
             body: { ...requestBody, id: compoundId }
           })
-          // Handle the errors
           .catch(err => this.handleError(err));
       } else {
         // If there is no id, save the new compound
@@ -265,7 +259,6 @@ export default {
               id: response.data.data.id
             })
           )
-          // Handle the errors
           .catch(err => this.handleError(err));
       }
     },

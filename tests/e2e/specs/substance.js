@@ -483,6 +483,12 @@ describe("The substance page authenticated access", () => {
             .join("\n")
         )
       );
+    cy.get("#recordCompoundID").should("have.value", "DTXCID902000556");
+    cy.get("#substanceInfoPanel")
+      .should("contain", "18.01528024673462")
+      .should("contain", "O")
+      .should("contain", "H2 O")
+      .should("contain", "XLYOFNOQVPJJNP-UHFFFAOYSA-N");
   });
 
   it("should post not-loaded illdefined compounds", () => {
@@ -656,25 +662,83 @@ describe("The substance page's Synonym Table", () => {
   });
 
   it("should allow editing", () => {
-    // Queue a simple success message (actual response is not currently used)
-    cy.route("PATCH", "/synonyms/*", "success");
+    // Queue a simple success message.  Response is a template, not valid data.
+    cy.route("PATCH", "/synonyms/*", {
+      data: {
+        type: "synonym",
+        id: "3",
+        attributes: {
+          identifier: "Hello World",
+          qcNotes: "bc"
+        },
+        relationships: {
+          source: {
+            links: {
+              self: "http://localhost:8000/synonyms/3/relationships/source",
+              related: "http://localhost:8000/synonyms/3/source"
+            },
+            data: {
+              type: "source",
+              id: "7"
+            }
+          },
+          substance: {
+            links: {
+              self: "http://localhost:8000/synonyms/3/relationships/substance",
+              related: "http://localhost:8000/synonyms/3/substance"
+            },
+            data: {
+              type: "substance",
+              id: "2"
+            }
+          },
+          synonymQuality: {
+            links: {
+              self:
+                "http://localhost:8000/synonyms/3/relationships/synonymQuality",
+              related: "http://localhost:8000/synonyms/3/synonymQuality"
+            },
+            data: {
+              type: "synonymQuality",
+              id: "8"
+            }
+          }
+        }
+      }
+    }).as("patch");
 
     cy.get("[data-cy=search-box]").type("Sample Substance 2");
     cy.get("[data-cy=search-button]").click();
 
-    // Find the first row's first cell and type
+    // Button is enabled
     cy.get("#substanceTable")
       .find("div.ag-center-cols-clipper")
       .find("div.ag-row[role=row]")
       .first()
       .children()
-      .first()
-      .type("Hello World\n");
+      .within(row => {
+        // Find the first row's save button, verify disabled
+        cy.wrap(row)
+          .last()
+          .find("button")
+          .should("be.disabled");
 
-    // Save the cell edit
-    cy.get("#synonym-save-button").click();
+        // Find the first row's first cell and type
+        cy.wrap(row)
+          .first()
+          .type("Hello World\n");
 
-    cy.get("body").should("contain.text", "All synonyms saved successfully");
+        // Save the cell edit
+        cy.wrap(row)
+          .last()
+          .find("button")
+          .should("be.enabled")
+          .click();
+      });
+
+    cy.get("@patch")
+      .its("request.body.data.attributes.identifier")
+      .should("eq", "Hello World");
   });
 
   it("should allow adding new synonyms", () => {
@@ -712,12 +776,14 @@ describe("The substance page's Synonym Table", () => {
         cy.wrap($newRow)
           .find("div[col-id='data.synonymType_1']")
           .type("1");
+
+        // Click Save
+        cy.wrap($newRow)
+          .children()
+          .last()
+          .find("button")
+          .click();
       });
-
-    // Save the cell edit
-    cy.get("#synonym-save-button").click();
-
-    cy.get("body").should("contain.text", "All synonyms saved successfully");
 
     cy.get("@post")
       .its("request.body.data")
@@ -819,10 +885,15 @@ describe("The substance page's Synonym Table", () => {
       .first()
       .type("Hello World\n");
 
-    // Save the cell edit
-    cy.get("#synonym-save-button").click();
-
-    cy.get("body").should("contain.text", "Some synonyms could not be saved");
+    // Save Row
+    cy.get("#substanceTable")
+      .find("div.ag-center-cols-clipper")
+      .find("div.ag-row[role=row]")
+      .first()
+      .children()
+      .last()
+      .find("button")
+      .click();
 
     // Relocate the first row and select
     cy.get("#substanceTable")
@@ -836,32 +907,6 @@ describe("The substance page's Synonym Table", () => {
       .click();
 
     cy.get("#synonym-error-table").should("contain.text", sampleErrorMessage);
-  });
-
-  it("should be able to reset", () => {
-    cy.get("[data-cy=search-box]").type("Sample Substance 2");
-    cy.get("[data-cy=search-button]").click();
-
-    // Find the first row's first cell and type
-    cy.get("#substanceTable")
-      .find("div.ag-center-cols-clipper")
-      .find("div.ag-row[role=row]")
-      .first()
-      .children()
-      .first()
-      .type("Hello World\n");
-
-    // Roll back the cell edit
-    cy.get("#synonym-reset-button").click();
-
-    // Find the first row's first cell and confirm the rollback
-    cy.get("#substanceTable")
-      .find("div.ag-center-cols-clipper")
-      .find("div.ag-row[role=row]")
-      .first()
-      .children()
-      .first()
-      .should("contain.text", "Synonym 1");
   });
 });
 

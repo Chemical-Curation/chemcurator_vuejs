@@ -13,6 +13,7 @@
           :editable="isAuthenticated"
           :substance="substance"
           @change="changed = $event"
+          @compoundUpdate="fetchCompound($event.data.id)"
         />
       </b-col>
     </b-row>
