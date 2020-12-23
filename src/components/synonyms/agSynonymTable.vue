@@ -134,10 +134,34 @@ export default {
           sortable: false,
           editable: false,
           headerName: "",
-          type: "rightAligned",
+          cellClass: "p-0 text-center",
           cellRenderer: "btnCellRenderer",
           cellRendererParams: {
-            clicked: this.saveRow
+            clicked: this.saveRow,
+            buttonText: "Save",
+            buttonVariant: "primary",
+            enabled: function(data) {
+              return !_.isEqual(data.data, data.initialData);
+            }
+          }
+        });
+        // Add the delete button
+        colDefs.push({
+          flex: 0,
+          width: 85,
+          resizable: false,
+          sortable: false,
+          editable: false,
+          headerName: "",
+          cellClass: "p-0 text-center",
+          cellRenderer: "btnCellRenderer",
+          cellRendererParams: {
+            clicked: this.deleteRow,
+            buttonText: "Delete",
+            buttonVariant: "danger",
+            enabled: function() {
+              return true;
+            } // delete is always available
           }
         });
       }
@@ -286,14 +310,16 @@ export default {
     buildErrorString: function(error) {
       let readableDetails = error.detail;
 
-      let pointerField = error.source.pointer
-        .split("/")
-        .slice(-1)
-        .shift();
-      if (pointerField !== "nonFieldErrors") {
-        let result = pointerField.replace(/([A-Z])/g, " $1");
-        let finalResult = result.charAt(0).toUpperCase() + result.slice(1);
-        readableDetails = finalResult + ": " + readableDetails;
+      if (error?.source?.pointer) {
+        let pointerField = error.source.pointer
+          .split("/")
+          .slice(-1)
+          .shift();
+        if (pointerField !== "nonFieldErrors") {
+          let result = pointerField.replace(/([A-Z])/g, " $1");
+          let finalResult = result.charAt(0).toUpperCase() + result.slice(1);
+          readableDetails = finalResult + ": " + readableDetails;
+        }
       }
       return readableDetails;
     },
@@ -482,8 +508,28 @@ export default {
             .catch(onFailure);
     },
 
-    saveRow: async function(row) {
-      await this.saveRequest(row);
+    /**
+     * Deletes a single row
+     *
+     * @param row {obj} - rowData object
+     * @returns {Promise} - Deletes a row
+     */
+    deleteRow: function(row) {
+      if (!row.data.created) {
+        SynonymApi.delete(row.data.id)
+          .then(() => {
+            this.gridOptions.rowData.splice(row.rowIndex, 1);
+          })
+          .catch(err => {
+            row.data.errors = err.response.data.errors;
+          });
+      } else this.gridOptions.rowData.splice(row.rowIndex, 1);
+
+      this.gridOptions.api.redrawRows();
+    },
+
+    saveRow: async function(params) {
+      await this.saveRequest(params.data);
       this.gridOptions.api.redrawRows();
     },
 

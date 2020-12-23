@@ -1,32 +1,39 @@
 <template>
-  <span>
-    <b-button
-      size="sm"
-      variant="primary"
-      :disabled="!hasChanged"
-      @click="btnClickedHandler()"
-    >
-      Save
-    </b-button>
-  </span>
+  <b-button
+    size="sm"
+    :variant="params.buttonVariant"
+    :disabled="!isEnabled"
+    @click="btnClickedHandler()"
+  >
+    {{ params.buttonText }}
+  </b-button>
 </template>
 
 <script>
 import Vue from "vue";
-import _ from "lodash";
 
 // Built using https://blog.ag-grid.com/cell-renderers-in-ag-grid-every-different-flavour/ as a guide
 
 export default Vue.extend({
   name: "BtnCellRenderer",
-  computed: {
-    hasChanged: function() {
-      return !_.isEqual(this.params.data.data, this.params.data.initialData);
+  data() {
+    return {
+      isEnabled: false
+    };
+  },
+  watch: {
+    "params.data": {
+      deep: true,
+      immediate: true,
+      handler: "enabled"
     }
   },
   methods: {
     btnClickedHandler() {
-      this.params.clicked(this.params.data);
+      this.params.clicked(this.params);
+    },
+    enabled() {
+      this.isEnabled = this.params.enabled(this.params.data);
     }
   }
 });
