@@ -112,7 +112,11 @@ export default {
   },
   watch: {
     initialCompound: function() {
-      if (!this.initialCompound?.id) this.type = "none";
+      if (!this.initialCompound?.id) {
+        this.type = "none";
+        // this.$refs["ketcher"].clearMolfile();
+        // this.$refs["marvin"].clearMarvin();
+      } 
       else if (this.initialCompound?.type === "definedCompound") {
         this.definedCompound = this.initialCompound;
         this.type = "definedCompound";
