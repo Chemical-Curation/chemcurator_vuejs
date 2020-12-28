@@ -116,8 +116,7 @@ export default {
         this.type = "none";
         this.$refs["ketcher"].clearMolfile();
         this.$refs["marvin"].clearMarvin();
-      } 
-      else if (this.initialCompound?.type === "definedCompound") {
+      } else if (this.initialCompound?.type === "definedCompound") {
         this.definedCompound = this.initialCompound;
         this.type = "definedCompound";
         // Attempt to load the new molfile
