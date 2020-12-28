@@ -51,10 +51,11 @@ export default {
   },
   watch: {
     substance: function() {
-      if (this.substance?.relationships?.associatedCompound?.data?.id)
+      if (this.substance?.relationships?.associatedCompound?.data) {
         this.fetchCompound(
-          this.substance?.relationships.associatedCompound.data?.id
+          this.substance.relationships.associatedCompound.data.id
         );
+      } else this.compound = {};
     }
   },
   methods: {
