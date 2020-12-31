@@ -15,7 +15,7 @@
             :state="validationState[field].state"
             :options="options[field]"
             :disabled="!isAuthenticated"
-            @change="markChanged"
+            @change="markChanged(field)"
           />
         </template>
         <template v-else-if="textareas.includes(field)">
@@ -24,7 +24,7 @@
             v-model="form[field]"
             :state="validationState[field].state"
             :disabled="!isAuthenticated"
-            @input="markChanged"
+            @input="markChanged(field)"
           />
         </template>
         <template v-else>
@@ -33,12 +33,15 @@
             v-model="form[field]"
             :state="validationState[field].state"
             :disabled="editable(field)"
-            @input="markChanged"
+            @input="markChanged(field)"
           />
         </template>
         <b-form-invalid-feedback :id="'feedback-' + field">
           {{ validationState[field].message }}
         </b-form-invalid-feedback>
+        <b-form-valid-feedback :id="'feedback-' + field">
+          {{ validationState[field].message }}
+        </b-form-valid-feedback>
       </b-form-group>
     </div>
     <b-button
@@ -80,8 +83,9 @@ export default {
     };
   },
   computed: {
-    ...mapGetters("substance", ["form"]),
     ...mapState("substance", ["detail"]),
+    ...mapGetters("substance", ["form"]),
+    ...mapGetters("substance", ["staticState"]),
     ...mapGetters("auth", ["isAuthenticated"]),
     ...mapGetters("qcLevel", { qcLevelOptions: "getOptions" }),
     ...mapGetters("source", { sourceOptions: "getOptions" }),
@@ -112,8 +116,9 @@ export default {
     editable(fld) {
       return fld === "id" ? true : !this.isAuthenticated;
     },
-    markChanged() {
+    markChanged(field) {
       this.changed++;
+      this.checkDataChanges(field);
     },
     clearForm() {
       this.$store.commit("substance/clearForm");
@@ -271,6 +276,21 @@ export default {
         this.$set(this.validationState["displayName"], "message", "not unique");
         this.$set(this.validationState["casrn"], "state", false);
         this.$set(this.validationState["casrn"], "message", "not unique");
+      }
+    },
+    markUnsavedChanges(field) {
+      this.$set(this.validationState[field], "state", true);
+      this.$set(this.validationState[field], "message", "This field has unsaved changes.");
+    },
+    unmarkChanges(field) {
+      this.$set(this.validationState[field], "state", null);
+    },
+    checkDataChanges(field) {
+      if (this.form[field] !== this.staticState[field]) {
+        this.markUnsavedChanges(field);
+      }
+      else {
+        this.unmarkChanges(field);
       }
     }
   }

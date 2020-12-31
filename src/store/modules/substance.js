@@ -47,6 +47,7 @@ const defaultState = () => {
 };
 
 const state = defaultState();
+const staticState = () => {};
 
 // actions
 let actions = {
@@ -89,6 +90,7 @@ let actions = {
             color: "warning",
             dismissCountDown: 4
           };
+          // ?: should getting a failed search result clear what you have loaded?
           context.commit("clearState");
           context.dispatch(`compound/clearAllStates`, {}, { root: true });
           context.dispatch("alert/alert", alert, {
@@ -125,6 +127,21 @@ const getters = {
       privateQCNote: detail.attributes.privateQcNote,
       publicQCNote: detail.attributes.publicQcNote
     };
+  },
+  staticState: staticState => {
+    let { detail } = staticState;
+    return {
+      preferredName: detail.attributes.preferredName,
+      displayName: detail.attributes.displayName,
+      casrn: detail.attributes.casrn,
+      qcLevel: detail.relationships.qcLevel.data.id,
+      source: detail.relationships.source.data.id,
+      substanceType: detail.relationships.substanceType.data.id,
+      description: detail.attributes.description,
+      privateQCNote: detail.attributes.privateQcNote,
+      publicQCNote: detail.attributes.publicQcNote
+    };
+    
   }
 };
 
@@ -132,6 +149,7 @@ const getters = {
 const mutations = {
   ...rootMutations,
   loadDetail(state, payload) {
+    this.staticState = JSON.parse(JSON.stringify(payload));
     state.detail = payload;
   },
   clearForm(state) {
@@ -145,6 +163,7 @@ const mutations = {
 export default {
   namespaced: true,
   state,
+  staticState,
   actions,
   getters,
   mutations
