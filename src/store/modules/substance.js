@@ -141,7 +141,6 @@ const getters = {
       privateQCNote: detail.attributes.privateQcNote,
       publicQCNote: detail.attributes.publicQcNote
     };
-    
   }
 };
 

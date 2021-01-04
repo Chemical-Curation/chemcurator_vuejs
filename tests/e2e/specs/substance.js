@@ -41,6 +41,10 @@ describe("The substance form", () => {
       "The proposed CASRN does not conform to the regular expression ^[0-9]{2,7}-[0-9]{2}-[0-9]$"
     );
   });
+  it("should show unsaved changes", () => {
+    cy.get("#casrn").type("not a casrn");
+    cy.get("#feedback-casrn").contains("This field has unsaved changes.");
+  });
   it("should validate nonFieldErrors", () => {
     let casrn = valid_casrns[Math.floor(Math.random() * valid_casrns.length)];
     cy.get("#preferredName").type(casrn);

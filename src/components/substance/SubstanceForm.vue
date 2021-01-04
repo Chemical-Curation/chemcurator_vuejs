@@ -279,7 +279,11 @@ export default {
     },
     markUnsavedChanges(field) {
       this.$set(this.validationState[field], "state", true);
-      this.$set(this.validationState[field], "message", "This field has unsaved changes.");
+      this.$set(
+        this.validationState[field],
+        "message",
+        "This field has unsaved changes."
+      );
     },
     unmarkChanges(field) {
       this.$set(this.validationState[field], "state", null);
@@ -288,8 +292,7 @@ export default {
       if (this.form[field] !== this.staticState[field]) {
         this.markUnsavedChanges(field);
         this.changed++;
-      }
-      else {
+      } else {
         this.unmarkChanges(field);
         this.changed--;
       }
