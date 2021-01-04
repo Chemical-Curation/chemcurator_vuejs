@@ -117,7 +117,6 @@ export default {
       return fld === "id" ? true : !this.isAuthenticated;
     },
     markChanged(field) {
-      this.changed++;
       this.checkDataChanges(field);
     },
     clearForm() {
@@ -288,9 +287,11 @@ export default {
     checkDataChanges(field) {
       if (this.form[field] !== this.staticState[field]) {
         this.markUnsavedChanges(field);
+        this.changed++;
       }
       else {
         this.unmarkChanges(field);
+        this.changed--;
       }
     }
   }
