@@ -21,11 +21,9 @@ const getters = {
   freak: state => {
     if (state.type === "definedCompound") {
       return definedcompound.state.data;
-    }
-    else if (state.type === "none") {
+    } else if (state.type === "none") {
       return null;
-    }
-    else {
+    } else {
       return illdefinedcompound.state.data;
     }
   }

@@ -40,7 +40,7 @@ export default {
   },
   computed: {
     ...mapGetters("auth", ["isAuthenticated"]),
-    ...mapGetters("compound", {compound: "freak"}),
+    ...mapGetters("compound", { compound: "freak" }),
     ...mapState("substance", { substance: "detail" }),
     ...mapState("queryStructureType", { qstList: "list" }),
     ifNoSubstance() {
@@ -48,7 +48,7 @@ export default {
     }
   },
   watch: {
-    $route: function (to, from) {
+    $route: function(to, from) {
       if (from.query !== to.query && to.query.search) {
         this.runSearch();
       }
@@ -63,9 +63,9 @@ export default {
     },
     runSearch: function() {
       this.$store.dispatch("substance/substanceSearch", {
-        searchString: this.$route.query.search,
+        searchString: this.$route.query.search
       });
-    },
+    }
   },
   components: {
     ChemicalEditors,
@@ -75,16 +75,14 @@ export default {
     SubstanceRelationshipTable,
     ListTable
   },
-  beforeCreate() {
-  },
+  beforeCreate() {},
   created() {
     window.addEventListener("beforeunload", this.checkChanged);
   },
   mounted() {
-    if (this.$route.params.sid){
+    if (this.$route.params.sid) {
       this.$store.dispatch("substance/fetchSubstance", this.$route.params.sid);
-    }
-    else if (this.$route.query.search) {
+    } else if (this.$route.query.search) {
       this.runSearch();
     }
     this.$store.dispatch("queryStructureType/getList");

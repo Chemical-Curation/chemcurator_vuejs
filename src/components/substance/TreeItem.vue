@@ -42,7 +42,7 @@ export default {
         this.isOpen = !this.isOpen;
       } else {
         this.$root.$emit("bv::toggle::collapse", "substance-sidebar");
-        this.$router.push({name: "substance_detail", params: { sid: val }});
+        this.$router.push({ name: "substance_detail", params: { sid: val } });
       }
     }
   }

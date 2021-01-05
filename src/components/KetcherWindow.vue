@@ -35,7 +35,7 @@ export default {
         "M  V30 END BOND\n" +
         "M  V30 END CTAB\n" +
         "M  END",
-      molfile: "",
+      molfile: ""
     };
   },
   methods: {
@@ -83,7 +83,7 @@ export default {
       return this.$refs.ketcher;
     },
     molfileChanged: function() {
-      if(this.compound.id) {
+      if (this.compound.id) {
         return false;
       } else {
         return this.blank !== this.removeHeader(this.molfile);
@@ -97,7 +97,10 @@ export default {
       });
     },
     molfile: function() {
-      this.$store.dispatch("compound/definedcompound/fetchByMolfile", this.molfile);
+      this.$store.dispatch(
+        "compound/definedcompound/fetchByMolfile",
+        this.molfile
+      );
     }
   },
   mounted() {

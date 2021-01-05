@@ -107,13 +107,15 @@ export default {
         qcLevel: this.qcLevelOptions(
           this.substance?.relationships?.qcLevel?.data?.id
         ),
-        source: this.sourceOptions(this.substance?.relationships?.source?.data?.id),
+        source: this.sourceOptions(
+          this.substance?.relationships?.source?.data?.id
+        ),
         substanceType: this.substanceTypeOptions(
           this.substance?.relationships?.substanceType?.data?.id
         )
       };
     },
-    form: function () {
+    form: function() {
       let { attributes, relationships } = this.substance;
       return {
         id: this.substance.id, // sid
@@ -131,10 +133,10 @@ export default {
     }
   },
   watch: {
-//    "substance.id": function() {
-//      this.validationState = this.clearValidation();
-//      this.changed = 0;
-//    }
+    //    "substance.id": function() {
+    //      this.validationState = this.clearValidation();
+    //      this.changed = 0;
+    //    }
   },
   methods: {
     editable(fld) {

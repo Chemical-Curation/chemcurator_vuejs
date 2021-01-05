@@ -13,7 +13,9 @@
           v-if="isAuthenticated && isSuperuser"
           >Vocabularies</b-nav-item
         >
-        <b-nav-item :to="{ name: 'substance' }" @click="clearEditors">Substances</b-nav-item>
+        <b-nav-item :to="{ name: 'substance' }" @click="clearEditors"
+          >Substances</b-nav-item
+        >
         <b-nav-item :to="{ name: 'lists' }">Lists</b-nav-item>
       </b-navbar-nav>
       <b-navbar-nav class="ml-auto">
@@ -83,7 +85,10 @@ export default {
       this.$store.commit("compound/clearState");
     },
     searchCompound: function() {
-      this.$router.push({name: "substance", query: { search: this.searchString } });
+      this.$router.push({
+        name: "substance",
+        query: { search: this.searchString }
+      });
       this.searchString = "";
     }
   },

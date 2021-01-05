@@ -67,7 +67,11 @@ let actions = {
       context.commit("loadDetail", res.data.data);
       let compound_id = res.data.data.relationships.associatedCompound.data.id;
       if (compound_id) {
-        context.dispatch("compound/fetchCompound", {id: compound_id}, {root: true});
+        context.dispatch(
+          "compound/fetchCompound",
+          { id: compound_id },
+          { root: true }
+        );
       }
     });
   },
@@ -76,10 +80,9 @@ let actions = {
 
     await HTTP.get(`/${resource}?filter[search]=${encodeURI(searchString)}`)
       .then(response => {
-
         if (response.data.data.length > 0) {
           let loaded_substance = response.data.data[0];
-          context.commit("loadDetail", loaded_substance );
+          context.commit("loadDetail", loaded_substance);
           let compound_id =
             loaded_substance.relationships.associatedCompound.data?.id;
 
@@ -94,7 +97,7 @@ let actions = {
             context.commit("compound/setType", "none", { root: true });
           }
 
-        // router.push({name: "substance_detail", params: { sid: searchString }, query: { substance: loaded_substance }, push: push });
+          // router.push({name: "substance_detail", params: { sid: searchString }, query: { substance: loaded_substance }, push: push });
         } else {
           // Handle no rows returned
           const alert = {

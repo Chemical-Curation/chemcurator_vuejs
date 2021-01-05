@@ -44,22 +44,30 @@
       <div id="substanceInfoPanel" class="border rounded mb-3">
         <dl class="row my-1 p-2">
           <dt class="col-lg-2">Molecular Weight</dt>
-          <dd class="col-lg-4 overflow-auto">{{ definedCompound.attributes.molecularWeight }}</dd>
+          <dd class="col-lg-4 overflow-auto">
+            {{ definedCompound.attributes.molecularWeight }}
+          </dd>
 
           <dt class="col-lg-2">Molecular Formula</dt>
-          <dd class="col-lg-4 overflow-auto">{{ definedCompound.attributes.molecularFormula }}</dd>
+          <dd class="col-lg-4 overflow-auto">
+            {{ definedCompound.attributes.molecularFormula }}
+          </dd>
 
           <dt class="col-lg-2">SMILES</dt>
-          <dd class="col-lg-4 overflow-auto">{{ definedCompound.attributes.smiles }}</dd>
+          <dd class="col-lg-4 overflow-auto">
+            {{ definedCompound.attributes.smiles }}
+          </dd>
 
           <dt class="col-lg-2">Inchikey</dt>
-          <dd class="col-lg-4 overflow-auto">{{ definedCompound.attributes.inchikey }}</dd>
+          <dd class="col-lg-4 overflow-auto">
+            {{ definedCompound.attributes.inchikey }}
+          </dd>
         </dl>
       </div>
       <KetcherWindow
         ref="ketcher"
         :compound="definedCompound"
-        @molfileUpdate="ketcherChanged = $event.changed;"
+        @molfileUpdate="ketcherChanged = $event.changed"
       />
     </div>
     <div v-show="type !== 'definedCompound' && type !== 'none'">
@@ -107,15 +115,16 @@ export default {
   },
   watch: {
     initialCompound: function() {
-      if(this.type === "none") {
+      if (this.type === "none") {
         // this block empties out the ketcher window when substance is
         // hit in the NavBar
         this.$refs["ketcher"].loadMolfile("");
         this.changed = false;
-      }
-      else if (this.initialCompound?.type === "definedCompound") {
+      } else if (this.initialCompound?.type === "definedCompound") {
         console.log("watcher", this.definedCompound.attributes.molfileV3000);
-        this.$refs["ketcher"].loadMolfile(this.definedCompound.attributes.molfileV3000);
+        this.$refs["ketcher"].loadMolfile(
+          this.definedCompound.attributes.molfileV3000
+        );
       } else {
         this.$refs["marvin"].loadMrvfile(this.initialMrvfile);
       }
@@ -128,10 +137,10 @@ export default {
     ...mapState("compound/definedcompound", { definedCompound: "data" }),
     ...mapGetters("queryStructureType", { options: "getOptions" }),
     type: {
-      get: function () {
+      get: function() {
         return this.$store.state.compound.type;
       },
-      set: function (newValue) {
+      set: function(newValue) {
         this.$store.commit("compound/setType", newValue);
       }
     },
@@ -156,10 +165,7 @@ export default {
       );
     },
     showSubstanceLink: function() {
-      return (
-        this.sid !== null &&
-        this.sid !== this.substance?.id
-      );
+      return this.sid !== null && this.sid !== this.substance?.id;
     }
   },
   methods: {
@@ -184,14 +190,18 @@ export default {
           .dispatch("compound/definedcompound/patch", {
             id: this.cid,
             body: { ...requestBody, id: this.cid }
-          }).then(() => this.ketcherChanged = false)
+          })
+          .then(() => (this.ketcherChanged = false))
           .catch(err => this.handleError(err));
       } else {
         // If there is no id, save the new compound
         this.$store
           .dispatch("compound/definedcompound/post", requestBody)
           .then(response => {
-            this.$store.dispatch("compound/definedcompound/getFetch",  response.data.data.id );
+            this.$store.dispatch(
+              "compound/definedcompound/getFetch",
+              response.data.data.id
+            );
             this.ketcherChanged = false;
           })
           .catch(err => this.handleError(err));
