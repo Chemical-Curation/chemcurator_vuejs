@@ -99,6 +99,39 @@ export const agGridMixin = {
   methods: {
     ...mapActions("alert", ["alert"]),
 
+    /** todo: Clean up this doc
+     * Rebuilds rowData with a provided array of jsonapi compliant synonyms
+     *
+     * @param synonyms {array} - Array of JsonAPI Synonym objects
+     *     Sample JsonAPI Synonym
+     *     {
+     *       id: "string"
+     *       attributes: { identifier: "string", qcNotes: "string" },
+     *       relationships: {
+     *         substance: {
+     *           data: { type: "substance", id: "string" }
+     *         },
+     *         source: {
+     *           data: { type: "source", id: "string" }
+     *         },
+     *         synonymQuality: {
+     *           data: { type: "synonymQuality", id: "string" }
+     *         },
+     *         synonymType: {
+     *           data: { type: "synonymType", id: "string" }
+     *         },
+     *       }
+     *     }
+     * @returns {array} - Array of agGrid rowData nodes.
+     */
+    buildRowData: function(jsonapiArray) {
+      let rowData = [];
+      for (let jsonapiObject of jsonapiArray) {
+        rowData.push(this.toRowData(jsonapiObject));
+      }
+      return rowData;
+    },
+
     /**
      * Adds an alert to the page and scrolls the user to the top of the page
      * so they can see it.

@@ -40,10 +40,10 @@
 </template>
 
 <script>
-import { mapActions, mapGetters, mapState } from "vuex";
-import _ from "lodash";
+import { mapActions, mapState } from "vuex";
 import { AgGridVue } from "ag-grid-vue";
 import { agGridMixin } from "@/components/ag-grid/agGridMixin";
+import SubstanceRelationshipApi from "@/api/substance-relationships";
 
 export default {
   name: "agSubstanceRelationshipTable",
@@ -56,16 +56,7 @@ export default {
     substanceId: String,
     editable: Boolean
   },
-  data() {
-    return {
-      rowData: null,
-      defaultColDef: null,
-      gridOptions: null
-    };
-  },
   computed: {
-    ...mapGetters("auth", ["isAuthenticated"]),
-    ...mapState("substanceRelationship", ["list", "included"]),
     ...mapState("source", { sourceList: "list" }),
     ...mapState("relationshipType", { relationshipTypeList: "list" }),
 
@@ -83,7 +74,7 @@ export default {
         },
         {
           headerName: "Source",
-          field: "relationships.source.data.id",
+          field: "data.source",
           comparator: this.sourceMapCompare,
           cellRenderer: "mappableCellRenderer",
           cellRendererParams: {
@@ -92,7 +83,7 @@ export default {
         },
         {
           headerName: "Type",
-          field: "relationships.relationshipType.data.id",
+          field: "data.relationshipType",
           comparator: this.typeMapCompare,
           cellRenderer: "mappableCellRenderer",
           cellRendererParams: {
@@ -101,12 +92,11 @@ export default {
         },
         {
           headerName: "QC Notes",
-          field: "attributes.qcNotes",
+          field: "data.qcNotes",
           cellEditor: "agLargeTextCellEditor"
         }
       ];
       colDefs = colDefs.concat(this.getEditButtons());
-      console.log(colDefs);
       return colDefs;
     },
 
@@ -140,64 +130,191 @@ export default {
   },
   watch: {
     /**
-     * Resets row data on Substance Relationship List updates
-     */
-    list: function() {
-      this.resetRowData();
-    },
-
-    /**
      * Loads the substance relationships for the currently loaded substance
      */
     substanceId: function() {
-      if (this.substanceId) this.loadSubstanceRelationships();
+      this.loadSubstanceRelationships(this.substanceId);
     }
   },
   methods: {
-    ...mapActions("alert", ["alert"]),
-    ...mapActions("substanceRelationship", ["getList", "patch"]),
     ...mapActions("relationshipType", { loadRelationshipTypeList: "getList" }),
     ...mapActions("source", { loadSourceList: "getList" }),
 
     /**
-     * Loads synonyms by substance id.
+     * Loads substance relationships by substance id.
      */
-    loadSubstanceRelationships: function() {
-      if (this.substanceId) {
-        this.getList({
-          params: [
-            { key: "filter[substance.id]", value: this.substanceId },
-            { key: "include", value: "fromSubstance,toSubstance" }
-          ]
+    loadSubstanceRelationships: async function(substanceId) {
+      this.loading = true;
+
+      let substanceRelationships = [];
+      if (substanceId)
+        substanceRelationships = await SubstanceRelationshipApi.list({
+          params: [{ key: "filter[substance.id]", value: substanceId }]
+        }).then(res => {
+          return res.data.data;
         });
-      }
+
+      this.rowData = this.buildRowData(substanceRelationships);
+      this.loading = false;
     },
 
     /**
-     * Resets the row data to whatever is in the substance relationship store.
-     * (the store should never be updated by this table)
+     * Transforms rowData.data into a jsonapi compliant body.
+     *
+     * @param data - rowData.data object
+     * @returns {obj} - Jsonapi formatted create request body
      */
-    resetRowData: function() {
-      this.rowData = _.cloneDeep(this.list);
-      this.gridOptions.api.refreshCells({
-        force: true,
-        suppressFlash: false
-      });
+    buildRequestBody: function(data) {
+      let requestBody = {
+        type: "substanceRelationship",
+        attributes: {
+          qcNotes: data.qcNotes
+        },
+        // todo: Needs either FROM or TO
+        relationships: {
+          substance: {
+            data: {
+              id: this.substanceId,
+              type: "substance"
+            }
+          }
+        }
+      };
+      for (let relationship of ["source", "relationshipType"]) {
+        if (data[relationship])
+          requestBody["relationships"][relationship] = {
+            data: { type: relationship, id: data[relationship] }
+          };
+      }
+      return requestBody;
     },
 
     /**
-     * Allows the buttons to be interactive and the overlays to display
-     * based on the state the data is in.
+     * Builds an update/save request for a single row
+     *
+     * @param row {obj} - rowData object
+     * @returns {Promise} - API request for a single row.
+     *    - On success the row will have created set to false and
+     *      initialData updated to reflect the current data.
+     *    - On failure the errors will be added to the row.
      */
-    manageOverlay: function() {
-      if (this.loading) {
-        this.gridOptions.api.showLoadingOverlay();
-      } else if (!this.loading && _.isEqual(this.list, [])) {
-        this.gridOptions.api.showNoRowsOverlay();
-      } else {
-        this.gridOptions.api.hideOverlay();
+    saveRequest: function(row) {
+      // Local functions to deal with successful saves and failures
+      function onSuccess(res) {
+        // Save the id of the potentially newly minted row.
+        row.id = res.data.data.id;
+        row.created = false;
+        row.initialData = { ...row.data };
+        row.errors = null;
+        return res;
       }
+
+      function onFailure(err) {
+        row.errors = err.response.data.errors;
+        return {
+          failed: true
+        };
+      }
+
+      let requestBody = this.buildRequestBody(row.data);
+
+      return row.created
+        ? SubstanceRelationshipApi.post(requestBody)
+            .then(onSuccess)
+            .catch(onFailure)
+        : SubstanceRelationshipApi.patch({
+            id: row.id,
+            body: { ...requestBody, id: row.id }
+          })
+            .then(onSuccess)
+            .catch(onFailure);
     },
+
+    /**
+     * Rebuilds rowData with a provided array of jsonapi compliant synonyms
+     *
+     * @param substanceRelationship {Object} - JsonAPI formatted synonym or null
+     *     Sample JsonAPI Synonym
+     *     {
+     *       id: "string"
+     *       attributes: { identifier: "string", qcNotes: "string" },
+     *       relationships: {
+     *         substance: {
+     *           data: { type: "substance", id: "string" }
+     *         },
+     *         source: {
+     *           data: { type: "source", id: "string" }
+     *         },
+     *         synonymQuality: {
+     *           data: { type: "synonymQuality", id: "string" }
+     *         },
+     *         synonymType: {
+     *           data: { type: "synonymType", id: "string" }
+     *         },
+     *       }
+     *     }
+     * @returns {Object} - agGrid rowData node.
+     *     Sample rowData node
+     *     {
+     *       id: "string",  The synonym's id or null
+     *       data: { identifier, qcNotes, synonymType, synonymQuality, source }, The synonyms rendered field data
+     *       initialData: { identifier, qcNotes, synonymType, synonymQuality, source }, The synonyms initial field data
+     *       errors: {detail, status, source: { pointer: "string"}, code },  Any save errors as error objects
+     *       created: Boolean(synonym?.id)  // True if this is a new, unsaved row
+     *     }
+     */
+    toRowData: function(substanceRelationship) {
+      let data = {
+        fromSubstance:
+          substanceRelationship?.relationships?.fromSubstance?.data?.id,
+        toSubstance:
+          substanceRelationship?.relationships?.toSubstance?.data?.id,
+        qcNotes: substanceRelationship?.attributes?.qcNotes ?? "",
+        relationshipType:
+          substanceRelationship?.relationships?.relationshipType?.data?.id ??
+          null,
+        source: substanceRelationship?.relationships?.source?.data?.id ?? null
+      };
+
+      return {
+        id: substanceRelationship?.id ?? null,
+        data: { ...data },
+        initialData: { ...data },
+        errors: null,
+        created: !substanceRelationship?.id // if there is no id, this row is considered "new".
+      };
+    },
+
+    /**
+     * Adds a new synonym to this.rowData
+     */
+    addRelationship: function() {
+      if (!this.substanceId) {
+        this.addAlert("Please load a substance", "warning");
+        return;
+      }
+      this.rowData.unshift(this.toRowData(null));
+    },
+
+    /**
+     * Deletes a single row - not implemented yet
+     *
+     * @param row {obj} - rowData object
+     * @returns {Promise} - Deletes a row
+     */
+    // deleteRow: function(row) {
+    //   if (!row.data.created) {
+    //     SubstanceRelationshipApi.delete(row.data.id)
+    //       .then(() => {
+    //         this.gridOptions.rowData.splice(row.rowIndex, 1);
+    //       })
+    //       .catch(err => {
+    //         row.data.errors = err.response.data.errors;
+    //       });
+    //   } else this.gridOptions.rowData.splice(row.rowIndex, 1);
+    //
+    //   this.gridOptions.api.redrawRows();
+    // },
 
     /**
      * Returns a boolean comparing two objects
@@ -207,14 +324,13 @@ export default {
      *    or the currently SID if this relationship is self-referential.
      */
     sidGetter: function(params) {
-      if (
-        params.data.relationships.fromSubstance.data.id === this.substanceId
-      ) {
-        return params.data.relationships.toSubstance.data.id;
+      if (params.data.data.fromSubstance === this.substanceId) {
+        return params.data.data.toSubstance;
       } else {
-        return params.data.relationships.fromSubstance.data.id;
+        return params.data.data.fromSubstance;
       }
     },
+
     /**
      * Returns an int comparing two objects
      *
@@ -256,11 +372,17 @@ export default {
     }
   },
   mounted() {
+    this.loadSubstanceRelationships(this.substanceId);
+    if (this.gridOptions.api)
+      this.gridOptions.api.refreshCells({
+        force: true,
+        suppressFlash: false
+      });
+
     // set the overlay based on the mounted state
     this.manageOverlay();
 
     // Load related info
-    this.loadSubstanceRelationships();
     this.loadRelationshipTypeList();
     // sources are loaded on the substance page.
     // This is redundant but will be required if reuse this component.
