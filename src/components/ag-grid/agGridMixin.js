@@ -222,6 +222,53 @@ export const agGridMixin = {
       } else {
         this.gridOptions.api.hideOverlay();
       }
+    },
+
+    getEditButtons: function() {
+      let buttons = [];
+
+      if (this.editable) {
+        // Add the save button
+        buttons.push({
+          flex: 0,
+          width: 85,
+          resizable: false,
+          sortable: false,
+          editable: false,
+          headerName: "",
+          cellClass: "p-0 text-center",
+          cellRenderer: "btnCellRenderer",
+          cellRendererParams: {
+            clicked: this.saveRow,
+            buttonText: "Save",
+            buttonVariant: "primary",
+            enabled: function(data) {
+              return !_.isEqual(data.data, data.initialData);
+            }
+          }
+        });
+        // Add the delete button
+        buttons.push({
+          flex: 0,
+          width: 85,
+          resizable: false,
+          sortable: false,
+          editable: false,
+          headerName: "",
+          cellClass: "p-0 text-center",
+          cellRenderer: "btnCellRenderer",
+          cellRendererParams: {
+            clicked: this.deleteRow,
+            buttonText: "Delete",
+            buttonVariant: "danger",
+            enabled: function() {
+              return true;
+            } // delete is always available
+          }
+        });
+      }
+
+      return buttons;
     }
   }
 };

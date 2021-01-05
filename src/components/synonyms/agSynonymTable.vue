@@ -41,7 +41,6 @@
 
 <script>
 import { mapActions, mapGetters, mapState } from "vuex";
-import _ from "lodash";
 import { AgGridVue } from "ag-grid-vue";
 import SynonymApi from "@/api/synonym.js";
 import { agGridMixin } from "@/components/ag-grid/agGridMixin";
@@ -121,46 +120,7 @@ export default {
           cellEditor: "agLargeTextCellEditor"
         }
       ];
-      if (this.editable) {
-        // Add the save button
-        colDefs.push({
-          flex: 0,
-          width: 85,
-          resizable: false,
-          sortable: false,
-          editable: false,
-          headerName: "",
-          cellClass: "p-0 text-center",
-          cellRenderer: "btnCellRenderer",
-          cellRendererParams: {
-            clicked: this.saveRow,
-            buttonText: "Save",
-            buttonVariant: "primary",
-            enabled: function(data) {
-              return !_.isEqual(data.data, data.initialData);
-            }
-          }
-        });
-        // Add the delete button
-        colDefs.push({
-          flex: 0,
-          width: 85,
-          resizable: false,
-          sortable: false,
-          editable: false,
-          headerName: "",
-          cellClass: "p-0 text-center",
-          cellRenderer: "btnCellRenderer",
-          cellRendererParams: {
-            clicked: this.deleteRow,
-            buttonText: "Delete",
-            buttonVariant: "danger",
-            enabled: function() {
-              return true;
-            } // delete is always available
-          }
-        });
-      }
+      colDefs = colDefs.concat(this.getEditButtons());
       return colDefs;
     },
 

@@ -11,7 +11,31 @@
       :defaultColDef="defaultColDef"
       :rowData="rowData"
       :gridOptions="gridOptions"
+      :rowClassRules="rowClassRules"
+      :frameworkComponents="frameworkComponents"
+      @row-selected="onRowSelected"
+      rowSelection="single"
     />
+    <div v-show="selectedError" class="mt-3 text-left">
+      <b-table
+        id="synonym-error-table"
+        :items="selectedError"
+        :fields="errorFields"
+        borderless
+        table-variant="danger"
+      ></b-table>
+    </div>
+    <div class="d-flex flex-row justify-content-end my-3" v-if="editable">
+      <b-button
+        id="synonym-add-button"
+        class="ml-1"
+        variant="success"
+        :disabled="!substanceId || loading"
+        @click="addRelationship"
+      >
+        Add Relationship
+      </b-button>
+    </div>
   </div>
 </template>
 
@@ -19,19 +43,18 @@
 import { mapActions, mapGetters, mapState } from "vuex";
 import _ from "lodash";
 import { AgGridVue } from "ag-grid-vue";
-import {
-  MappableCellRenderer,
-  SelectObjectCellEditor
-} from "@/components/ag-grid/custom-renderers";
+import { agGridMixin } from "@/components/ag-grid/agGridMixin";
 
 export default {
   name: "agSubstanceRelationshipTable",
   components: {
     AgGridVue
   },
+  mixins: [agGridMixin],
   props: {
     // Substance ID to which these synonyms will be related
-    substanceId: String
+    substanceId: String,
+    editable: Boolean
   },
   data() {
     return {
@@ -42,7 +65,7 @@ export default {
   },
   computed: {
     ...mapGetters("auth", ["isAuthenticated"]),
-    ...mapState("substanceRelationship", ["list", "loading", "included"]),
+    ...mapState("substanceRelationship", ["list", "included"]),
     ...mapState("source", { sourceList: "list" }),
     ...mapState("relationshipType", { relationshipTypeList: "list" }),
 
@@ -50,7 +73,7 @@ export default {
      * Defines the columns to be used in ag grid table
      */
     columnDefs: function() {
-      return [
+      let colDefs = [
         {
           headerName: "SID",
           // Strips the checksum from the comparison
@@ -82,6 +105,9 @@ export default {
           cellEditor: "agLargeTextCellEditor"
         }
       ];
+      colDefs = colDefs.concat(this.getEditButtons());
+      console.log(colDefs);
+      return colDefs;
     },
 
     /**
@@ -125,13 +151,6 @@ export default {
      */
     substanceId: function() {
       if (this.substanceId) this.loadSubstanceRelationships();
-    },
-
-    /**
-     * Handles the AG-Grid loading overlays when substance relationship loading starts and stops
-     */
-    loading: function() {
-      this.manageOverlay();
     }
   },
   methods: {
@@ -235,22 +254,6 @@ export default {
         this.typeListMap[valueB].attributes.label.toLowerCase();
       return comparison ? 1 : -1;
     }
-  },
-  beforeMount() {
-    // Load grid options
-    this.gridOptions = {
-      components: {
-        mappableCellRenderer: MappableCellRenderer,
-        selectObjectCellEditor: SelectObjectCellEditor
-      }
-    };
-
-    // Load grid styling
-    this.defaultColDef = {
-      flex: 1,
-      resizable: true,
-      sortable: true
-    };
   },
   mounted() {
     // set the overlay based on the mounted state
