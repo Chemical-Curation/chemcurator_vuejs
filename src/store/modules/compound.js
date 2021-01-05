@@ -15,14 +15,30 @@ const defaultState = () => {
 };
 
 const state = defaultState();
+
+// getters
+const getters = {
+  freak: state => {
+    if (state.type === "definedCompound") {
+      return definedcompound.state.data;
+    }
+    else if (state.type === "none") {
+      return null;
+    }
+    else {
+      return illdefinedcompound.state.data;
+    }
+  }
+};
+
 // actions
 let actions = {
   ...rootActions,
   getResourceURI: () => {
     return "compounds";
   },
-  fetchCompound: async ({ commit, dispatch }, { id }) => {
-    dispatch("clearAllStates");
+  fetchCompound: async ({ commit }, { id }) => {
+    //dispatch("clearAllStates");
 
     let endpoint = `/compounds/${id}`;
     await HTTP.get(endpoint).then(response => {
@@ -58,6 +74,7 @@ export default {
   namespaced: true,
   state,
   actions,
+  getters,
   mutations,
   modules: {
     definedcompound,

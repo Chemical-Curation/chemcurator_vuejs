@@ -7,6 +7,7 @@
         label-cols="3"
         :label-for="field"
         class="pb-3"
+        :class="field"
       >
         <template v-if="dropdowns.includes(field)">
           <b-form-select
@@ -24,6 +25,15 @@
             v-model="form[field]"
             :state="validationState[field].state"
             :disabled="!isAuthenticated"
+            @input="markChanged"
+          />
+        </template>
+        <template v-else-if="field == 'associatedCompound'">
+          <b-form-input
+            :id="field"
+            v-model="form[field]"
+            :state="validationState[field].state"
+            :disabled="editable(field)"
             @input="markChanged"
           />
         </template>
@@ -55,10 +65,11 @@
 </template>
 
 <script>
-import { mapGetters, mapState } from "vuex";
+import { mapGetters } from "vuex";
 
 export default {
   name: "SubstanceForm",
+  props: ["substance"],
   data() {
     return {
       changed: 0,
@@ -80,12 +91,13 @@ export default {
     };
   },
   computed: {
-    ...mapGetters("substance", ["form"]),
-    ...mapState("substance", ["detail"]),
+    //...mapGetters("substance", ["form"]),
+    //...mapState("substance", ["detail"]),
     ...mapGetters("auth", ["isAuthenticated"]),
     ...mapGetters("qcLevel", { qcLevelOptions: "getOptions" }),
     ...mapGetters("source", { sourceOptions: "getOptions" }),
     ...mapGetters("substanceType", { substanceTypeOptions: "getOptions" }),
+    ...mapGetters("compound", ["freak"]),
 
     btnDisabled: function() {
       return !(this.changed > 0);
@@ -93,20 +105,36 @@ export default {
     options: function() {
       return {
         qcLevel: this.qcLevelOptions(
-          this.detail?.relationships.qcLevel.data?.id
+          this.substance?.relationships?.qcLevel?.data?.id
         ),
-        source: this.sourceOptions(this.detail?.relationships.source.data?.id),
+        source: this.sourceOptions(this.substance?.relationships?.source?.data?.id),
         substanceType: this.substanceTypeOptions(
-          this.detail?.relationships.substanceType.data?.id
+          this.substance?.relationships?.substanceType?.data?.id
         )
+      };
+    },
+    form: function () {
+      let { attributes, relationships } = this.substance;
+      return {
+        id: this.substance.id, // sid
+        preferredName: attributes.preferredName,
+        displayName: attributes.displayName,
+        casrn: attributes.casrn,
+        qcLevel: relationships.qcLevel.data.id,
+        source: relationships.source.data.id,
+        substanceType: relationships.substanceType.data.id,
+        description: attributes.description,
+        privateQCNote: attributes.privateQcNote,
+        publicQCNote: attributes.publicQcNote,
+        associatedCompound: this.freak?.id
       };
     }
   },
   watch: {
-    "form.id": function() {
-      this.validationState = this.clearValidation();
-      this.changed = 0;
-    }
+//    "substance.id": function() {
+//      this.validationState = this.clearValidation();
+//      this.changed = 0;
+//    }
   },
   methods: {
     editable(fld) {
@@ -135,7 +163,8 @@ export default {
         qcLevel: { ...clean },
         source: { ...clean },
         description: { ...clean },
-        substanceType: { ...clean }
+        substanceType: { ...clean },
+        associatedCompound: { ...clean }
       };
     },
     buildPayload() {
@@ -154,7 +183,8 @@ export default {
       )(data);
       // filter out attributes that have not been changed
       if (id) {
-        let { attributes } = this.detail;
+        // this is all going to need to change
+        let { attributes } = this.substance;
         Object.keys(attrs).forEach(key => {
           if (attrs[key] == attributes[key]) delete attrs[key];
         });
@@ -176,7 +206,7 @@ export default {
       )(data);
       // filter out the relationships that haven't been changed
       if (id) {
-        let { relationships } = this.detail;
+        let { relationships } = this.substance;
         Object.keys(related).forEach(key => {
           if (related[key].data.id == relationships[key].data.id)
             delete related[key];
@@ -277,4 +307,8 @@ export default {
 };
 </script>
 
-<style scoped></style>
+<!-- <style scoped> -->
+<!--   .associatedCompound { -->
+<!--     display: none; -->
+<!--   } -->
+<!-- </style> -->

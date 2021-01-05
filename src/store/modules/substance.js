@@ -1,7 +1,6 @@
 import rootActions from "../actions.js";
 import rootMutations from "../mutations.js";
 import { HTTP } from "@/store/http-common";
-import router from "@/router";
 
 const defaultDetail = () => {
   return {
@@ -27,6 +26,11 @@ const defaultDetail = () => {
         }
       },
       qcLevel: {
+        data: {
+          id: null
+        }
+      },
+      associatedCompound: {
         data: {
           id: null
         }
@@ -58,19 +62,24 @@ let actions = {
     let payload = state.list.filter(sub => sub.id === id).shift();
     commit("loadDetail", payload);
   },
-  substanceSearch: async (context, { searchString, push }) => {
+  fetchSubstance: async (context, sid) => {
+    HTTP.get(`substances/${sid}`).then(res => {
+      context.commit("loadDetail", res.data.data);
+      let compound_id = res.data.data.relationships.associatedCompound.data.id;
+      if (compound_id) {
+        context.dispatch("compound/fetchCompound", {id: compound_id}, {root: true});
+      }
+    });
+  },
+  substanceSearch: async (context, { searchString }) => {
     let resource = await context.dispatch("getResourceURI");
-
-    if (push && router.currentRoute.name !== "substance")
-      await router.push("substance");
 
     await HTTP.get(`/${resource}?filter[search]=${encodeURI(searchString)}`)
       .then(response => {
-        context.commit("storeList", response.data.data);
-        context.commit("storeCount", response.data.meta.pagination.count);
 
         if (response.data.data.length > 0) {
           let loaded_substance = response.data.data[0];
+          context.commit("loadDetail", loaded_substance );
           let compound_id =
             loaded_substance.relationships.associatedCompound.data?.id;
 
@@ -81,7 +90,11 @@ let actions = {
               { id: compound_id },
               { root: true }
             );
+          } else {
+            context.commit("compound/setType", "none", { root: true });
           }
+
+        // router.push({name: "substance_detail", params: { sid: searchString }, query: { substance: loaded_substance }, push: push });
         } else {
           // Handle no rows returned
           const alert = {

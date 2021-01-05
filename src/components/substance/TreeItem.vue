@@ -21,8 +21,6 @@
 </template>
 
 <script>
-import { mapActions } from "vuex";
-
 export default {
   name: "TreeItem",
   props: {
@@ -39,13 +37,12 @@ export default {
     }
   },
   methods: {
-    ...mapActions({ loadDetail: "substance/loadDetail" }),
     toggle: function(val) {
       if (this.isFolder) {
         this.isOpen = !this.isOpen;
       } else {
         this.$root.$emit("bv::toggle::collapse", "substance-sidebar");
-        this.loadDetail(val);
+        this.$router.push({name: "substance_detail", params: { sid: val }});
       }
     }
   }

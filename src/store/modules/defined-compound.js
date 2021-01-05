@@ -4,7 +4,16 @@ import { HTTP } from "@/store/http-common";
 
 const defaultState = () => {
   return {
-    data: {},
+    data: {
+      id: "",
+      attributes: {
+        molfileV3000: "",
+        molecularWeight: "",
+        molecularFormula: "",
+        smiles: "",
+        inchikey: ""
+      }
+    },
     included: {},
     changed: false
   };
@@ -35,6 +44,8 @@ const actions = {
         //       or if the json:api id is the same as the cid being passed in.
         if (obj) {
           dispatch("getFetch", obj.id);
+        } else {
+          commit("clearState");
         }
       })
       .catch(err => {
