@@ -12,6 +12,7 @@
           :initial-compound="compound"
           :editable="isAuthenticated"
           :substance="substance"
+          :urlParam="urlParam"
           @change="changed = $event"
         />
       </b-col>
@@ -35,7 +36,8 @@ export default {
   name: "home",
   data() {
     return {
-      changed: false
+      changed: false,
+      urlParam: false
     };
   },
   computed: {
@@ -82,8 +84,10 @@ export default {
   mounted() {
     if (this.$route.params.sid) {
       this.$store.dispatch("substance/fetchSubstance", this.$route.params.sid);
+      this.urlParam = true;
     } else if (this.$route.query.search) {
       this.runSearch();
+      this.urlParam = true;
     }
     this.$store.dispatch("queryStructureType/getList");
     this.$store.dispatch("source/getList");

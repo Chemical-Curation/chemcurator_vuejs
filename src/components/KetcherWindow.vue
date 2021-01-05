@@ -21,7 +21,8 @@ import { mapState } from "vuex";
 export default {
   name: "KetcherWindow",
   props: {
-    compound: Object
+    compound: Object,
+    urlParam: Boolean
   },
   data() {
     return {
@@ -35,13 +36,13 @@ export default {
         "M  V30 END BOND\n" +
         "M  V30 END CTAB\n" +
         "M  END",
-      molfile: ""
+      molfile: "",
+      loadedMolfile: ""
     };
   },
   methods: {
     loadMolfile: function(molfile) {
       if (molfile) {
-        console.log("loading...", molfile);
         this.ketcherFrame.contentWindow.postMessage(
           {
             type: "importMolfile",
@@ -58,7 +59,6 @@ export default {
       );
     },
     clearMolfile: function() {
-      console.log("clearing...");
       this.ketcherFrame.contentWindow.postMessage(
         { type: "clearMolfile" },
         "*"
@@ -83,8 +83,8 @@ export default {
       return this.$refs.ketcher;
     },
     molfileChanged: function() {
-      if (this.compound.id) {
-        return false;
+      if(this.urlParam) {
+        return this.removeHeader(this.loadedMolfile) !== this.removeHeader(this.molfile);
       } else {
         return this.blank !== this.removeHeader(this.molfile);
       }
@@ -108,6 +108,7 @@ export default {
       "message",
       event => {
         if (event.data.type === "returnMolfile") {
+          if(!this.loadedMolfile) this.loadedMolfile = event.data.molfile;
           this.molfile = event.data.molfile;
         }
       },

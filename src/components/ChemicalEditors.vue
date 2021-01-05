@@ -67,6 +67,7 @@
       <KetcherWindow
         ref="ketcher"
         :compound="definedCompound"
+        :urlParam="urlParam"
         @molfileUpdate="ketcherChanged = $event.changed"
       />
     </div>
@@ -103,12 +104,11 @@ export default {
   props: {
     initialCompound: Object,
     editable: Boolean,
-    substance: Object
+    substance: Object,
+    urlParam: Boolean
   },
   data() {
     return {
-      //definedCompound: {},
-      illDefinedCompound: {},
       ketcherChanged: false,
       marvinChanged: false
     };
@@ -120,8 +120,7 @@ export default {
         // hit in the NavBar
         this.$refs["ketcher"].loadMolfile("");
         this.changed = false;
-      } else if (this.initialCompound?.type === "definedCompound") {
-        console.log("watcher", this.definedCompound.attributes.molfileV3000);
+      } else if (this.initialCompound?.type === "definedCompound" && this.urlParam) {
         this.$refs["ketcher"].loadMolfile(
           this.definedCompound.attributes.molfileV3000
         );
