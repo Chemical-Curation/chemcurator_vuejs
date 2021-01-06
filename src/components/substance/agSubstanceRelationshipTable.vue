@@ -40,7 +40,7 @@
 </template>
 
 <script>
-import { mapActions, mapState } from "vuex";
+import {mapActions, mapGetters, mapState} from "vuex";
 import { AgGridVue } from "ag-grid-vue";
 import { agGridMixin } from "@/components/ag-grid/agGridMixin";
 import SubstanceRelationshipApi from "@/api/substance-relationships";
@@ -57,6 +57,8 @@ export default {
     editable: Boolean
   },
   computed: {
+    ...mapGetters("source", { sourceListOptions: "getOptions" }),
+    ...mapGetters("relationshipType", { typeListOptions: "getOptions" }),
     ...mapState("source", { sourceList: "list" }),
     ...mapState("relationshipType", { relationshipTypeList: "list" }),
 
@@ -69,8 +71,7 @@ export default {
           headerName: "SID",
           // Strips the checksum from the comparison
           comparator: this.sidCompare,
-          // Fetches the sid value from this relationship that is currently loaded
-          valueGetter: this.sidGetter
+          field: "data.relatedSubstanceId",
         },
         {
           headerName: "Source",
@@ -79,6 +80,11 @@ export default {
           cellRenderer: "mappableCellRenderer",
           cellRendererParams: {
             map: this.sourceListMap
+          },
+          cellEditor: "selectObjectCellEditor",
+          cellEditorParams: {
+            cellRenderer: "mappableCellRenderer",
+            values: this.sourceListOptions("relationships.source.data.id")
           }
         },
         {
@@ -88,6 +94,13 @@ export default {
           cellRenderer: "mappableCellRenderer",
           cellRendererParams: {
             map: this.typeListMap
+          },
+          cellEditor: "selectObjectCellEditor",
+          cellEditorParams: {
+          cellRenderer: "mappableCellRenderer",
+          values: this.typeListOptions(
+            "relationships.relationshipType.data.id"
+          )
           }
         },
         {
@@ -172,9 +185,15 @@ export default {
         },
         // todo: Needs either FROM or TO
         relationships: {
-          substance: {
+          fromSubstance: {
             data: {
               id: this.substanceId,
+              type: "substance"
+            }
+          },
+          toSubstance: {
+            data: {
+              id: data.relatedSubstanceId,
               type: "substance"
             }
           }
@@ -265,10 +284,7 @@ export default {
      */
     toRowData: function(substanceRelationship) {
       let data = {
-        fromSubstance:
-          substanceRelationship?.relationships?.fromSubstance?.data?.id,
-        toSubstance:
-          substanceRelationship?.relationships?.toSubstance?.data?.id,
+        relatedSubstanceId: this.sidGetter(substanceRelationship),
         qcNotes: substanceRelationship?.attributes?.qcNotes ?? "",
         relationshipType:
           substanceRelationship?.relationships?.relationshipType?.data?.id ??
@@ -323,11 +339,14 @@ export default {
      * @returns {string} - SID of the substance that is not the currently loaded one,
      *    or the currently SID if this relationship is self-referential.
      */
-    sidGetter: function(params) {
-      if (params.data.data.fromSubstance === this.substanceId) {
-        return params.data.data.toSubstance;
+    sidGetter: function(substanceRelationship) {
+      let fromSID = substanceRelationship?.relationships?.fromSubstance?.data?.id
+      let toSID = substanceRelationship?.relationships?.toSubstance?.data?.id
+
+      if (fromSID === this.substanceId) {
+        return toSID;
       } else {
-        return params.data.data.fromSubstance;
+        return fromSID;
       }
     },
 
