@@ -32,6 +32,7 @@
           id="compound-type-dropdown"
           v-model="type"
           :options="options(type)"
+          @input="setInitialType"
         >
           <template #first>
             <option value="none">None</option>
@@ -45,28 +46,28 @@
         <dl class="row my-1 p-2">
           <dt class="col-lg-2">Molecular Weight</dt>
           <dd class="col-lg-4 overflow-auto">
-            {{ definedCompound.attributes.molecularWeight }}
+            {{ molecularWeight }}
           </dd>
 
           <dt class="col-lg-2">Molecular Formula</dt>
           <dd class="col-lg-4 overflow-auto">
-            {{ definedCompound.attributes.molecularFormula }}
+            {{ molecularFormula }}
           </dd>
 
           <dt class="col-lg-2">SMILES</dt>
           <dd class="col-lg-4 overflow-auto">
-            {{ definedCompound.attributes.smiles }}
+            {{ smiles }}
           </dd>
 
           <dt class="col-lg-2">Inchikey</dt>
           <dd class="col-lg-4 overflow-auto">
-            {{ definedCompound.attributes.inchikey }}
+            {{ inchikey }}
           </dd>
         </dl>
       </div>
       <KetcherWindow
         ref="ketcher"
-        :compound="definedCompound"
+        :initial-molfile="initialMolfile"
         :urlParam="urlParam"
         @molfileUpdate="ketcherChanged = $event.changed"
       />
@@ -93,7 +94,7 @@
 <script>
 import KetcherWindow from "@/components/KetcherWindow";
 import MarvinWindow from "@/components/MarvinWindow";
-import { mapGetters, mapState } from "vuex";
+import { mapGetters } from "vuex";
 
 export default {
   name: "ChemicalEditors",
@@ -110,7 +111,8 @@ export default {
   data() {
     return {
       ketcherChanged: false,
-      marvinChanged: false
+      marvinChanged: false,
+      initialType: ""
     };
   },
   watch: {
@@ -120,10 +122,12 @@ export default {
         // hit in the NavBar
         this.$refs["ketcher"].loadMolfile("");
         this.changed = false;
-      } else if (this.initialCompound?.type === "definedCompound" && this.urlParam) {
-        this.$refs["ketcher"].loadMolfile(
-          this.definedCompound.attributes.molfileV3000
-        );
+      } else if (
+        this.initialCompound?.type === "definedCompound" &&
+        this.urlParam &&
+        this.initialType === "definedCompound"
+      ) {
+        this.$refs["ketcher"].loadMolfile(this.initialMolfile);
       } else {
         this.$refs["marvin"].loadMrvfile(this.initialMrvfile);
       }
@@ -133,7 +137,6 @@ export default {
     }
   },
   computed: {
-    ...mapState("compound/definedcompound", { definedCompound: "data" }),
     ...mapGetters("queryStructureType", { options: "getOptions" }),
     type: {
       get: function() {
@@ -143,8 +146,23 @@ export default {
         this.$store.commit("compound/setType", newValue);
       }
     },
+    initialMolfile: function() {
+      return this.initialCompound?.attributes?.molfileV3000 ?? "";
+    },
     initialMrvfile: function() {
       return this.initialCompound?.attributes?.mrvfile ?? "<MDocument/>";
+    },
+    molecularWeight: function() {
+      return this.initialCompound?.attributes?.molecularWeight ?? "-";
+    },
+    molecularFormula: function() {
+      return this.initialCompound?.attributes?.molecularFormula ?? "-";
+    },
+    smiles: function() {
+      return this.initialCompound?.attributes?.smiles ?? "-";
+    },
+    inchikey: function() {
+      return this.initialCompound?.attributes?.inchikey ?? "-";
     },
     cid: function() {
       return this.initialCompound?.id;
@@ -168,6 +186,11 @@ export default {
     }
   },
   methods: {
+    setInitialType(val) {
+      if (!this.initialType) {
+        this.initialType = val;
+      }
+    },
     saveCompound(type) {
       if (type === "definedCompound") {
         this.saveDefinedCompound();

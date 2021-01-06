@@ -6,7 +6,7 @@
         class="ketcher flex-fill"
         data-cy="ketcher"
         :src="ketcherURL"
-        @load="loadMolfile(compound.attributes.molfileV3000)"
+        @load="loadMolfile(initialMolfile)"
         height="600"
         ref="ketcher"
         >ketcher</iframe
@@ -16,12 +16,10 @@
 </template>
 
 <script>
-import { mapState } from "vuex";
-
 export default {
   name: "KetcherWindow",
   props: {
-    compound: Object,
+    initialMolfile: String,
     urlParam: Boolean
   },
   data() {
@@ -78,13 +76,15 @@ export default {
     }
   },
   computed: {
-    ...mapState("compound/definedcompound", ["data"]),
     ketcherFrame: function() {
       return this.$refs.ketcher;
     },
     molfileChanged: function() {
-      if(this.urlParam) {
-        return this.removeHeader(this.loadedMolfile) !== this.removeHeader(this.molfile);
+      if (this.urlParam) {
+        return (
+          this.removeHeader(this.loadedMolfile) !==
+          this.removeHeader(this.molfile)
+        );
       } else {
         return this.blank !== this.removeHeader(this.molfile);
       }
@@ -108,7 +108,7 @@ export default {
       "message",
       event => {
         if (event.data.type === "returnMolfile") {
-          if(!this.loadedMolfile) this.loadedMolfile = event.data.molfile;
+          if (!this.loadedMolfile) this.loadedMolfile = event.data.molfile;
           this.molfile = event.data.molfile;
         }
       },
