@@ -18,7 +18,32 @@ let actions = {
 
 // getters
 let getters = {
-  ...rootGetters
+  ...rootGetters,
+  /**
+   * Overrides the getOptions to return both the label and correlary label.
+   * @param state
+   * @return {function(*): {disabled: boolean|*, text: *, value: *}[]}
+   */
+  getOptions: state => selected => {
+    return state.list
+      .filter(item => {
+        return !item.attributes.deprecated || item.id === selected;
+      })
+      .flatMap(item => {
+        return [
+          {
+            value: { id: item.id, reverse: false },
+            text: item.attributes.label,
+            disabled: item.attributes.deprecated
+          },
+          {
+            value: { id: item.id, reverse: true },
+            text: item.attributes.corrolaryLabel,
+            disabled: item.attributes.deprecated
+          }
+        ];
+      });
+  }
 };
 
 // mutations

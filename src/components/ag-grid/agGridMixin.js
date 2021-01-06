@@ -5,6 +5,8 @@ import {
   SelectObjectCellEditor
 } from "@/components/ag-grid/custom-renderers";
 import BtnCellRenderer from "@/components/ag-grid/BtnCellRenderer";
+import RelationshipTypeCellRenderer from "@/components/ag-grid/RelationshipTypeCellRenderer";
+import RelationshipTypeCellEditor from "@/components/ag-grid/RelationshipTypeCellEditor";
 
 export const agGridMixin = {
   data() {
@@ -29,7 +31,9 @@ export const agGridMixin = {
       }
     };
     this.frameworkComponents = {
-      btnCellRenderer: BtnCellRenderer
+      btnCellRenderer: BtnCellRenderer,
+      relationshipTypeCellRenderer: RelationshipTypeCellRenderer,
+      relationshipTypeCellEditor: RelationshipTypeCellEditor
     };
 
     // Load grid styling

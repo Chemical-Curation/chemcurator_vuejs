@@ -40,7 +40,7 @@
 </template>
 
 <script>
-import {mapActions, mapGetters, mapState} from "vuex";
+import { mapActions, mapGetters, mapState } from "vuex";
 import { AgGridVue } from "ag-grid-vue";
 import { agGridMixin } from "@/components/ag-grid/agGridMixin";
 import SubstanceRelationshipApi from "@/api/substance-relationships";
@@ -71,7 +71,7 @@ export default {
           headerName: "SID",
           // Strips the checksum from the comparison
           comparator: this.sidCompare,
-          field: "data.relatedSubstanceId",
+          field: "data.relatedSubstanceId"
         },
         {
           headerName: "Source",
@@ -91,16 +91,15 @@ export default {
           headerName: "Type",
           field: "data.relationshipType",
           comparator: this.typeMapCompare,
-          cellRenderer: "mappableCellRenderer",
+          cellRenderer: "relationshipTypeCellRenderer",
           cellRendererParams: {
             map: this.typeListMap
           },
-          cellEditor: "selectObjectCellEditor",
+          cellEditor: "relationshipTypeCellEditor",
           cellEditorParams: {
-          cellRenderer: "mappableCellRenderer",
-          values: this.typeListOptions(
-            "relationships.relationshipType.data.id"
-          )
+            values: this.typeListOptions(
+              "relationships.relationshipType.data.id"
+            )
           }
         },
         {
@@ -283,12 +282,18 @@ export default {
      *     }
      */
     toRowData: function(substanceRelationship) {
+      let relatedSubstanceId = this.sidGetter(substanceRelationship);
       let data = {
-        relatedSubstanceId: this.sidGetter(substanceRelationship),
+        relatedSubstanceId: relatedSubstanceId,
         qcNotes: substanceRelationship?.attributes?.qcNotes ?? "",
-        relationshipType:
-          substanceRelationship?.relationships?.relationshipType?.data?.id ??
-          null,
+        relationshipType: {
+          id:
+            substanceRelationship?.relationships?.relationshipType?.data?.id ??
+            null,
+          reverse:
+            substanceRelationship?.relationships?.fromSubstance?.data?.id ===
+            relatedSubstanceId
+        },
         source: substanceRelationship?.relationships?.source?.data?.id ?? null
       };
 
@@ -340,8 +345,9 @@ export default {
      *    or the currently SID if this relationship is self-referential.
      */
     sidGetter: function(substanceRelationship) {
-      let fromSID = substanceRelationship?.relationships?.fromSubstance?.data?.id
-      let toSID = substanceRelationship?.relationships?.toSubstance?.data?.id
+      let fromSID =
+        substanceRelationship?.relationships?.fromSubstance?.data?.id;
+      let toSID = substanceRelationship?.relationships?.toSubstance?.data?.id;
 
       if (fromSID === this.substanceId) {
         return toSID;
