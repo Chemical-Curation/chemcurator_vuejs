@@ -187,7 +187,7 @@ export default {
   },
   methods: {
     setInitialType(val) {
-      if (!this.initialType) {
+      if (!this.initialType && !val === "definedCompound") {
         this.initialType = val;
       }
     },
