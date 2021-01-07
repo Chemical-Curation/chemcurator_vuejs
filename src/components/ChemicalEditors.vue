@@ -125,7 +125,7 @@ export default {
         this.urlParam &&
         this.$store.state.compound.definedcompound.loadable
       ) {
-        this.$refs["ketcher"].loadMolfile(this.initialMolfile);
+        this.$refs["ketcher"].loadMolfile(this.initialMolfile, true);
         this.$store.commit("compound/definedcompound/setLoadable", false);
       } else {
         this.$refs["marvin"].loadMrvfile(this.initialMrvfile);

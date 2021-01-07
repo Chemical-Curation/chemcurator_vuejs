@@ -39,7 +39,7 @@ export default {
     };
   },
   methods: {
-    loadMolfile: function(molfile) {
+    loadMolfile: function(molfile, loaded) {
       if (molfile) {
         this.ketcherFrame.contentWindow.postMessage(
           {
@@ -49,6 +49,9 @@ export default {
           "*"
         );
       } else this.clearMolfile();
+      if (loaded) {
+        this.loadedMolfile = "";
+      }
     },
     exportMolfile: function() {
       this.ketcherFrame.contentWindow.postMessage(
@@ -109,11 +112,7 @@ export default {
       "message",
       event => {
         if (event.data.type === "returnMolfile") {
-          if (
-            !this.loadedMolfile &&
-            this.removeHeader(event.data.molfile) !== this.blank
-          )
-            this.loadedMolfile = event.data.molfile;
+          if (!this.loadedMolfile) this.loadedMolfile = event.data.molfile;
           this.molfile = event.data.molfile;
         }
       },
