@@ -2,7 +2,7 @@
   <div>
     <h3 class="text-left">Lists</h3>
     <ag-grid-vue
-      id="listTable"
+      id="record-table"
       style="height: 250px;"
       class="ag-theme-alpine"
       :columnDefs="columnDefs"

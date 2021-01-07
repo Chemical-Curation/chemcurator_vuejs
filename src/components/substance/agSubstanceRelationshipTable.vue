@@ -4,7 +4,7 @@
       <h3>Substance Relationships</h3>
     </div>
     <ag-grid-vue
-      id="substanceRelationshipTable"
+      id="substance-relationship-table"
       style="height: 250px;"
       class="ag-theme-alpine"
       :columnDefs="columnDefs"
@@ -18,7 +18,7 @@
     />
     <div v-show="selectedError" class="mt-3 text-left">
       <b-table
-        id="synonym-error-table"
+        id="relationship-error-table"
         :items="selectedError"
         :fields="errorFields"
         borderless
@@ -27,7 +27,7 @@
     </div>
     <div class="d-flex flex-row justify-content-end my-3" v-if="editable">
       <b-button
-        id="synonym-add-button"
+        id="relationship-add-button"
         class="ml-1"
         variant="success"
         :disabled="!substanceId || loading"

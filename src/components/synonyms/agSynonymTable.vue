@@ -4,7 +4,7 @@
       <h3>Synonyms</h3>
     </div>
     <ag-grid-vue
-      id="substanceTable"
+      id="synonym-table"
       style="height: 250px;"
       class="ag-theme-alpine"
       :columnDefs="columnDefs"
