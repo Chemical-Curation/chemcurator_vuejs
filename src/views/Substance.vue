@@ -68,9 +68,15 @@ export default {
       }
     },
     runSearch: function() {
-      this.$store.dispatch("substance/substanceSearch", {
-        searchString: this.$route.query.search
-      });
+      this.$store
+        .dispatch("substance/substanceSearch", {
+          searchString: this.$route.query.search
+        })
+        .then(compound_type => {
+          if (!compound_type || compound_type === "definedCompound") {
+            this.$store.commit("compound/illdefinedcompound/clearState");
+          }
+        });
     }
   },
   components: {

@@ -118,7 +118,7 @@ export default {
       if (this.type === "none") {
         // this block empties out the ketcher window when substance is
         // hit in the NavBar
-        this.$refs["ketcher"].loadMolfile("");
+        this.$refs["ketcher"].clearMolfile();
         this.changed = false;
       } else if (
         this.initialCompound?.type === "definedCompound" &&

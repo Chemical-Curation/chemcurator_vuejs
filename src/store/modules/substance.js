@@ -78,13 +78,17 @@ let actions = {
   substanceSearch: async (context, { searchString }) => {
     let resource = await context.dispatch("getResourceURI");
 
-    await HTTP.get(`/${resource}?filter[search]=${encodeURI(searchString)}`)
+    let promise = await HTTP.get(
+      `/${resource}?filter[search]=${encodeURI(searchString)}`
+    )
       .then(response => {
         if (response.data.data.length > 0) {
           let loaded_substance = response.data.data[0];
           context.commit("loadDetail", loaded_substance);
           let compound_id =
             loaded_substance.relationships.associatedCompound.data?.id;
+          let compound_type =
+            loaded_substance.relationships.associatedCompound.data?.type;
 
           context.commit("loadDetail", loaded_substance);
           if (compound_id) {
@@ -93,14 +97,14 @@ let actions = {
               { id: compound_id },
               { root: true }
             );
+            return compound_type;
           } else {
             context.commit("compound/setType", "none", { root: true });
             context.commit("compound/definedcompound/setLoadable", false, {
               root: true
             });
+            return false;
           }
-
-          // router.push({name: "substance_detail", params: { sid: searchString }, query: { substance: loaded_substance }, push: push });
         } else {
           // Handle no rows returned
           const alert = {
@@ -125,6 +129,7 @@ let actions = {
           root: true
         });
       });
+    return promise;
   }
 };
 
