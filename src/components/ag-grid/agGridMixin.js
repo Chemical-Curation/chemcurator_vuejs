@@ -1,19 +1,17 @@
 import _ from "lodash";
 import { mapActions } from "vuex";
-import {
-  MappableCellRenderer,
-  SelectObjectCellEditor
-} from "@/components/ag-grid/custom-renderers";
 import BtnCellRenderer from "@/components/ag-grid/BtnCellRenderer";
 import RelationshipTypeCellRenderer from "@/components/ag-grid/RelationshipTypeCellRenderer";
 import RelationshipTypeCellEditor from "@/components/ag-grid/RelationshipTypeCellEditor";
+import MappableCellRenderer from "@/components/ag-grid/MappableCellRenderer";
+import SelectObjectCellEditor from "@/components/ag-grid/SelectObjectCellEditor";
 
 export const agGridMixin = {
   data() {
     return {
       rowData: [],
       defaultColDef: null,
-      gridOptions: null,
+      gridOptions: {},
       loading: false,
       selectedRow: null,
       frameworkComponents: null,
@@ -24,13 +22,9 @@ export const agGridMixin = {
 
   beforeMount() {
     // Load grid options
-    this.gridOptions = {
-      components: {
-        mappableCellRenderer: MappableCellRenderer,
-        selectObjectCellEditor: SelectObjectCellEditor
-      }
-    };
     this.frameworkComponents = {
+      selectObjectCellEditor: SelectObjectCellEditor,
+      mappableCellRenderer: MappableCellRenderer,
       btnCellRenderer: BtnCellRenderer,
       relationshipTypeCellRenderer: RelationshipTypeCellRenderer,
       relationshipTypeCellEditor: RelationshipTypeCellEditor

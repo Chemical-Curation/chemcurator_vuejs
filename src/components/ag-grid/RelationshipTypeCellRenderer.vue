@@ -7,8 +7,6 @@
 <script>
 import Vue from "vue";
 
-// Built using https://blog.ag-grid.com/cell-renderers-in-ag-grid-every-different-flavour/ as a guide
-
 export default Vue.extend({
   name: "RelationshipTypeCellRenderer",
   computed: {
