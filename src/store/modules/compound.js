@@ -18,7 +18,7 @@ const state = defaultState();
 
 // getters
 const getters = {
-  freak: state => {
+  getCompound: state => {
     if (state.type === "definedCompound") {
       return definedcompound.state.data;
     } else if (state.type === "none") {

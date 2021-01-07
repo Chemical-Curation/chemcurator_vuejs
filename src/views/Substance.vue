@@ -41,7 +41,7 @@ export default {
   },
   computed: {
     ...mapGetters("auth", ["isAuthenticated"]),
-    ...mapGetters("compound", { compound: "freak" }),
+    ...mapGetters("compound", { compound: "getCompound" }),
     ...mapState("substance", { substance: "detail" }),
     ...mapState("queryStructureType", { qstList: "list" }),
     ifNoSubstance() {

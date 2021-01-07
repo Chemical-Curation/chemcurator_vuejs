@@ -97,7 +97,7 @@ export default {
     ...mapGetters("qcLevel", { qcLevelOptions: "getOptions" }),
     ...mapGetters("source", { sourceOptions: "getOptions" }),
     ...mapGetters("substanceType", { substanceTypeOptions: "getOptions" }),
-    ...mapGetters("compound", ["freak"]),
+    ...mapGetters("compound", { compound: "getCompound" }),
 
     btnDisabled: function() {
       return !(this.changed > 0);
@@ -128,7 +128,7 @@ export default {
         description: attributes.description,
         privateQCNote: attributes.privateQcNote,
         publicQCNote: attributes.publicQcNote,
-        associatedCompound: this.freak?.id
+        associatedCompound: this.compound?.id
       };
     }
   },
