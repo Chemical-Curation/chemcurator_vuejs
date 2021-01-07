@@ -32,7 +32,6 @@
           id="compound-type-dropdown"
           v-model="type"
           :options="options(type)"
-          @input="setInitialType"
         >
           <template #first>
             <option value="none">None</option>
