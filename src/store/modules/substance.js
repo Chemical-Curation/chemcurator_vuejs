@@ -95,6 +95,9 @@ let actions = {
             );
           } else {
             context.commit("compound/setType", "none", { root: true });
+            context.commit("compound/definedcompound/setLoadable", false, {
+              root: true
+            });
           }
 
           // router.push({name: "substance_detail", params: { sid: searchString }, query: { substance: loaded_substance }, push: push });

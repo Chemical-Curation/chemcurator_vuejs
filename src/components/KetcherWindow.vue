@@ -83,7 +83,8 @@ export default {
       if (this.urlParam) {
         return (
           this.removeHeader(this.loadedMolfile) !==
-          this.removeHeader(this.molfile)
+            this.removeHeader(this.molfile) &&
+          this.removeHeader(this.molfile) !== this.blank
         );
       } else {
         return this.blank !== this.removeHeader(this.molfile);

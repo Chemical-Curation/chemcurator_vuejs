@@ -111,8 +111,7 @@ export default {
   data() {
     return {
       ketcherChanged: false,
-      marvinChanged: false,
-      initialType: ""
+      marvinChanged: false
     };
   },
   watch: {
@@ -125,9 +124,10 @@ export default {
       } else if (
         this.initialCompound?.type === "definedCompound" &&
         this.urlParam &&
-        this.initialType === "definedCompound"
+        this.$store.state.compound.definedcompound.loadable
       ) {
         this.$refs["ketcher"].loadMolfile(this.initialMolfile);
+        this.$store.commit("compound/definedcompound/setLoadable", false);
       } else {
         this.$refs["marvin"].loadMrvfile(this.initialMrvfile);
       }
@@ -182,15 +182,10 @@ export default {
       );
     },
     showSubstanceLink: function() {
-      return this.sid !== null && this.sid !== this.substance?.id;
+      return this.sid && this.sid !== this.substance?.id;
     }
   },
   methods: {
-    setInitialType(val) {
-      if (!this.initialType && !val === "definedCompound") {
-        this.initialType = val;
-      }
-    },
     saveCompound(type) {
       if (type === "definedCompound") {
         this.saveDefinedCompound();

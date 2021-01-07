@@ -42,6 +42,7 @@ export default {
         this.isOpen = !this.isOpen;
       } else {
         this.$root.$emit("bv::toggle::collapse", "substance-sidebar");
+        this.$store.commit("compound/definedcompound/setLoadable", true);
         this.$router.push({ name: "substance_detail", params: { sid: val } });
       }
     }

@@ -36,8 +36,7 @@ export default {
   name: "home",
   data() {
     return {
-      changed: false,
-      urlParam: false
+      changed: false
     };
   },
   computed: {
@@ -47,6 +46,11 @@ export default {
     ...mapState("queryStructureType", { qstList: "list" }),
     ifNoSubstance() {
       return !this.substance?.id;
+    },
+    urlParam: function() {
+      return (
+        Boolean(this.$route.params.sid) || Boolean(this.$route.query.search)
+      );
     }
   },
   watch: {
@@ -84,10 +88,8 @@ export default {
   mounted() {
     if (this.$route.params.sid) {
       this.$store.dispatch("substance/fetchSubstance", this.$route.params.sid);
-      this.urlParam = true;
     } else if (this.$route.query.search) {
       this.runSearch();
-      this.urlParam = true;
     }
     this.$store.dispatch("queryStructureType/getList");
     this.$store.dispatch("source/getList");

@@ -6,16 +6,11 @@ const defaultState = () => {
   return {
     data: {
       id: "",
-      attributes: {
-        molfileV3000: "",
-        molecularWeight: "",
-        molecularFormula: "",
-        smiles: "",
-        inchikey: ""
-      }
+      type: ""
     },
     included: {},
-    changed: false
+    changed: false,
+    loadable: false
   };
 };
 
@@ -68,6 +63,9 @@ const mutations = {
   ...rootMutations,
   clearState(state) {
     Object.assign(state, defaultState());
+  },
+  setLoadable(state, val) {
+    state.loadable = val;
   }
 };
 

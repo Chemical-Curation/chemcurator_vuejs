@@ -85,6 +85,7 @@ export default {
       this.$store.commit("compound/clearState");
     },
     searchCompound: function() {
+      this.$store.commit("compound/definedcompound/setLoadable", true);
       this.$router.push({
         name: "substance",
         query: { search: this.searchString }
