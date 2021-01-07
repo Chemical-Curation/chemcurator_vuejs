@@ -14,9 +14,11 @@ export default Vue.extend({
   computed: {
     label: function() {
       let obj = this.params.map[this.params.data.data.relationshipType.id];
-      return this.params.data.data.relationshipType.reverse
-        ? obj.attributes.corrolaryLabel
-        : obj.attributes.label;
+      if (obj)
+        return this.params.data.data.relationshipType.reverse
+          ? obj.attributes.corrolaryLabel
+          : obj.attributes.label;
+      return "";
     }
   }
 });

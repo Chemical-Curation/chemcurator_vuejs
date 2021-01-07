@@ -182,28 +182,37 @@ export default {
         attributes: {
           qcNotes: data.qcNotes
         },
-        // todo: Needs either FROM or TO
         relationships: {
           fromSubstance: {
             data: {
-              id: this.substanceId,
+              id: data.relationshipType?.reverse
+                ? data.relatedSubstanceId
+                : this.substanceId,
               type: "substance"
             }
           },
           toSubstance: {
             data: {
-              id: data.relatedSubstanceId,
+              id: data.relationshipType?.reverse
+                ? this.substanceId
+                : data.relatedSubstanceId,
               type: "substance"
+            }
+          },
+          source: {
+            data: {
+              id: data.source,
+              type: "source"
+            }
+          },
+          relationshipType: {
+            data: {
+              id: data.relationshipType?.id,
+              type: "relationshipType"
             }
           }
         }
       };
-      for (let relationship of ["source", "relationshipType"]) {
-        if (data[relationship])
-          requestBody["relationships"][relationship] = {
-            data: { type: relationship, id: data[relationship] }
-          };
-      }
       return requestBody;
     },
 
