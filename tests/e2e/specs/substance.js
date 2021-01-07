@@ -800,27 +800,48 @@ describe("The substance page's Synonym Table", () => {
       .find("div.ag-center-cols-clipper")
       .find("div.ag-row[role=row].new-ag-row")
       .first()
-      .within($newRow => {
-        cy.wrap($newRow)
-          .find("div[col-id='data.identifier_1']")
-          .type("Synonym 9");
-        cy.wrap($newRow)
-          .find("div[col-id='data.source_1']")
-          .type("1");
-        cy.wrap($newRow)
-          .find("div[col-id='data.synonymQuality_1']")
-          .type("1");
-        cy.wrap($newRow)
-          .find("div[col-id='data.synonymType_1']")
-          .type("1");
+      .find("div[col-id='data.identifier_1']")
+      .type("Synonym 9");
 
-        // Click Save
-        cy.wrap($newRow)
-          .children()
-          .eq(5)
-          .find("button")
-          .click();
-      });
+    cy.get("#substanceTable")
+      .find("div.ag-center-cols-clipper")
+      .find("div.ag-row[role=row].new-ag-row")
+      .first()
+      .find("div[col-id='data.source_1']")
+      .dblclick();
+    cy.get("#substanceTable")
+      .find("select")
+      .select("down indeed other 4");
+
+    cy.get("#substanceTable")
+      .find("div.ag-center-cols-clipper")
+      .find("div.ag-row[role=row].new-ag-row")
+      .first()
+      .find("div[col-id='data.synonymQuality_1']")
+      .dblclick();
+    cy.get("#substanceTable")
+      .find("select")
+      .select("area professor fromage");
+
+    cy.get("#substanceTable")
+      .find("div.ag-center-cols-clipper")
+      .find("div.ag-row[role=row].new-ag-row")
+      .first()
+      .find("div[col-id='data.synonymType_1']")
+      .dblclick();
+    cy.get("#substanceTable")
+      .find("select")
+      .select("capital performance 4");
+
+    // Click Save
+    cy.get("#substanceTable")
+      .find("div.ag-center-cols-clipper")
+      .find("div.ag-row[role=row].new-ag-row")
+      .first()
+      .children()
+      .eq(5)
+      .find("button")
+      .click();
 
     cy.get("@post")
       .its("request.body.data")
@@ -884,9 +905,10 @@ describe("The substance page's Synonym Table", () => {
         .first()
         .children()
         .eq(param.column_number)
-        .dblclick()
-        .find("select")
-        .should("not.contain", param.deprecated_name);
+        .dblclick({ force: true });
+      cy.get("#substanceTable")
+        .find("option")
+        .should("not.contain", param.depreciated_label);
     });
   });
 
