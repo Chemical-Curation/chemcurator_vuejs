@@ -1104,7 +1104,9 @@ describe("The substance page's Relationships Table", () => {
       .dblclick();
     cy.get("#substance-relationship-table")
       .find("select")
-      .select("Field paper tree where she. Plant project range research be especially half.");
+      .select(
+        "Field paper tree where she. Plant project range research be especially half."
+      );
 
     // Click Save
     cy.get("#substance-relationship-table")
@@ -1161,7 +1163,7 @@ describe("The substance page's Relationships Table", () => {
 
     // Build assertion info
     let test_data = [
-      { column_number: 1, depreciated_label: "Depreciated Source" },
+      { column_number: 1, depreciated_label: "Depreciated Source" }
     ];
 
     // Test Dropdowns
@@ -1232,7 +1234,10 @@ describe("The substance page's Relationships Table", () => {
       .first()
       .click();
 
-    cy.get("#relationship-error-table").should("contain.text", sampleErrorMessage);
+    cy.get("#relationship-error-table").should(
+      "contain.text",
+      sampleErrorMessage
+    );
   });
 });
 
@@ -1247,10 +1252,7 @@ describe("The substance page's Record Table", () => {
   });
 
   it("should show the record table", () => {
-    cy.get("#record-table").should(
-      "contain.text",
-      "No Rows To Show"
-    );
+    cy.get("#record-table").should("contain.text", "No Rows To Show");
   });
 
   it("should load records", () => {

@@ -113,16 +113,6 @@ export default {
     },
 
     /**
-     * Synonym objects to be looked up by id.  (used to verify changes)
-     */
-    substanceRelationshipListMap: function() {
-      let map = {};
-      for (let substanceRelationship of this.list)
-        map[substanceRelationship.id] = substanceRelationship;
-      return map;
-    },
-
-    /**
      * Source objects to be looked up by id.  (used in cell renderers from id)
      */
     sourceListMap: function() {
@@ -217,6 +207,64 @@ export default {
     },
 
     /**
+     * Rebuilds rowData with a provided array of jsonapi compliant synonyms
+     *
+     * @param substanceRelationship {Object} - JsonAPI formatted synonym or null
+     *     Sample JsonAPI substanceRelationship
+     *     {
+     *       id: "substanceRelationship"
+     *       attributes: { qcNotes: "string" },
+     *       relationships: {
+     *         toSubstance: {
+     *           data: { type: "substance", id: "string" }
+     *         },
+     *         fromSubstance: {
+     *           data: { type: "substance", id: "string" }
+     *         },
+     *         source: {
+     *           data: { type: "source", id: "string" }
+     *         },
+     *         relationshipType: {
+     *           data: { type: "relationshipType", id: "string" }
+     *         },
+     *       }
+     *     }
+     * @returns {Object} - agGrid rowData node.
+     *     Sample rowData node
+     *     {
+     *       id: "string",  The synonym's id or null
+     *       data: { qcNotes, relatedSubstanceId, relationshipType, source }, The rendered field data
+     *       initialData: The initial field data
+     *       errors: {detail, status, source: { pointer: "string"}, code },  Any save errors as error objects
+     *       created: True if this is a new, unsaved row
+     *     }
+     */
+    toRowData: function(substanceRelationship) {
+      let relatedSubstanceId = this.sidGetter(substanceRelationship);
+      let data = {
+        relatedSubstanceId: relatedSubstanceId,
+        qcNotes: substanceRelationship?.attributes?.qcNotes ?? "",
+        relationshipType: {
+          id:
+            substanceRelationship?.relationships?.relationshipType?.data?.id ??
+            null,
+          reverse:
+            substanceRelationship?.relationships?.fromSubstance?.data?.id ===
+            relatedSubstanceId
+        },
+        source: substanceRelationship?.relationships?.source?.data?.id ?? null
+      };
+
+      return {
+        id: substanceRelationship?.id ?? null,
+        data: { ...data },
+        initialData: { ...data },
+        errors: null,
+        created: !substanceRelationship?.id // if there is no id, this row is considered "new".
+      };
+    },
+
+    /**
      * Builds an update/save request for a single row
      *
      * @param row {obj} - rowData object
@@ -258,64 +306,6 @@ export default {
     },
 
     /**
-     * Rebuilds rowData with a provided array of jsonapi compliant synonyms
-     *
-     * @param substanceRelationship {Object} - JsonAPI formatted synonym or null
-     *     Sample JsonAPI Synonym
-     *     {
-     *       id: "string"
-     *       attributes: { identifier: "string", qcNotes: "string" },
-     *       relationships: {
-     *         substance: {
-     *           data: { type: "substance", id: "string" }
-     *         },
-     *         source: {
-     *           data: { type: "source", id: "string" }
-     *         },
-     *         synonymQuality: {
-     *           data: { type: "synonymQuality", id: "string" }
-     *         },
-     *         synonymType: {
-     *           data: { type: "synonymType", id: "string" }
-     *         },
-     *       }
-     *     }
-     * @returns {Object} - agGrid rowData node.
-     *     Sample rowData node
-     *     {
-     *       id: "string",  The synonym's id or null
-     *       data: { identifier, qcNotes, synonymType, synonymQuality, source }, The synonyms rendered field data
-     *       initialData: { identifier, qcNotes, synonymType, synonymQuality, source }, The synonyms initial field data
-     *       errors: {detail, status, source: { pointer: "string"}, code },  Any save errors as error objects
-     *       created: Boolean(synonym?.id)  // True if this is a new, unsaved row
-     *     }
-     */
-    toRowData: function(substanceRelationship) {
-      let relatedSubstanceId = this.sidGetter(substanceRelationship);
-      let data = {
-        relatedSubstanceId: relatedSubstanceId,
-        qcNotes: substanceRelationship?.attributes?.qcNotes ?? "",
-        relationshipType: {
-          id:
-            substanceRelationship?.relationships?.relationshipType?.data?.id ??
-            null,
-          reverse:
-            substanceRelationship?.relationships?.fromSubstance?.data?.id ===
-            relatedSubstanceId
-        },
-        source: substanceRelationship?.relationships?.source?.data?.id ?? null
-      };
-
-      return {
-        id: substanceRelationship?.id ?? null,
-        data: { ...data },
-        initialData: { ...data },
-        errors: null,
-        created: !substanceRelationship?.id // if there is no id, this row is considered "new".
-      };
-    },
-
-    /**
      * Adds a new synonym to this.rowData
      */
     addRelationship: function() {
@@ -349,9 +339,9 @@ export default {
     /**
      * Returns a boolean comparing two objects
      *
-     * @param params - Params object from aggrid.  Contains row data
-     * @returns {string} - SID of the substance that is not the currently loaded one,
-     *    or the currently SID if this relationship is self-referential.
+     * @param substanceRelationship - JsonApi formatted substance relationship
+     * @returns {string} - SID of the substance that is not currently loaded,
+     *    or the current SID if this relationship is self-referential.
      */
     sidGetter: function(substanceRelationship) {
       let fromSID =
