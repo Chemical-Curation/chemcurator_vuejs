@@ -9,9 +9,9 @@
       </div>
       <div class="substance-search-panel-results text-center">
         <ul class="list-group">
-          <li class="list-group-item">Result 1</li>
-          <li class="list-group-item">Result 2</li>
-          <li class="list-group-item">Result 3</li>
+          <li v-for="(result, index) in searchResults" v-bind:key="index">
+            {{ result }}
+          </li>
         </ul>
       </div>
     </b-sidebar>
@@ -22,7 +22,8 @@
 export default {
   name: "SubstanceSearchPanel",
   props: {
-    headerText: String
+    headerText: String,
+    searchResults: Array
   },
   components: {},
   computed: {}
