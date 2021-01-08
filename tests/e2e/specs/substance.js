@@ -1011,6 +1011,94 @@ describe("The substance page's Relationships Table", () => {
       .should("contain", "DTXSID202000002");
   });
 
+  it("should allow editing (forward and reverse)", () => {
+    // Queue a simple success message.  Response is a template, not valid data.
+    cy.route({
+      method: "PATCH",
+      url: "/substanceRelationships/*",
+      status: 200,
+      response: {} // currently unneeded
+    }).as("patch");
+
+    cy.get("[data-cy=search-box]").type("Sample Substance 2");
+    cy.get("[data-cy=search-button]").click();
+
+    // Button is disabled
+    cy.get("#substance-relationship-table")
+      .find("div.ag-center-cols-clipper")
+      .find("div.ag-row[role=row]")
+      .first()
+      .children()
+      .eq(4)
+      .find("button")
+      .should("be.disabled");
+
+    // Find the first row's first cell and type (SID cell)
+    cy.get("#substance-relationship-table")
+      .find("div.ag-center-cols-clipper")
+      .find("div.ag-row[role=row]")
+      .first()
+      .children()
+      .first()
+      .type("Hello World\n");
+
+    // Change to forward relationship type.  (Relationship Type cell)
+    cy.get("#substance-relationship-table")
+      .find("div.ag-center-cols-clipper")
+      .find("div.ag-row[role=row]")
+      .first()
+      .find("div[col-id='data.relationshipType']")
+      .dblclick();
+    cy.get("#substance-relationship-table")
+      .find("select")
+      .select("central many throw 3");
+
+    // Save the cell edit
+    cy.get("#substance-relationship-table")
+      .find("div.ag-center-cols-clipper")
+      .find("div.ag-row[role=row]")
+      .first()
+      .children()
+      .eq(4)
+      .find("button")
+      .should("be.enabled")
+      .click();
+
+    // Verify fake sid is in "toSubstance" relationship
+    cy.get("@patch")
+      .its("request.body.data.relationships.toSubstance.data.id")
+      .should("eq", "Hello World");
+
+    // Change to reverse relationship type.  (Relationship Type cell)
+    cy.get("#substance-relationship-table")
+      .find("div.ag-center-cols-clipper")
+      .find("div.ag-row[role=row]")
+      .first()
+      .find("div[col-id='data.relationshipType']")
+      .dblclick();
+    cy.get("#substance-relationship-table")
+      .find("select")
+      .select(
+        "Field paper tree where she. Plant project range research be especially half."
+      );
+
+    // Save the cell edit
+    cy.get("#substance-relationship-table")
+      .find("div.ag-center-cols-clipper")
+      .find("div.ag-row[role=row]")
+      .first()
+      .children()
+      .eq(4)
+      .find("button")
+      .should("be.enabled")
+      .click();
+
+    // Verify fake sid is in "fromSubstance" relationship
+    cy.get("@patch")
+      .its("request.body.data.relationships.fromSubstance.data.id")
+      .should("eq", "Hello World");
+  });
+
   it("should allow adding new substance relationships (forward & reverse)", () => {
     // Queue a simple success message (actual response is not currently used)
     cy.route({
