@@ -9,6 +9,10 @@
         class="col"
       >
         <b-form-input id="recordCompoundID" :value="cid" disabled />
+        <b-form-invalid-feedback :state="checkCompound">
+          <!-- The Compound below has no relationship to the Substance displayed. -->
+          Compound displayed does not match saved value.
+        </b-form-invalid-feedback>
         <template v-if="showSubstanceLink">
           <router-link
             id="substanceLink"
@@ -180,6 +184,26 @@ export default {
         this.substance.id !== "" &&
         this.sid !== this.substance.id
       );
+    },
+    checkCompound: function() {
+      //if no inital compound, hide feedback until something else is selected
+      if (this.initialCompound.type === undefined) {
+        if (this.type !== "none") {
+          return false;
+        } else {
+          return true;
+        }
+      } else {
+        //if there is an inital compound
+        if (
+          this.initialCompound.type !== this.type ||
+          this.initialCompound.id !== this.cid
+        ) {
+          return false;
+        } else {
+          return true;
+        }
+      }
     }
   },
   methods: {
