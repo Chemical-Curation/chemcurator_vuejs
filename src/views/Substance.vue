@@ -3,6 +3,7 @@
     <div id="sidebar" v-show="ifSearchParameter">
       <SubstanceSidebar />
     </div>
+    <SubstanceSearchPanel :headerText="this.$route.query.search" />
     <b-row>
       <b-col cols="12" order="1" lg="4" order-lg="0">
         <SubstanceForm :substance="substance" />
@@ -30,6 +31,7 @@ import SubstanceForm from "@/components/substance/SubstanceForm";
 import SynonymTable from "@/components/synonyms/agSynonymTable";
 import SubstanceRelationshipTable from "@/components/substance/agSubstanceRelationshipTable";
 import ListTable from "@/components/records/agRecordTable";
+import SubstanceSearchPanel from "@/components/substance/SubstanceSearchPanel";
 import { mapGetters, mapState } from "vuex";
 
 export default {
@@ -85,7 +87,8 @@ export default {
     SubstanceForm,
     SynonymTable,
     SubstanceRelationshipTable,
-    ListTable
+    ListTable,
+    SubstanceSearchPanel
   },
   beforeCreate() {},
   created() {

@@ -7,7 +7,6 @@
       <div class="substance-search-panel-header text-center">
         <h3 id="header-text">{{ headerText }}</h3>
       </div>
-
       <div class="substance-search-panel-results text-center">
         <ul class="list-group">
           <li class="list-group-item">Result 1</li>
