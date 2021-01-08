@@ -1,6 +1,6 @@
 <template>
   <b-container fluid="true" class="mx-5">
-    <div id="sidebar" v-show="ifNoSubstance">
+    <div id="sidebar" v-show="ifSearchParameter">
       <SubstanceSidebar />
     </div>
     <b-row>
@@ -44,8 +44,8 @@ export default {
     ...mapGetters("compound", { compound: "getCompound" }),
     ...mapState("substance", { substance: "detail" }),
     ...mapState("queryStructureType", { qstList: "list" }),
-    ifNoSubstance() {
-      return !this.substance?.id;
+    ifSearchParameter() {
+      return !this.$route.query.search;
     },
     urlParam: function() {
       return (
