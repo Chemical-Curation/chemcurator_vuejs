@@ -6,7 +6,7 @@ const defaultState = () => {
   return {
     data: {
       id: "",
-      type: ""
+      type: "definedCompound"
     },
     included: {},
     changed: false,

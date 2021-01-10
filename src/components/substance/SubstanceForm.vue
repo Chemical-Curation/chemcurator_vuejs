@@ -28,15 +28,6 @@
             @input="markChanged"
           />
         </template>
-        <template v-else-if="field == 'associatedCompound'">
-          <b-form-input
-            :id="field"
-            v-model="form[field]"
-            :state="validationState[field].state"
-            :disabled="editable(field)"
-            @input="markChanged"
-          />
-        </template>
         <template v-else>
           <b-form-input
             :id="field"
@@ -69,12 +60,13 @@ import { mapGetters } from "vuex";
 
 export default {
   name: "SubstanceForm",
-  props: ["substance"],
+  props: ["substance", "compound"],
   data() {
     return {
-      changed: 0,
+      formChanged: 0,
+      compoundsMatch: false,
       validationState: this.clearValidation(),
-      textareas: ["description", "privateQCNote", "publicQCNote"],
+      textareas: ["description", "privateQcNote", "publicQcNote"],
       dropdowns: ["qcLevel", "source", "substanceType"],
       labels: {
         id: "Substance ID:",
@@ -82,8 +74,8 @@ export default {
         displayName: "Display Name:",
         casrn: "CAS-RN:",
         description: "Substance Description:",
-        privateQCNote: "Private QC Notes:",
-        publicQCNote: "Public QC Notes:",
+        privateQcNote: "Private QC Notes:",
+        publicQcNote: "Public QC Notes:",
         qcLevel: "QC Level:",
         source: "Source:",
         substanceType: "Substance Type:"
@@ -91,16 +83,13 @@ export default {
     };
   },
   computed: {
-    //...mapGetters("substance", ["form"]),
-    //...mapState("substance", ["detail"]),
     ...mapGetters("auth", ["isAuthenticated"]),
     ...mapGetters("qcLevel", { qcLevelOptions: "getOptions" }),
     ...mapGetters("source", { sourceOptions: "getOptions" }),
     ...mapGetters("substanceType", { substanceTypeOptions: "getOptions" }),
-    ...mapGetters("compound", { compound: "getCompound" }),
 
     btnDisabled: function() {
-      return !(this.changed > 0);
+      return this.compoundsMatch || this.formChanged === 0;
     },
     options: function() {
       return {
@@ -126,16 +115,29 @@ export default {
         source: relationships.source.data.id,
         substanceType: relationships.substanceType.data.id,
         description: attributes.description,
-        privateQCNote: attributes.privateQcNote,
-        publicQCNote: attributes.publicQcNote,
-        associatedCompound: this.compound?.id
+        privateQcNote: attributes.privateQcNote,
+        publicQcNote: attributes.publicQcNote
       };
     }
   },
   watch: {
+    "compound.id": function() {
+      if (
+        this.compound?.id &&
+        this.substance.relationships.associatedCompound.data?.id ===
+          this.compound?.id
+      ) {
+        this.compoundsMatch = true;
+      } else if (this.compound?.id) {
+        this.compoundsMatch = false;
+        this.formChanged++;
+      } else {
+        this.compoundsMatch = false;
+      }
+    }
     //    "substance.id": function() {
     //      this.validationState = this.clearValidation();
-    //      this.changed = 0;
+    //      this.formChanged = 0;
     //    }
   },
   methods: {
@@ -143,12 +145,12 @@ export default {
       return fld === "id" ? true : !this.isAuthenticated;
     },
     markChanged() {
-      this.changed++;
+      this.formChanged++;
     },
     clearForm() {
       this.$store.commit("substance/clearForm");
       this.validationState = this.clearValidation();
-      this.changed = 0;
+      this.formChanged = 0;
     },
     clearValidation() {
       let clean = {
@@ -160,13 +162,12 @@ export default {
         casrn: { ...clean },
         preferredName: { ...clean },
         displayName: { ...clean },
-        privateQCNote: { ...clean },
-        publicQCNote: { ...clean },
+        privateQcNote: { ...clean },
+        publicQcNote: { ...clean },
         qcLevel: { ...clean },
         source: { ...clean },
         description: { ...clean },
-        substanceType: { ...clean },
-        associatedCompound: { ...clean }
+        substanceType: { ...clean }
       };
     },
     buildPayload() {
@@ -180,15 +181,14 @@ export default {
         "displayName",
         "casrn",
         "description",
-        "publicQCNote",
-        "privateQCNote"
+        "publicQcNote",
+        "privateQcNote"
       )(data);
       // filter out attributes that have not been changed
       if (id) {
-        // this is all going to need to change
         let { attributes } = this.substance;
         Object.keys(attrs).forEach(key => {
-          if (attrs[key] == attributes[key]) delete attrs[key];
+          if (attrs[key] === attributes[key]) delete attrs[key];
         });
       } else {
         Object.keys(attrs).forEach(key => {
@@ -207,8 +207,8 @@ export default {
         "substanceType"
       )(data);
       // filter out the relationships that haven't been changed
+      let { relationships } = this.substance;
       if (id) {
-        let { relationships } = this.substance;
         Object.keys(related).forEach(key => {
           if (related[key].data.id == relationships[key].data.id)
             delete related[key];
@@ -218,6 +218,29 @@ export default {
           if (related[key].data.id == null) delete related[key];
         });
       }
+      if (
+        this.compound &&
+        this.compound.id &&
+        this.compound.id !== relationships.associatedCompound.data?.id
+      ) {
+        console.log(
+          "relationship id",
+          relationships.associatedCompound.data?.id
+        );
+        related["associatedCompound"] = {
+          data: {
+            id: this.compound.id,
+            type: this.compound.type
+          }
+        };
+      } else if (!this.compound) {
+        console.log(
+          "relationship id",
+          relationships.associatedCompound.data?.id
+        );
+        related["associatedCompound"] = { data: null };
+      }
+      console.log("related", related);
       let payload = {
         type: "substance",
         attributes: attrs,
@@ -229,6 +252,7 @@ export default {
       let { id } = this.form;
       let payload = this.buildPayload();
       if (id) {
+        console.log("patch", payload);
         payload["id"] = id;
         // if there is an id, patch the currently loaded substance.
         this.$store
@@ -239,6 +263,7 @@ export default {
           .then(response => this.handleSuccess(response))
           .catch(err => this.handleFail(err));
       } else {
+        console.log("post", payload);
         // If there is no id, save the new substance.
         this.$store
           .dispatch("substance/post", payload)
@@ -250,7 +275,7 @@ export default {
       let action = response.status === 201 ? "created" : "updated";
       let { id } = response.data.data;
       this.validationState = this.clearValidation();
-      this.changed = 0;
+      this.formChanged = 0;
       this.$store.commit("substance/loadDetail", response.data.data);
       // update for the tree
       this.$store.dispatch("substance/getList");
@@ -309,8 +334,4 @@ export default {
 };
 </script>
 
-<!-- <style scoped> -->
-<!--   .associatedCompound { -->
-<!--     display: none; -->
-<!--   } -->
-<!-- </style> -->
+<style scoped></style>

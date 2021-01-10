@@ -5,7 +5,7 @@
     </div>
     <b-row>
       <b-col cols="12" order="1" lg="4" order-lg="0">
-        <SubstanceForm :substance="substance" />
+        <SubstanceForm :compound="compound" :substance="substance" />
       </b-col>
       <b-col>
         <ChemicalEditors

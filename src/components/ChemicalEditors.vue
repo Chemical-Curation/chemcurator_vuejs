@@ -175,10 +175,15 @@ export default {
       }
     },
     editorChanged: function() {
-      return (
-        (this.marvinChanged && this.type !== "definedCompound") ||
-        (this.ketcherChanged && this.type === "definedCompound")
-      );
+      if (this.initialCompound?.type === "illDefinedCompound") {
+        if (
+          this.initialCompound.id &&
+          this.type !==
+            this.initialCompound?.relationships?.queryStructureType.data.id
+        ) {
+          return true;
+        } else return this.marvinChanged;
+      } else return this.ketcherChanged;
     },
     showSubstanceLink: function() {
       return this.sid && this.sid !== this.substance?.id;
@@ -246,6 +251,13 @@ export default {
           .dispatch("compound/illdefinedcompound/patch", {
             id: compoundId,
             body: { ...requestBody, id: compoundId }
+          })
+          .then(response => {
+            this.$store.commit(
+              "compound/illdefinedcompound/storeFetch",
+              response.data.data
+            );
+            this.marvinChanged = false;
           })
           .catch(err => this.handleError(err));
       } else {
