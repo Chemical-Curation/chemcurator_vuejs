@@ -1160,7 +1160,7 @@ describe("The substance page's Relationships Table", () => {
       });
   });
 
-  it.only("should allow deleting", () => {
+  it("should allow deleting", () => {
     // Queue a simple success message.  Response is a template, not valid data.
     cy.route({
       method: "DELETE",
