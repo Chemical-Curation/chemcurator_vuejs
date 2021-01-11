@@ -1204,7 +1204,6 @@ describe("The substance page's Relationships Table", () => {
       });
   });
 
-
   it("should not show deprecated data", () => {
     // Queue a simple success message (actual response is not currently used)
     cy.route("PATCH", "/synonyms/*", "success");
