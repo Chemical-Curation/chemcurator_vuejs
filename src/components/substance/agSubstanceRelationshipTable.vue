@@ -322,19 +322,19 @@ export default {
      * @param row {obj} - rowData object
      * @returns {Promise} - Deletes a row
      */
-    // deleteRow: function(row) {
-    //   if (!row.data.created) {
-    //     SubstanceRelationshipApi.delete(row.data.id)
-    //       .then(() => {
-    //         this.gridOptions.rowData.splice(row.rowIndex, 1);
-    //       })
-    //       .catch(err => {
-    //         row.data.errors = err.response.data.errors;
-    //       });
-    //   } else this.gridOptions.rowData.splice(row.rowIndex, 1);
-    //
-    //   this.gridOptions.api.redrawRows();
-    // },
+    deleteRow: function(row) {
+      if (!row.data.created) {
+        SubstanceRelationshipApi.delete(row.data.id)
+          .then(() => {
+            this.gridOptions.rowData.splice(row.rowIndex, 1);
+          })
+          .catch(err => {
+            row.data.errors = err.response.data.errors;
+          });
+      } else this.gridOptions.rowData.splice(row.rowIndex, 1);
+
+      this.gridOptions.api.redrawRows();
+    },
 
     /**
      * Returns a boolean comparing two objects
