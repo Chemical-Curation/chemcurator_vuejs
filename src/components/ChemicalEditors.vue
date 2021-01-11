@@ -188,21 +188,12 @@ export default {
     checkCompound: function() {
       //if no inital compound, hide feedback until something else is selected
       if (this.initialCompound.type === undefined) {
-        if (this.type !== "none") {
-          return false;
-        } else {
-          return true;
-        }
+        return this.type !== "none" ? false : true;
       } else {
-        //if there is an inital compound
-        if (
-          this.initialCompound.type !== this.type ||
+        return this.initialCompound.type !== this.type ||
           this.initialCompound.id !== this.cid
-        ) {
-          return false;
-        } else {
-          return true;
-        }
+          ? false
+          : true;
       }
     }
   },
