@@ -4,19 +4,19 @@
 
     <b-form @submit.prevent="onSubmit">
       <b-form-group label="Source">
-        <b-form-select v-model="form.source" :options="sourceListOptions()" required></b-form-select>
+        <b-form-select v-model="relationships.source" :options="sourceListOptions()" required></b-form-select>
       </b-form-group>
 
       <b-form-group label="Quality">
-        <b-form-select v-model="form.quality" :options="qualityListOptions()" required></b-form-select>
+        <b-form-select v-model="relationships.synonymQuality" :options="qualityListOptions()" required></b-form-select>
       </b-form-group>
 
       <b-form-group label="Type">
-        <b-form-select v-model="form.type" :options="typeListOptions()"></b-form-select>
+        <b-form-select v-model="relationships.synonymType" :options="typeListOptions()"></b-form-select>
       </b-form-group>
 
       <b-form-group label="Identifiers">
-        <b-form-textarea v-model="form.identifiers" placeholder="Please provide list of identifiers..." required></b-form-textarea>
+        <b-form-textarea v-model="attributes.identifiers" placeholder="Please provide list of identifiers..." required></b-form-textarea>
       </b-form-group>
 
       <div class="d-flex flex-row-reverse">
@@ -30,22 +30,63 @@
 
 <script>
 import {mapGetters} from "vuex";
+import SynonymAPI from "@/api/synonym"
 
 export default {
   name: "BulkAddSynonyms",
+  props: {
+    substanceId: String
+  },
   data() {
     return {
-      form: {
+      relationships: {
         source: null,
-        quality: null,
-        type: null,
+        synonymQuality: null,
+        synonymType: null,
+      },
+      attributes: {
         identifiers: "",
       }
     }
   },
   methods: {
     onSubmit: function(){
-      alert("Submitted")
+      let identArr = this.attributes.identifiers.split("\n")
+
+      for (let ident of identArr) {
+        if (ident !== ""){
+          SynonymAPI.post(this.buildRequestBody(ident))
+            .catch(this.onReject)
+        }
+      }
+    },
+    onReject: function(err) {
+      console.log(err.response.data)
+    },
+    buildRequestBody: function(identifier){
+       let body = {
+        type: "synonym",
+        attributes: {
+          identifier: identifier
+        },
+        relationships: {
+          substance: {
+            data: {
+              id: this.substanceId,
+              type: "substance"
+            }
+          }
+        }
+      }
+
+      for (let relationship in this.relationships){
+        if (this.relationships[relationship]) {
+          body.relationships[relationship] = {}
+          body.relationships[relationship]["data"] = { id: this.relationships[relationship], type: relationship }
+        }
+      }
+
+      return body
     }
   },
   computed: {
