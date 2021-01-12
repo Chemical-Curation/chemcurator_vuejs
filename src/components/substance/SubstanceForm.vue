@@ -65,6 +65,7 @@ export default {
     return {
       formChanged: 0,
       compoundsMatch: false,
+      notSavable: false,
       validationState: this.clearValidation(),
       textareas: ["description", "privateQcNote", "publicQcNote"],
       dropdowns: ["qcLevel", "source", "substanceType"],
@@ -89,7 +90,8 @@ export default {
     ...mapGetters("substanceType", { substanceTypeOptions: "getOptions" }),
 
     btnDisabled: function() {
-      return this.compoundsMatch || this.formChanged === 0;
+      console.log("disaoble", (this.$store.state.compound.type === "none" && !this.compound?.id));
+      return this.compoundsMatch || this.formChanged === 0 || this.notSavable;
     },
     options: function() {
       return {
@@ -122,17 +124,26 @@ export default {
   },
   watch: {
     "compound.id": function() {
+      console.log("compund wathc");
       if (
         this.compound?.id &&
         this.substance.relationships.associatedCompound.data?.id ===
           this.compound?.id
       ) {
         this.compoundsMatch = true;
-      } else if (this.compound?.id) {
+      }  else {
         this.compoundsMatch = false;
-        this.formChanged++;
+      }
+      if(this.$store.state.compound.type === "none") {
+        this.notSavable = false;
       } else {
-        this.compoundsMatch = false;
+        if(!this.compound?.id) {
+          this.formChanged--;
+          this.notSavable = true;
+        } else {
+          this.formChanged++;
+          this.notSavable = false;
+        }
       }
     }
     //    "substance.id": function() {
@@ -233,7 +244,7 @@ export default {
             type: this.compound.type
           }
         };
-      } else if (!this.compound) {
+      } else if (this.$store.state.compound.type === "none") {
         console.log(
           "relationship id",
           relationships.associatedCompound.data?.id
@@ -252,23 +263,24 @@ export default {
       let { id } = this.form;
       let payload = this.buildPayload();
       if (id) {
+        console.log("patch", this.$store.state.compound.type);
         console.log("patch", payload);
         payload["id"] = id;
         // if there is an id, patch the currently loaded substance.
-        this.$store
-          .dispatch("substance/patch", {
-            id: id,
-            body: { ...payload }
-          })
-          .then(response => this.handleSuccess(response))
-          .catch(err => this.handleFail(err));
+//        this.$store
+//          .dispatch("substance/patch", {
+//            id: id,
+//            body: { ...payload }
+//          })
+//          .then(response => this.handleSuccess(response))
+//          .catch(err => this.handleFail(err));
       } else {
         console.log("post", payload);
         // If there is no id, save the new substance.
-        this.$store
-          .dispatch("substance/post", payload)
-          .then(response => this.handleSuccess(response))
-          .catch(err => this.handleFail(err));
+//        this.$store
+//          .dispatch("substance/post", payload)
+//          .then(response => this.handleSuccess(response))
+//          .catch(err => this.handleFail(err));
       }
     },
     handleSuccess(response) {
