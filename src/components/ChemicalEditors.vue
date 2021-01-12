@@ -9,6 +9,17 @@
         class="col"
       >
         <b-form-input id="recordCompoundID" :value="cid" disabled />
+        <template v-if="showSubstanceLink">
+          <router-link
+            id="substanceLink"
+            :to="{ name: 'substance_detail', params: { sid: sid } }"
+            target="_blank"
+            title="Open substance associated with this compound in a new tab"
+          >
+            <b-icon icon="link" />
+            {{ sid }}
+          </router-link>
+        </template>
       </b-form-group>
       <b-form-group
         label="Structure Type:"
@@ -87,7 +98,8 @@ export default {
   },
   props: {
     initialCompound: Object,
-    editable: Boolean
+    editable: Boolean,
+    substance: Object
   },
   data() {
     return {
@@ -100,8 +112,11 @@ export default {
   },
   watch: {
     initialCompound: function() {
-      if (!this.initialCompound?.id) this.type = "none";
-      else if (this.initialCompound?.type === "definedCompound") {
+      if (!this.initialCompound?.id) {
+        this.type = "none";
+        this.$refs["ketcher"].clearMolfile();
+        this.$refs["marvin"].clearMarvin();
+      } else if (this.initialCompound?.type === "definedCompound") {
         this.definedCompound = this.initialCompound;
         this.type = "definedCompound";
         // Attempt to load the new molfile
@@ -143,10 +158,27 @@ export default {
         ? this.definedCompound?.id
         : this.illDefinedCompound?.id;
     },
+    sid: function() {
+      // the sid that the loaded compound is related to
+      if (this.cid) {
+        return this.type === "definedCompound"
+          ? this.definedCompound?.relationships?.substance?.data?.id
+          : this.illDefinedCompound?.relationships.substance.data.id;
+      } else {
+        return null;
+      }
+    },
     editorChanged: function() {
       return (
         (this.marvinChanged && this.type !== "definedCompound") ||
         (this.ketcherChanged && this.type === "definedCompound")
+      );
+    },
+    showSubstanceLink: function() {
+      return (
+        this.sid !== null &&
+        this.substance.id !== "" &&
+        this.sid !== this.substance.id
       );
     }
   },
@@ -154,8 +186,10 @@ export default {
     async fetchByMolfile(molfile) {
       if (molfile) {
         let fetchedCompound = await compoundApi.fetchByMolfile(molfile);
-        if (fetchedCompound) this.definedCompound = fetchedCompound;
-        else this.definedCompound = {};
+        if (fetchedCompound) {
+          this.definedCompound = fetchedCompound;
+          this.ketcherChanged = false;
+        } else this.definedCompound = {};
       }
     },
     saveCompound(type) {
@@ -180,21 +214,14 @@ export default {
             id: this.cid,
             body: { ...requestBody, id: this.cid }
           })
-          // Handle the errors
           .catch(err => this.handleError(err));
       } else {
         // If there is no id, save the new compound
         this.$store
           .dispatch("compound/definedcompound/post", requestBody)
           .then(response =>
-            // Load the newly created compound.  We could bypass this action by
-            // storing the response but this verifies the compound is the same and
-            // further searches will work
-            this.$store.dispatch("compound/fetchCompound", {
-              id: response.data.data.id
-            })
+            this.$emit("compoundUpdate", { data: response.data.data })
           )
-          // Handle the errors
           .catch(err => this.handleError(err));
       }
     },
@@ -222,7 +249,6 @@ export default {
             id: compoundId,
             body: { ...requestBody, id: compoundId }
           })
-          // Handle the errors
           .catch(err => this.handleError(err));
       } else {
         // If there is no id, save the new compound
@@ -236,7 +262,6 @@ export default {
               id: response.data.data.id
             })
           )
-          // Handle the errors
           .catch(err => this.handleError(err));
       }
     },

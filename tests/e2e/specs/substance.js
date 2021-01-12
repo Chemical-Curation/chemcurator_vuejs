@@ -158,7 +158,6 @@ describe("The substance page anonymous access", () => {
   });
 
   it("should load the substance form from tree", () => {
-    // Search
     cy.get("#DTXSID502000000").click({ force: true });
     cy.get("#recordCompoundID").should("have.value", "DTXCID302000003");
     cy.get("#id").should("have.value", "DTXSID502000000");
@@ -174,6 +173,69 @@ describe("The substance page anonymous access", () => {
     );
     cy.get("#privateQCNote").should("have.value", "Private QC notes");
     cy.get("#publicQCNote").should("have.value", "Public QC notes");
+  });
+
+  it("should show substance link with mismatched DTXCID=>DTXSID", () => {
+    // Search for the Solo Substance (which has no compound)
+    cy.get("[data-cy=search-box]").type("Solo Substance");
+    cy.get("[data-cy=search-button]").click();
+
+    // Verify no elements are in the iframe
+    cy.get("iframe[id=ketcher]")
+      .its("0.contentDocument.body")
+      .should("not.be.empty")
+      .then(cy.wrap)
+      .find("#canvas")
+      .children()
+      .find("text")
+      .should("not.exist");
+
+    // Create Compound - Hydrogen Peroxide
+    cy.get("#compound-type-dropdown").select("Defined Compound");
+    cy.get("iframe[id=ketcher]")
+      .its("0.contentDocument.body")
+      .should("not.be.empty")
+      .then(cy.wrap)
+      .find("#canvas")
+      .children()
+      .find("text")
+      .should("not.exist");
+
+    // Find the oxygen button
+    cy.get("iframe[id=ketcher]")
+      .its("0.contentDocument.body")
+      .should("not.be.empty")
+      .then(cy.wrap)
+      .find("#atom")
+      .find("button")
+      .eq(3)
+      .click();
+
+    // Select a point. create a H2O there, click and drag to make H2O2
+    cy.get("iframe[id=ketcher]")
+      .its("0.contentDocument.body")
+      .should("not.be.empty")
+      .then(cy.wrap)
+      .find("#canvas")
+      // create first node
+      .click()
+      .find("text")
+      .first()
+      // select first node
+      .trigger("mousedown", { button: 0 })
+      // back up to canvas
+      .parent()
+      // drag to create compound
+      .trigger("mousemove", 500, 500, { force: true })
+      .trigger("mouseup", { force: true });
+
+    // Now h202 is drawn, see if link to existing sub/comp populates
+    cy.get("#recordCompoundID").should("have.value", "DTXCID502000024");
+    cy.get("#id").should("have.value", "DTXSID202000099");
+    cy.get("#substanceLink")
+      .should("have.attr", "href")
+      // existing SID
+      .and("include", "DTXSID202000002");
   });
 
   it("should load defined compound into ketcher window", () => {
@@ -263,7 +325,7 @@ describe("The substance page anonymous access", () => {
       // back up to canvas
       .parent()
       // drag to create compound
-      .trigger("mousemove", 500, 500)
+      .trigger("mousemove", 500, 500, { force: true })
       .trigger("mouseup", { force: true });
 
     // Check compound loaded
@@ -286,6 +348,24 @@ describe("The substance page anonymous access", () => {
     cy.get("[data-cy=search-box]").type("compound 47");
     cy.get("[data-cy=search-button]").click();
     cy.get("[data-cy=alert-box]").should("contain", "compound 47 not valid");
+  });
+
+  it("should not have compound data persist", () => {
+    // When loading a substance that does not have an associated
+    // compound the compound window should not be populated
+
+    // load a Substance that has a Compound
+    cy.get("[data-cy=search-box]").type("Sample Substance");
+    cy.get("[data-cy=search-button]").click();
+
+    cy.get("#compound-type-dropdown").should("have.value", "definedCompound");
+
+    // load a Substance that has NO Compound
+    cy.get("[data-cy=search-box]").clear(); // clear search box
+    cy.get("[data-cy=search-box]").type("Solo Substance");
+    cy.get("[data-cy=search-button]").click();
+
+    cy.get("#compound-type-dropdown").should("not.have.value");
   });
 });
 
@@ -575,25 +655,127 @@ describe("The substance page's Synonym Table", () => {
   });
 
   it("should allow editing", () => {
-    // Queue a simple success message (actual response is not currently used)
-    cy.route("PATCH", "/synonyms/*", "success");
+    // Queue a simple success message.  Response is a template, not valid data.
+    cy.route("PATCH", "/synonyms/*", {
+      data: {
+        type: "synonym",
+        id: "3",
+        attributes: {
+          identifier: "Hello World",
+          qcNotes: "bc"
+        },
+        relationships: {
+          source: {
+            links: {
+              self: "http://localhost:8000/synonyms/3/relationships/source",
+              related: "http://localhost:8000/synonyms/3/source"
+            },
+            data: {
+              type: "source",
+              id: "7"
+            }
+          },
+          substance: {
+            links: {
+              self: "http://localhost:8000/synonyms/3/relationships/substance",
+              related: "http://localhost:8000/synonyms/3/substance"
+            },
+            data: {
+              type: "substance",
+              id: "2"
+            }
+          },
+          synonymQuality: {
+            links: {
+              self:
+                "http://localhost:8000/synonyms/3/relationships/synonymQuality",
+              related: "http://localhost:8000/synonyms/3/synonymQuality"
+            },
+            data: {
+              type: "synonymQuality",
+              id: "8"
+            }
+          }
+        }
+      }
+    }).as("patch");
 
     cy.get("[data-cy=search-box]").type("Sample Substance 2");
     cy.get("[data-cy=search-button]").click();
 
-    // Find the first row's first cell and type
+    // Button is enabled
     cy.get("#substanceTable")
       .find("div.ag-center-cols-clipper")
       .find("div.ag-row[role=row]")
       .first()
       .children()
+      .within(row => {
+        // Find the first row's save button, verify disabled
+        cy.wrap(row)
+          .eq(5)
+          .find("button")
+          .should("be.disabled");
+
+        // Find the first row's first cell and type
+        cy.wrap(row)
+          .first()
+          .type("Hello World\n");
+
+        // Save the cell edit
+        cy.wrap(row)
+          .eq(5)
+          .find("button")
+          .should("be.enabled")
+          .click();
+      });
+
+    cy.get("@patch")
+      .its("request.body.data.attributes.identifier")
+      .should("eq", "Hello World");
+  });
+
+  it("should allow deleting", () => {
+    // Queue a simple success message.  Response is a template, not valid data.
+    cy.route({
+      method: "DELETE",
+      url: /synonyms\/\d+/,
+      status: 204,
+      response: ""
+    });
+
+    cy.get("[data-cy=search-box]").type("Sample Substance 2");
+    cy.get("[data-cy=search-button]").click();
+
+    // This is the number of rows before delete
+    let rowCount;
+
+    cy.get("#substanceTable")
+      .find("div.ag-center-cols-clipper")
+      .find("div.ag-row[role=row]")
+      .its("length")
+      .then($rowCount => {
+        rowCount = $rowCount;
+      });
+
+    // Find the first row's delete button, verify enabled and click
+    cy.get("#substanceTable")
+      .find("div.ag-center-cols-clipper")
+      .find("div.ag-row[role=row]")
       .first()
-      .type("Hello World\n");
+      .children()
+      .eq(6)
+      .find("button")
+      .should("be.enabled")
+      .click();
 
-    // Save the cell edit
-    cy.get("#synonym-save-button").click();
-
-    cy.get("body").should("contain.text", "All synonyms saved successfully");
+    cy.get("#substanceTable")
+      .find("div.ag-center-cols-clipper")
+      .find("div.ag-row[role=row]")
+      .its("length")
+      .should($newRowCount => {
+        // Verify row count after delete is one less than the rows before change
+        expect($newRowCount).to.equal(rowCount - 1);
+      });
   });
 
   it("should allow adding new synonyms", () => {
@@ -631,12 +813,14 @@ describe("The substance page's Synonym Table", () => {
         cy.wrap($newRow)
           .find("div[col-id='data.synonymType_1']")
           .type("1");
+
+        // Click Save
+        cy.wrap($newRow)
+          .children()
+          .eq(5)
+          .find("button")
+          .click();
       });
-
-    // Save the cell edit
-    cy.get("#synonym-save-button").click();
-
-    cy.get("body").should("contain.text", "All synonyms saved successfully");
 
     cy.get("@post")
       .its("request.body.data")
@@ -738,10 +922,15 @@ describe("The substance page's Synonym Table", () => {
       .first()
       .type("Hello World\n");
 
-    // Save the cell edit
-    cy.get("#synonym-save-button").click();
-
-    cy.get("body").should("contain.text", "Some synonyms could not be saved");
+    // Save Row
+    cy.get("#substanceTable")
+      .find("div.ag-center-cols-clipper")
+      .find("div.ag-row[role=row]")
+      .first()
+      .children()
+      .eq(5)
+      .find("button")
+      .click();
 
     // Relocate the first row and select
     cy.get("#substanceTable")
@@ -755,32 +944,6 @@ describe("The substance page's Synonym Table", () => {
       .click();
 
     cy.get("#synonym-error-table").should("contain.text", sampleErrorMessage);
-  });
-
-  it("should be able to reset", () => {
-    cy.get("[data-cy=search-box]").type("Sample Substance 2");
-    cy.get("[data-cy=search-button]").click();
-
-    // Find the first row's first cell and type
-    cy.get("#substanceTable")
-      .find("div.ag-center-cols-clipper")
-      .find("div.ag-row[role=row]")
-      .first()
-      .children()
-      .first()
-      .type("Hello World\n");
-
-    // Roll back the cell edit
-    cy.get("#synonym-reset-button").click();
-
-    // Find the first row's first cell and confirm the rollback
-    cy.get("#substanceTable")
-      .find("div.ag-center-cols-clipper")
-      .find("div.ag-row[role=row]")
-      .first()
-      .children()
-      .first()
-      .should("contain.text", "Synonym 1");
   });
 });
 
@@ -855,9 +1018,23 @@ describe("The substance page's List Table", () => {
 });
 
 describe("The substance page's Sidebar and Tree View", () => {
+  beforeEach(() => {
+    cy.adminLogin();
+    cy.visit("/substance");
+    cy.server();
+  });
+
   it("should have the sidebar button present", () => {
-    cy.get("button:contains('Toggle Sidebar')")
-      .should("not.be.disabled")
+    cy.get("#sidebar")
+      .should("be.visible")
       .click();
+  });
+
+  it("should not have the sidebar button present", () => {
+    // after loading a substance
+    cy.get("[data-cy=search-box]").type("Sample Substance 2");
+    cy.get("[data-cy=search-button]").click();
+
+    cy.get("#sidebar").should("not.be.visible");
   });
 });
