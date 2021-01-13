@@ -47,7 +47,6 @@ const defaultState = () => {
 };
 
 const state = defaultState();
-const staticState = () => {};
 
 // actions
 let actions = {
@@ -112,43 +111,11 @@ let actions = {
 };
 
 // getters
-const getters = {
-  form: state => {
-    let { detail } = state;
-    return {
-      id: detail.id, // sid
-      preferredName: detail.attributes.preferredName,
-      displayName: detail.attributes.displayName,
-      casrn: detail.attributes.casrn,
-      qcLevel: detail.relationships.qcLevel.data.id,
-      source: detail.relationships.source.data.id,
-      substanceType: detail.relationships.substanceType.data.id,
-      description: detail.attributes.description,
-      privateQCNote: detail.attributes.privateQcNote,
-      publicQCNote: detail.attributes.publicQcNote
-    };
-  },
-  staticState: staticState => {
-    let { detail } = staticState;
-    return {
-      preferredName: detail.attributes.preferredName,
-      displayName: detail.attributes.displayName,
-      casrn: detail.attributes.casrn,
-      qcLevel: detail.relationships.qcLevel.data.id,
-      source: detail.relationships.source.data.id,
-      substanceType: detail.relationships.substanceType.data.id,
-      description: detail.attributes.description,
-      privateQCNote: detail.attributes.privateQcNote,
-      publicQCNote: detail.attributes.publicQcNote
-    };
-  }
-};
 
 // mutations
 const mutations = {
   ...rootMutations,
   loadDetail(state, payload) {
-    this.staticState = JSON.parse(JSON.stringify(payload));
     state.detail = payload;
   },
   clearForm(state) {
@@ -162,8 +129,7 @@ const mutations = {
 export default {
   namespaced: true,
   state,
-  staticState,
   actions,
-  getters,
+  // getters,
   mutations
 };

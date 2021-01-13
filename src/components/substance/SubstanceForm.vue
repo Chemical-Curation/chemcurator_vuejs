@@ -319,8 +319,6 @@ export default {
       this.$set(this.validationState[field], "state", null);
     },
     checkDataChanges(field) {
-      console.log("field", this.form[field]);
-      console.log("static", this.staticState[field]);
       if (this.form[field] !== this.staticState[field]) {
         this.markUnsavedChanges(field);
         this.changed++;
