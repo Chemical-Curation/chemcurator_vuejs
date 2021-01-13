@@ -185,17 +185,20 @@ export default {
       );
     },
     checkCompound: function() {
-      // if no inital compound, hide feedback until something else is selected
-      if (this.initialCompound.type === undefined) {
-        return this.type !== "none" ? false : true;
-      } else if (this.type === "deprecated") {
-        return this.type !== "deprecated" ? false : true;
-      } else {
-        return this.initialCompound.type !== this.type ||
-          this.initialCompound.id !== this.cid
-          ? false
-          : true;
-      }
+      if (this.substance.id !== "") {
+        // if no inital compound, hide feedback until something else is selected
+        if (this.initialCompound.type === undefined) {
+          return this.type !== "none" ? false : true;
+        } else if (this.type === "deprecated") {
+          return this.type !== "deprecated" ? false : true;
+        } else {
+          // if something is selected, see if it matches
+          return this.initialCompound.type !== this.type ||
+            this.initialCompound.id !== this.cid
+            ? false
+            : true;
+        }
+      } else return true;
     }
   },
   methods: {
