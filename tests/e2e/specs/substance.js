@@ -105,6 +105,15 @@ describe("The substance form", () => {
       .its("request.body.data.relationships.substanceType.data.id")
       .should("contain", "1");
   });
+  it("should alert on unsaved Compounds", () => {
+    // quark
+    cy.get("[data-cy=search-box]").type("Hydrogen Peroxide");
+    cy.get("[data-cy=search-button]").click();
+    cy.get("#compound-type-dropdown").select("Ill defined");
+    cy.get("#feedback-cid").contains(
+      "This Compound is not related to the Substance displayed."
+    );
+  });
 });
 
 describe("The substance page anonymous access", () => {
