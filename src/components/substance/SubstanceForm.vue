@@ -69,8 +69,6 @@ export default {
   data() {
     return {
       formChanged: 0,
-      compoundsMatch: false,
-      notSavable: false,
       validationState: this.clearValidation(),
       textareas: ["description", "privateQcNote", "publicQcNote"],
       dropdowns: ["qcLevel", "source", "substanceType"],
@@ -90,17 +88,30 @@ export default {
   },
   computed: {
     compoundChanged: function() {
-      if (this.$store.state.compound.type == "none") {
+      if (
+        this.$store.state.compound.type == "none" &&
+        Boolean(this.substance.relationships.associatedCompound.data)
+      ) {
+        return true;
+      } else if (
+        this.$store.state.compound.type == "none" &&
+        !this.substance.relationships.associatedCompound.data
+      ) {
         return false;
-      } else
-        return (
-          !this.compound.id &&
-          this.compound.id !==
-            this.substance.relationships.associatedCompound.data.id
-        );
+      } else if (
+        this.compound.id &&
+        this.compound.id !==
+          this.substance.relationships.associatedCompound?.data?.id
+      ) {
+        return true;
+      } else {
+        return false;
+      }
     },
     btnDisabled: function() {
-      return this.formChanged === 0 || this.compoundChanged;
+      if (this.compoundChanged) {
+        return false;
+      } else return this.formChanged === 0;
     },
     options: function() {
       return {

@@ -31,9 +31,7 @@ const defaultDetail = () => {
         }
       },
       associatedCompound: {
-        data: {
-          id: ""
-        }
+        data: null
       }
     }
   };

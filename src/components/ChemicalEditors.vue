@@ -105,7 +105,7 @@ export default {
     editable: Boolean,
     substance: Object,
     urlParam: Boolean,
-    options: Object
+    options: Function
   },
   data() {
     return {
