@@ -93,7 +93,6 @@
 <script>
 import KetcherWindow from "@/components/KetcherWindow";
 import MarvinWindow from "@/components/MarvinWindow";
-import { mapGetters } from "vuex";
 
 export default {
   name: "ChemicalEditors",
@@ -105,7 +104,8 @@ export default {
     initialCompound: Object,
     editable: Boolean,
     substance: Object,
-    urlParam: Boolean
+    urlParam: Boolean,
+    options: Object
   },
   data() {
     return {
@@ -136,7 +136,6 @@ export default {
     }
   },
   computed: {
-    ...mapGetters("queryStructureType", { options: "getOptions" }),
     type: {
       get: function() {
         return this.$store.state.compound.type;

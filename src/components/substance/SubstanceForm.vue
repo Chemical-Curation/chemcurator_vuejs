@@ -56,11 +56,16 @@
 </template>
 
 <script>
-import { mapGetters } from "vuex";
-
 export default {
   name: "SubstanceForm",
-  props: ["substance", "compound"],
+  props: [
+    "substance",
+    "compound",
+    "isAuthenticated",
+    "qcLevelOptions",
+    "sourceOptions",
+    "substanceTypeOptions"
+  ],
   data() {
     return {
       formChanged: 0,
@@ -84,11 +89,6 @@ export default {
     };
   },
   computed: {
-    ...mapGetters("auth", ["isAuthenticated"]),
-    ...mapGetters("qcLevel", { qcLevelOptions: "getOptions" }),
-    ...mapGetters("source", { sourceOptions: "getOptions" }),
-    ...mapGetters("substanceType", { substanceTypeOptions: "getOptions" }),
-
     compoundChanged: function() {
       if (this.$store.state.compound.type == "none") {
         return false;
@@ -215,29 +215,16 @@ export default {
           if (related[key].data.id == null) delete related[key];
         });
       }
-      if (
-        this.compound &&
-        this.compound.id &&
-        this.compound.id !== relationships.associatedCompound.data?.id
-      ) {
-        console.log(
-          "relationship id",
-          relationships.associatedCompound.data?.id
-        );
+      if (this.compound.id) {
         related["associatedCompound"] = {
           data: {
             id: this.compound.id,
             type: this.compound.type
           }
         };
-      } else if (this.$store.state.compound.type === "none") {
-        console.log(
-          "relationship id",
-          relationships.associatedCompound.data?.id
-        );
+      } else {
         related["associatedCompound"] = { data: null };
       }
-      console.log("related", related);
       let payload = {
         type: "substance",
         attributes: attrs,

@@ -5,7 +5,14 @@
     </div>
     <b-row>
       <b-col cols="12" order="1" lg="4" order-lg="0">
-        <SubstanceForm :compound="compound" :substance="substance" />
+        <SubstanceForm
+          :compound="compound"
+          :substance="substance"
+          :isAuthenticated="isAuthenticated"
+          :qcLevelOptions="qcLevelOptions"
+          :sourceOptions="sourceOptions"
+          :substanceTypeOptions="substanceTypeOptions"
+        />
       </b-col>
       <b-col>
         <ChemicalEditors
@@ -13,6 +20,7 @@
           :editable="isAuthenticated"
           :substance="substance"
           :urlParam="urlParam"
+          :options="options"
           @change="changed = $event"
         />
       </b-col>
@@ -42,8 +50,13 @@ export default {
   computed: {
     ...mapGetters("auth", ["isAuthenticated"]),
     ...mapGetters("compound", { compound: "getCompound" }),
+    ...mapGetters("qcLevel", { qcLevelOptions: "getOptions" }),
+    ...mapGetters("queryStructureType", { options: "getOptions" }),
+    ...mapGetters("source", { sourceOptions: "getOptions" }),
+    ...mapGetters("substanceType", { substanceTypeOptions: "getOptions" }),
     ...mapState("substance", { substance: "detail" }),
     ...mapState("queryStructureType", { qstList: "list" }),
+
     ifSearchParameter() {
       return !this.$route.query.search;
     },
