@@ -12,8 +12,8 @@ const defaultDetail = () => {
       displayName: null,
       casrn: null,
       description: null,
-      privateQCNote: null,
-      publicQCNote: null
+      privateQcNote: null,
+      publicQcNote: null
     },
     relationships: {
       source: {

@@ -66,7 +66,7 @@ export default {
     return {
       changed: 0,
       validationState: this.clearValidation(),
-      textareas: ["description", "privateQCNote", "publicQCNote"],
+      textareas: ["description", "privateQcNote", "publicQcNote"],
       dropdowns: ["qcLevel", "source", "substanceType"],
       labels: {
         id: "Substance ID:",
@@ -74,8 +74,8 @@ export default {
         displayName: "Display Name:",
         casrn: "CAS-RN:",
         description: "Substance Description:",
-        privateQCNote: "Private QC Notes:",
-        publicQCNote: "Public QC Notes:",
+        privateQcNote: "Private QC Notes:",
+        publicQcNote: "Public QC Notes:",
         qcLevel: "QC Level:",
         source: "Source:",
         substanceType: "Substance Type:"
@@ -83,9 +83,7 @@ export default {
     };
   },
   computed: {
-    ...mapState("substance", ["detail"]),
-    ...mapGetters("substance", ["form"]),
-    ...mapGetters("substance", ["staticState"]),
+    ...mapState("substance", { substance: "detail" }),
     ...mapGetters("auth", ["isAuthenticated"]),
     ...mapGetters("qcLevel", { qcLevelOptions: "getOptions" }),
     ...mapGetters("source", { sourceOptions: "getOptions" }),
@@ -97,12 +95,44 @@ export default {
     options: function() {
       return {
         qcLevel: this.qcLevelOptions(
-          this.detail?.relationships.qcLevel.data?.id
+          this.substance?.relationships.qcLevel.data?.id
         ),
-        source: this.sourceOptions(this.detail?.relationships.source.data?.id),
+        source: this.sourceOptions(
+          this.substance?.relationships.source.data?.id
+        ),
         substanceType: this.substanceTypeOptions(
-          this.detail?.relationships.substanceType.data?.id
+          this.substance?.relationships.substanceType.data?.id
         )
+      };
+    },
+    form: function() {
+      let { attributes, relationships } = this.substance;
+      return {
+        id: this.substance.id, // sid
+        preferredName: attributes.preferredName,
+        displayName: attributes.displayName,
+        casrn: attributes.casrn,
+        qcLevel: relationships.qcLevel.data.id,
+        source: relationships.source.data.id,
+        substanceType: relationships.substanceType.data.id,
+        description: attributes.description,
+        privateQcNote: attributes.privateQcNote,
+        publicQcNote: attributes.publicQcNote
+      };
+    },
+    staticState: function() {
+      let { attributes, relationships } = this.substance;
+      return {
+        id: this.substance.id, // sid
+        preferredName: attributes.preferredName || "",
+        displayName: attributes.displayName || "",
+        casrn: attributes.casrn || "",
+        qcLevel: relationships.qcLevel.data.id,
+        source: relationships.source.data.id,
+        substanceType: relationships.substanceType.data.id,
+        description: attributes.description || "",
+        privateQcNote: attributes.privateQcNote || "",
+        publicQcNote: attributes.publicQcNote || ""
       };
     }
   },
@@ -134,8 +164,8 @@ export default {
         casrn: { ...clean },
         preferredName: { ...clean },
         displayName: { ...clean },
-        privateQCNote: { ...clean },
-        publicQCNote: { ...clean },
+        privateQcNote: { ...clean },
+        publicQcNote: { ...clean },
         qcLevel: { ...clean },
         source: { ...clean },
         description: { ...clean },
@@ -153,12 +183,12 @@ export default {
         "displayName",
         "casrn",
         "description",
-        "publicQCNote",
-        "privateQCNote"
+        "publicQcNote",
+        "privateQcNote"
       )(data);
       // filter out attributes that have not been changed
       if (id) {
-        let { attributes } = this.detail;
+        let { attributes } = this.substance;
         Object.keys(attrs).forEach(key => {
           if (attrs[key] == attributes[key]) delete attrs[key];
         });
@@ -180,7 +210,7 @@ export default {
       )(data);
       // filter out the relationships that haven't been changed
       if (id) {
-        let { relationships } = this.detail;
+        let { relationships } = this.substance;
         Object.keys(related).forEach(key => {
           if (related[key].data.id == relationships[key].data.id)
             delete related[key];
@@ -289,6 +319,8 @@ export default {
       this.$set(this.validationState[field], "state", null);
     },
     checkDataChanges(field) {
+      console.log("field", this.form[field]);
+      console.log("static", this.staticState[field]);
       if (this.form[field] !== this.staticState[field]) {
         this.markUnsavedChanges(field);
         this.changed++;
