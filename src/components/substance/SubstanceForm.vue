@@ -119,21 +119,6 @@ export default {
         privateQcNote: attributes.privateQcNote,
         publicQcNote: attributes.publicQcNote
       };
-    },
-    staticState: function() {
-      let { attributes, relationships } = this.substance;
-      return {
-        id: this.substance.id, // sid
-        preferredName: attributes.preferredName || "",
-        displayName: attributes.displayName || "",
-        casrn: attributes.casrn || "",
-        qcLevel: relationships.qcLevel.data.id,
-        source: relationships.source.data.id,
-        substanceType: relationships.substanceType.data.id,
-        description: attributes.description || "",
-        privateQcNote: attributes.privateQcNote || "",
-        publicQcNote: attributes.publicQcNote || ""
-      };
     }
   },
   watch: {
@@ -319,7 +304,11 @@ export default {
       this.$set(this.validationState[field], "state", null);
     },
     checkDataChanges(field) {
-      if (this.form[field] !== this.staticState[field]) {
+      let initialValue;
+      if (this.dropdowns.includes(field)) {
+        initialValue = this.substance.relationships[field].data.id;
+      } else initialValue = this.substance.attributes[field] || "";
+      if (this.form[field] !== initialValue) {
         this.markUnsavedChanges(field);
         this.changed++;
       } else {
