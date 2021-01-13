@@ -66,7 +66,7 @@ export default {
     return {
       changed: 0,
       validationState: this.clearValidation(),
-      textareas: ["description", "privateQCNote", "publicQCNote"],
+      textareas: ["description", "privateQcNote", "publicQcNote"],
       dropdowns: ["qcLevel", "source", "substanceType"],
       labels: {
         id: "Substance ID:",
@@ -74,8 +74,8 @@ export default {
         displayName: "Display Name:",
         casrn: "CAS-RN:",
         description: "Substance Description:",
-        privateQCNote: "Private QC Notes:",
-        publicQCNote: "Public QC Notes:",
+        privateQcNote: "Private QC Notes:",
+        publicQcNote: "Public QC Notes:",
         qcLevel: "QC Level:",
         source: "Source:",
         substanceType: "Substance Type:"
@@ -116,8 +116,8 @@ export default {
         source: relationships.source.data.id,
         substanceType: relationships.substanceType.data.id,
         description: attributes.description,
-        privateQCNote: attributes.privateQCNote,
-        publicQCNote: attributes.publicQCNote
+        privateQcNote: attributes.privateQcNote,
+        publicQcNote: attributes.publicQcNote
       };
     },
     staticState: function() {
@@ -131,8 +131,8 @@ export default {
         source: relationships.source.data.id,
         substanceType: relationships.substanceType.data.id,
         description: attributes.description || "",
-        privateQCNote: attributes.privateQCNote || "",
-        publicQCNote: attributes.publicQCNote || ""
+        privateQcNote: attributes.privateQcNote || "",
+        publicQcNote: attributes.publicQcNote || ""
       };
     }
   },
@@ -164,8 +164,8 @@ export default {
         casrn: { ...clean },
         preferredName: { ...clean },
         displayName: { ...clean },
-        privateQCNote: { ...clean },
-        publicQCNote: { ...clean },
+        privateQcNote: { ...clean },
+        publicQcNote: { ...clean },
         qcLevel: { ...clean },
         source: { ...clean },
         description: { ...clean },
@@ -183,8 +183,8 @@ export default {
         "displayName",
         "casrn",
         "description",
-        "publicQCNote",
-        "privateQCNote"
+        "publicQcNote",
+        "privateQcNote"
       )(data);
       // filter out attributes that have not been changed
       if (id) {

@@ -166,8 +166,8 @@ describe("The substance page anonymous access", () => {
       "have.value",
       "This is the description for the test substance"
     );
-    cy.get("#privateQCNote").should("have.value", "Private QC notes");
-    cy.get("#publicQCNote").should("have.value", "Public QC notes");
+    cy.get("#privateQcNote").should("have.value", "Private QC notes");
+    cy.get("#publicQcNote").should("have.value", "Public QC notes");
   });
 
   it("should load the substance form from tree", () => {
@@ -184,8 +184,8 @@ describe("The substance page anonymous access", () => {
       "have.value",
       "This is the description for the test substance"
     );
-    cy.get("#privateQCNote").should("have.value", "Private QC notes");
-    cy.get("#publicQCNote").should("have.value", "Public QC notes");
+    cy.get("#privateQcNote").should("have.value", "Private QC notes");
+    cy.get("#publicQcNote").should("have.value", "Public QC notes");
   });
 
   it("should show substance link with mismatched DTXCID=>DTXSID", () => {
