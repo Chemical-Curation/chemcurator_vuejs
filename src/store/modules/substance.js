@@ -43,8 +43,7 @@ const defaultState = () => {
     included: {},
     loading: false,
     count: 0,
-    list: [],
-    form: {}
+    list: []
   };
 };
 
@@ -132,32 +131,13 @@ let actions = {
 };
 
 // getters
-const getters = {
-  form: state => {
-    let { detail } = state;
-    return {
-      id: detail.id, // sid
-      preferredName: detail.attributes.preferredName,
-      displayName: detail.attributes.displayName,
-      casrn: detail.attributes.casrn,
-      qcLevel: detail.relationships.qcLevel.data.id,
-      source: detail.relationships.source.data.id,
-      substanceType: detail.relationships.substanceType.data.id,
-      description: detail.attributes.description,
-      privateQCNote: detail.attributes.privateQcNote,
-      publicQCNote: detail.attributes.publicQcNote
-    };
-  }
-};
+const getters = {};
 
 // mutations
 const mutations = {
   ...rootMutations,
   loadDetail(state, payload) {
     state.detail = payload;
-  },
-  clearForm(state) {
-    state.detail = defaultDetail();
   },
   clearState(state) {
     Object.assign(state, defaultState());
