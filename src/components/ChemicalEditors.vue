@@ -115,7 +115,7 @@ export default {
   },
   watch: {
     initialCompound: function() {
-      if (this.type === "none") {
+      if (this.type === "none" && !this.substance.id) {
         // this block empties out the ketcher window when substance is
         // hit in the NavBar
         this.$refs["ketcher"].clearMolfile();
@@ -264,14 +264,15 @@ export default {
         // If there is no id, save the new compound
         this.$store
           .dispatch("compound/illdefinedcompound/post", requestBody)
-          .then(response =>
+          .then(response => {
             // Load the newly created compound.  We could bypass this action by
             // storing the response but this verifies the compound is the same and
             // further searches will work
             this.$store.dispatch("compound/fetchCompound", {
               id: response.data.data.id
-            })
-          )
+            });
+            this.marvinChanged = false;
+          })
           .catch(err => this.handleError(err));
       }
     },

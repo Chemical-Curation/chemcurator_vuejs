@@ -89,9 +89,18 @@ export default {
     ...mapGetters("source", { sourceOptions: "getOptions" }),
     ...mapGetters("substanceType", { substanceTypeOptions: "getOptions" }),
 
+    compoundChanged: function() {
+      if (this.$store.state.compound.type == "none") {
+        return false;
+      } else
+        return (
+          !this.compound.id &&
+          this.compound.id !==
+            this.substance.relationships.associatedCompound.data.id
+        );
+    },
     btnDisabled: function() {
-      console.log("disaoble", (this.$store.state.compound.type === "none" && !this.compound?.id));
-      return this.compoundsMatch || this.formChanged === 0 || this.notSavable;
+      return this.formChanged === 0 || this.compoundChanged;
     },
     options: function() {
       return {
@@ -123,29 +132,6 @@ export default {
     }
   },
   watch: {
-    "compound.id": function() {
-      console.log("compund wathc");
-      if (
-        this.compound?.id &&
-        this.substance.relationships.associatedCompound.data?.id ===
-          this.compound?.id
-      ) {
-        this.compoundsMatch = true;
-      }  else {
-        this.compoundsMatch = false;
-      }
-      if(this.$store.state.compound.type === "none") {
-        this.notSavable = false;
-      } else {
-        if(!this.compound?.id) {
-          this.formChanged--;
-          this.notSavable = true;
-        } else {
-          this.formChanged++;
-          this.notSavable = false;
-        }
-      }
-    }
     //    "substance.id": function() {
     //      this.validationState = this.clearValidation();
     //      this.formChanged = 0;
@@ -267,20 +253,20 @@ export default {
         console.log("patch", payload);
         payload["id"] = id;
         // if there is an id, patch the currently loaded substance.
-//        this.$store
-//          .dispatch("substance/patch", {
-//            id: id,
-//            body: { ...payload }
-//          })
-//          .then(response => this.handleSuccess(response))
-//          .catch(err => this.handleFail(err));
+        this.$store
+          .dispatch("substance/patch", {
+            id: id,
+            body: { ...payload }
+          })
+          .then(response => this.handleSuccess(response))
+          .catch(err => this.handleFail(err));
       } else {
         console.log("post", payload);
         // If there is no id, save the new substance.
-//        this.$store
-//          .dispatch("substance/post", payload)
-//          .then(response => this.handleSuccess(response))
-//          .catch(err => this.handleFail(err));
+        this.$store
+          .dispatch("substance/post", payload)
+          .then(response => this.handleSuccess(response))
+          .catch(err => this.handleFail(err));
       }
     },
     handleSuccess(response) {
