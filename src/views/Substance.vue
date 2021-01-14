@@ -26,7 +26,11 @@
       </b-col>
     </b-row>
     <SynonymTable :substance-id="substance.id" :editable="isAuthenticated" />
-    <SubstanceRelationshipTable class="mb-5" :substance-id="substance.id" />
+    <SubstanceRelationshipTable
+      class="mb-5"
+      :substance-id="substance.id"
+      :editable="isAuthenticated"
+    />
     <ListTable class="mb-5" :substance-id="substance.id" />
   </b-container>
 </template>

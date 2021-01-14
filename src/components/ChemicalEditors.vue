@@ -9,6 +9,9 @@
         class="col"
       >
         <b-form-input id="recordCompoundID" :value="cid" disabled />
+        <b-form-invalid-feedback id="feedback-cid" :state="checkCompound">
+          This Compound is not related to the Substance displayed.
+        </b-form-invalid-feedback>
         <template v-if="showSubstanceLink">
           <router-link
             id="substanceLink"
@@ -186,6 +189,11 @@ export default {
     },
     showSubstanceLink: function() {
       return this.sid && this.sid !== this.substance?.id;
+    },
+    checkCompound: function() {
+      let sub_id =
+        this.substance.relationships.associatedCompound?.data?.id || "";
+      return sub_id === this.cid;
     }
   },
   methods: {

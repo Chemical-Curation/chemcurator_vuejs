@@ -11,8 +11,8 @@ const defaultDetail = () => {
       displayName: null,
       casrn: null,
       description: null,
-      privateQCNote: null,
-      publicQCNote: null
+      privateQcNote: null,
+      publicQcNote: null
     },
     relationships: {
       source: {
@@ -109,6 +109,7 @@ let actions = {
             color: "warning",
             dismissCountDown: 4
           };
+          // ?: should getting a failed search result clear what you have loaded?
           context.commit("clearState");
           context.dispatch(`compound/clearAllStates`, {}, { root: true });
           context.dispatch("alert/alert", alert, {
@@ -130,9 +131,6 @@ let actions = {
   }
 };
 
-// getters
-const getters = {};
-
 // mutations
 const mutations = {
   ...rootMutations,
@@ -148,6 +146,5 @@ export default {
   namespaced: true,
   state,
   actions,
-  getters,
   mutations
 };
