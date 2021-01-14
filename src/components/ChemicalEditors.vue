@@ -9,6 +9,9 @@
         class="col"
       >
         <b-form-input id="recordCompoundID" :value="cid" disabled />
+        <b-form-invalid-feedback id="feedback-cid" :state="checkCompound">
+          This Compound is not related to the Substance displayed.
+        </b-form-invalid-feedback>
         <template v-if="showSubstanceLink">
           <router-link
             id="substanceLink"
@@ -154,9 +157,13 @@ export default {
       return this.definedCompound?.attributes?.inchikey ?? "-";
     },
     cid: function() {
-      return this.type === "definedCompound"
-        ? this.definedCompound?.id
-        : this.illDefinedCompound?.id;
+      if (this.type === "definedCompound") {
+        return this.definedCompound?.id || "";
+      } else if (this.type === "none") {
+        return "";
+      } else {
+        return this.illDefinedCompound?.id || "";
+      }
     },
     sid: function() {
       // the sid that the loaded compound is related to
@@ -180,6 +187,11 @@ export default {
         this.substance.id !== "" &&
         this.sid !== this.substance.id
       );
+    },
+    checkCompound: function() {
+      let sub_id =
+        this.substance.relationships.associatedCompound?.data?.id || "";
+      return sub_id === this.cid;
     }
   },
   methods: {

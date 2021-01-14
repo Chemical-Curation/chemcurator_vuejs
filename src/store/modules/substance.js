@@ -12,8 +12,8 @@ const defaultDetail = () => {
       displayName: null,
       casrn: null,
       description: null,
-      privateQCNote: null,
-      publicQCNote: null
+      privateQcNote: null,
+      publicQcNote: null
     },
     relationships: {
       source: {
@@ -29,6 +29,11 @@ const defaultDetail = () => {
       qcLevel: {
         data: {
           id: null
+        }
+      },
+      associatedCompound: {
+        data: {
+          id: ""
         }
       }
     }
@@ -89,6 +94,7 @@ let actions = {
             color: "warning",
             dismissCountDown: 4
           };
+          // ?: should getting a failed search result clear what you have loaded?
           context.commit("clearState");
           context.dispatch(`compound/clearAllStates`, {}, { root: true });
           context.dispatch("alert/alert", alert, {
@@ -110,23 +116,6 @@ let actions = {
 };
 
 // getters
-const getters = {
-  form: state => {
-    let { detail } = state;
-    return {
-      id: detail.id, // sid
-      preferredName: detail.attributes.preferredName,
-      displayName: detail.attributes.displayName,
-      casrn: detail.attributes.casrn,
-      qcLevel: detail.relationships.qcLevel.data.id,
-      source: detail.relationships.source.data.id,
-      substanceType: detail.relationships.substanceType.data.id,
-      description: detail.attributes.description,
-      privateQCNote: detail.attributes.privateQcNote,
-      publicQCNote: detail.attributes.publicQcNote
-    };
-  }
-};
 
 // mutations
 const mutations = {
@@ -146,6 +135,6 @@ export default {
   namespaced: true,
   state,
   actions,
-  getters,
+  // getters,
   mutations
 };

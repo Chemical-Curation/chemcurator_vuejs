@@ -41,6 +41,10 @@ describe("The substance form", () => {
       "The proposed CASRN does not conform to the regular expression ^[0-9]{2,7}-[0-9]{2}-[0-9]$"
     );
   });
+  it("should show unsaved changes", () => {
+    cy.get("#casrn").type("not a casrn");
+    cy.get("#feedback-casrn").contains("This field has unsaved changes.");
+  });
   it("should validate nonFieldErrors", () => {
     let casrn = valid_casrns[Math.floor(Math.random() * valid_casrns.length)];
     cy.get("#preferredName").type(casrn);
@@ -101,6 +105,15 @@ describe("The substance form", () => {
       .its("request.body.data.relationships.substanceType.data.id")
       .should("contain", "1");
   });
+  it("should alert on unsaved Compounds", () => {
+    // quark
+    cy.get("[data-cy=search-box]").type("Hydrogen Peroxide");
+    cy.get("[data-cy=search-button]").click();
+    cy.get("#compound-type-dropdown").select("Ill defined");
+    cy.get("#feedback-cid").contains(
+      "This Compound is not related to the Substance displayed."
+    );
+  });
 });
 
 describe("The substance page anonymous access", () => {
@@ -153,8 +166,8 @@ describe("The substance page anonymous access", () => {
       "have.value",
       "This is the description for the test substance"
     );
-    cy.get("#privateQCNote").should("have.value", "Private QC notes");
-    cy.get("#publicQCNote").should("have.value", "Public QC notes");
+    cy.get("#privateQcNote").should("have.value", "Private QC notes");
+    cy.get("#publicQcNote").should("have.value", "Public QC notes");
   });
 
   it("should load the substance form from tree", () => {
@@ -171,8 +184,8 @@ describe("The substance page anonymous access", () => {
       "have.value",
       "This is the description for the test substance"
     );
-    cy.get("#privateQCNote").should("have.value", "Private QC notes");
-    cy.get("#publicQCNote").should("have.value", "Public QC notes");
+    cy.get("#privateQcNote").should("have.value", "Private QC notes");
+    cy.get("#publicQcNote").should("have.value", "Public QC notes");
   });
 
   it("should show substance link with mismatched DTXCID=>DTXSID", () => {
