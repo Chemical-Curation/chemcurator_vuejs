@@ -157,9 +157,13 @@ export default {
       return this.definedCompound?.attributes?.inchikey ?? "-";
     },
     cid: function() {
-      return this.type === "definedCompound"
-        ? this.definedCompound?.id
-        : this.illDefinedCompound?.id;
+      if (this.type === "definedCompound") {
+        return this.definedCompound?.id || "";
+      } else if (this.type === "none") {
+        return "";
+      } else {
+        return this.illDefinedCompound?.id || "";
+      }
     },
     sid: function() {
       // the sid that the loaded compound is related to
@@ -185,20 +189,9 @@ export default {
       );
     },
     checkCompound: function() {
-      if (this.substance.id !== "") {
-        // if no inital compound, hide feedback until something else is selected
-        if (this.initialCompound.type === undefined) {
-          return this.type !== "none" ? false : true;
-        } else if (this.type === "deprecated") {
-          return this.type !== "deprecated" ? false : true;
-        } else {
-          // if something is selected, see if it matches
-          return this.initialCompound.type !== this.type ||
-            this.initialCompound.id !== this.cid
-            ? false
-            : true;
-        }
-      } else return true;
+      let sub_id =
+        this.substance.relationships.associatedCompound?.data?.id || "";
+      return sub_id === this.cid;
     }
   },
   methods: {

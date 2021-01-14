@@ -30,6 +30,11 @@ const defaultDetail = () => {
         data: {
           id: null
         }
+      },
+      associatedCompound: {
+        data: {
+          id: ""
+        }
       }
     }
   };
