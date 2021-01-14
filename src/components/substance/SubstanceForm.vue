@@ -71,7 +71,17 @@ export default {
   ],
   data() {
     return {
-      formChanged: 0,
+      formChanged: {
+        preferredName: 0,
+        displayName: 0,
+        casrn: 0,
+        description: 0,
+        privateQcNote: 0,
+        publicQcNote: 0,
+        qcLevel: 0,
+        source: 0,
+        substanceType: 0
+      },
       validationState: this.clearValidation(),
       textareas: ["description", "privateQcNote", "publicQcNote"],
       dropdowns: ["qcLevel", "source", "substanceType"],
@@ -115,7 +125,7 @@ export default {
     btnDisabled: function() {
       if (this.compoundChanged) {
         return false;
-      } else return this.formChanged === 0;
+      } else return this.sumValues(this.formChanged) === 0;
     },
     options: function() {
       return {
@@ -153,6 +163,9 @@ export default {
     //    }
   },
   methods: {
+    sumValues(obj) {
+      return Object.values(obj).reduce((a, b) => a + b);
+    },
     editable(fld) {
       return fld === "id" ? true : !this.isAuthenticated;
     },
@@ -337,9 +350,11 @@ export default {
         "message",
         "This field has unsaved changes."
       );
+      this.formChanged[field]++;
     },
     unmarkChanges(field) {
       this.$set(this.validationState[field], "state", null);
+      this.formChanged[field] = 0;
     },
     checkDataChanges(field) {
       let initialValue;
@@ -348,10 +363,8 @@ export default {
       } else initialValue = this.substance.attributes[field] || "";
       if (this.form[field] !== initialValue) {
         this.markUnsavedChanges(field);
-        this.changed++;
       } else {
         this.unmarkChanges(field);
-        this.changed--;
       }
     }
   }
