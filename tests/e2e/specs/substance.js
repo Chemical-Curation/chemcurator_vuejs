@@ -1039,7 +1039,7 @@ describe("The substance page's Relationships Table", () => {
       .find("div.ag-row[role=row]")
       .first()
       .children()
-      .first()
+      .eq(1)
       .type("Hello World\n");
 
     // Change to forward relationship type.  (Relationship Type cell)
