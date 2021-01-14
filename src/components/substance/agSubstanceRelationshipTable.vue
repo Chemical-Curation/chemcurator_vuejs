@@ -5,7 +5,7 @@
     </div>
     <ag-grid-vue
       id="substance-relationship-table"
-      style="height: 250px;"
+      style="height: 250px"
       class="ag-theme-alpine"
       :columnDefs="columnDefs"
       :defaultColDef="defaultColDef"
@@ -68,6 +68,21 @@ export default {
     columnDefs: function() {
       let colDefs = [
         {
+          headerName: "Type",
+          field: "data.relationshipType",
+          comparator: this.typeMapCompare,
+          cellRenderer: "relationshipTypeCellRenderer",
+          cellRendererParams: {
+            map: this.typeListMap
+          },
+          cellEditor: "relationshipTypeCellEditor",
+          cellEditorParams: {
+            values: this.typeListOptions(
+              "relationships.relationshipType.data.id"
+            )
+          }
+        },
+        {
           headerName: "SID",
           // Strips the checksum from the comparison
           comparator: this.sidCompare,
@@ -85,21 +100,6 @@ export default {
           cellEditorParams: {
             cellRenderer: "mappableCellRenderer",
             values: this.sourceListOptions("relationships.source.data.id")
-          }
-        },
-        {
-          headerName: "Type",
-          field: "data.relationshipType",
-          comparator: this.typeMapCompare,
-          cellRenderer: "relationshipTypeCellRenderer",
-          cellRendererParams: {
-            map: this.typeListMap
-          },
-          cellEditor: "relationshipTypeCellEditor",
-          cellEditorParams: {
-            values: this.typeListOptions(
-              "relationships.relationshipType.data.id"
-            )
           }
         },
         {
