@@ -974,13 +974,6 @@ describe("The substance page's Relationships Table", () => {
     cy.adminLogin();
     cy.visit("/substance");
     cy.server();
-
-    // fixture loading the substance relationships
-    cy.route(
-      "GET",
-      "/substanceRelationships?*",
-      "fx:../responses/substance-relationships.json"
-    );
   });
 
   it("should show the relationships table", () => {
@@ -1158,7 +1151,7 @@ describe("The substance page's Relationships Table", () => {
     // Queue a simple success message (actual response is not currently used)
     cy.route("PATCH", "/synonyms/*", "success");
 
-    cy.get("[data-cy=search-box]").type("Deprecated Substance");
+    cy.get("[data-cy=search-box]").type("Sample Substance 2");
     cy.get("[data-cy=search-button]").click();
 
     // Build assertion info
@@ -1210,7 +1203,7 @@ describe("The substance page's Relationships Table", () => {
       .find("div.ag-row[role=row]")
       .first()
       .children()
-      .first()
+      .eq(1)
       .type("Hello World\n");
 
     // Save Row
@@ -1231,7 +1224,7 @@ describe("The substance page's Relationships Table", () => {
       .should("have.class", "bg-danger")
       .first()
       .children()
-      .first()
+      .eq(1)
       .click();
 
     cy.get("#relationship-error-table").should(
