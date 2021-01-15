@@ -32,7 +32,7 @@
       </b-button>
     </div>
     <b-modal id="bulk-add-synonyms-modal" title="Bulk Add Synonyms" size="lg" hide-footer>
-      <BulkAddSynonyms :substance-id="substanceId"> </BulkAddSynonyms>
+      <BulkAddSynonyms :substance-id="substanceId" @save="loadSynonyms(substanceId)"> </BulkAddSynonyms>
     </b-modal>
   </div>
 </template>
