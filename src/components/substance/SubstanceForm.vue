@@ -156,6 +156,12 @@ export default {
       };
     }
   },
+    watch: {
+    "substance.id": function() {
+      this.validationState = this.clearValidation();
+      Object.keys(this.formChanged).forEach(v => (this.formChanged[v] = 0));
+    }
+  },
   methods: {
     sumValues(obj) {
       return Object.values(obj).reduce((a, b) => a + b);
