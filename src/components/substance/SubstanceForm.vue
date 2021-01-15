@@ -169,7 +169,7 @@ export default {
     clearForm() {
       this.$store.commit("substance/clearDetail");
       this.validationState = this.clearValidation();
-      Object.keys(this.formChanged).forEach(v => this.formChanged[v] = 0);
+      Object.keys(this.formChanged).forEach(v => (this.formChanged[v] = 0));
     },
     clearValidation() {
       let clean = {
@@ -283,7 +283,7 @@ export default {
       let action = response.status === 201 ? "created" : "updated";
       let { id } = response.data.data;
       this.validationState = this.clearValidation();
-      Object.keys(this.formChanged).forEach(v => this.formChanged[v] = 0);
+      Object.keys(this.formChanged).forEach(v => (this.formChanged[v] = 0));
       this.$store.commit("substance/loadDetail", response.data.data);
       // update for the tree
       this.$store.dispatch("substance/getList");
@@ -305,7 +305,7 @@ export default {
           .shift();
         if (attr == "nonFieldErrors") {
           nonField.push(error.detail);
-        } else if(attr == "associatedCompound") {
+        } else if (attr == "associatedCompound") {
           console.log(error.detail);
           this.$store.dispatch("alert/alert", {
             message: error.detail,
