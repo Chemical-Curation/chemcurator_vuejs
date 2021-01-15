@@ -79,7 +79,7 @@ export default {
       this.$store.dispatch("auth/logout");
     },
     clearEditors: function() {
-      this.$store.commit("substance/clearForm");
+      this.$store.commit("substance/clearState");
       this.$store.commit("compound/definedcompound/clearState");
       this.$store.commit("compound/illdefinedcompound/clearState");
       this.$store.commit("compound/clearState");
