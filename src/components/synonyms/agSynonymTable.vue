@@ -4,7 +4,7 @@
       <h3>Synonyms</h3>
     </div>
     <ag-grid-vue
-      id="substanceTable"
+      id="synonym-table"
       style="height: 250px;"
       class="ag-theme-alpine"
       :columnDefs="columnDefs"
@@ -35,14 +35,9 @@
 
 <script>
 import { mapActions, mapGetters, mapState } from "vuex";
-import _ from "lodash";
 import { AgGridVue } from "ag-grid-vue";
-import {
-  MappableCellRenderer,
-  SelectObjectCellEditor
-} from "@/components/ag-grid/custom-renderers";
-import BtnCellRenderer from "@/components/ag-grid/BtnCellRenderer";
 import SynonymApi from "@/api/synonym.js";
+import { agGridMixin } from "@/components/ag-grid/agGridMixin";
 import ErrorTable from "@/components/ErrorTable";
 
 export default {
@@ -51,13 +46,13 @@ export default {
     ErrorTable,
     AgGridVue
   },
+  mixins: [agGridMixin],
   props: {
     // Substance ID to which these synonyms will be related
     substanceId: String,
     editable: Boolean
   },
   computed: {
-    ...mapGetters("auth", ["isAuthenticated"]),
     ...mapGetters("synonymQuality", { qualityListOptions: "getOptions" }),
     ...mapGetters("source", { sourceListOptions: "getOptions" }),
     ...mapGetters("synonymType", { typeListOptions: "getOptions" }),
@@ -121,82 +116,8 @@ export default {
           cellEditor: "agLargeTextCellEditor"
         }
       ];
-      if (this.editable) {
-        // Add the save button
-        colDefs.push({
-          flex: 0,
-          width: 85,
-          resizable: false,
-          sortable: false,
-          editable: false,
-          headerName: "",
-          cellClass: "p-0 text-center",
-          cellRenderer: "btnCellRenderer",
-          cellRendererParams: {
-            clicked: this.saveRow,
-            buttonText: "Save",
-            buttonVariant: "primary",
-            enabled: function(data) {
-              return !_.isEqual(data.data, data.initialData);
-            }
-          }
-        });
-        // Add the delete button
-        colDefs.push({
-          flex: 0,
-          width: 85,
-          resizable: false,
-          sortable: false,
-          editable: false,
-          headerName: "",
-          cellClass: "p-0 text-center",
-          cellRenderer: "btnCellRenderer",
-          cellRendererParams: {
-            clicked: this.deleteRow,
-            buttonText: "Delete",
-            buttonVariant: "danger",
-            enabled: function() {
-              return true;
-            } // delete is always available
-          }
-        });
-      }
+      colDefs = colDefs.concat(this.getEditButtons());
       return colDefs;
-    },
-
-    /**
-     * Row highlighting rules
-     */
-    rowClassRules: function() {
-      return {
-        // background danger any rows have errors
-        "bg-danger": params => {
-          return params.data.errors;
-        },
-        // background info any rows where there is no id
-        "new-ag-row": params => {
-          // new-ag-row is currently an unscoped style.
-          // It naturally takes a position below ag-grid's row style
-          // and thus needs an important tag.
-          return params.data.created && !params.data.errors;
-        }
-      };
-    },
-
-    selectedError: function() {
-      return this.selectedRow?.errors ?? [];
-    },
-
-    /**
-     * Checks for any row additions/edits and returns a bool
-     *
-     * @return {boolean} - True if any row has changed, false if not.
-     */
-    buttonsEnabled: function() {
-      for (let row of this.rowData) {
-        if (!_.isEqual(row.data, row.initialData) || row.created) return true;
-      }
-      return false;
     },
 
     /**
@@ -226,124 +147,19 @@ export default {
       return map;
     }
   },
-  data() {
-    return {
-      rowData: [],
-      defaultColDef: null,
-      gridOptions: null,
-      loading: false,
-      selectedRow: null,
-      frameworkComponents: null,
-      // Display options for error table.
-      errorFields: [{ label: "Errors", key: "modifiedDetail" }]
-    };
-  },
+
   watch: {
     /**
      * Loads the synonyms for the currently loaded substance
      */
     substanceId: function() {
       this.loadSynonyms(this.substanceId);
-    },
-
-    /**
-     * Handles the AG-Grid loading overlays when synonym loading starts and stops
-     */
-    loading: function() {
-      this.manageOverlay();
     }
   },
   methods: {
-    ...mapActions("alert", ["alert"]),
     ...mapActions("synonymQuality", { loadQualityList: "getList" }),
     ...mapActions("synonymType", { loadTypeList: "getList" }),
     ...mapActions("source", { loadSourceList: "getList" }),
-
-    /**
-     * Adds an alert to the page and scrolls the user to the top of the page
-     * so they can see it.
-     */
-    addAlert(message, color) {
-      this.alert({
-        message: message,
-        color: color,
-        dismissCountDown: 15
-      });
-      window.scrollTo(0, 0);
-    },
-
-    /**
-     * Sets this.selectedError to the currently selected row.
-     */
-    onRowSelected: function(event) {
-      if (event.node.isSelected()) {
-        this.selectedRow = event.data;
-      }
-    },
-
-    /**
-     * Clears the selected row.
-     */
-    clearSelected: function() {
-      this.gridOptions.api.deselectAll();
-    },
-
-    /**
-     * Resets the row data to whatever is in the synonym store.
-     * (the synonym store should never be updated by this table)
-     */
-    resetRowData: function() {
-      this.clearSelected();
-
-      // Reset created rows
-      this.rowData = this.rowData.filter(row => {
-        return !row.created;
-      });
-
-      // Reset modified rows
-      for (let row of this.rowData) {
-        row.data = { ...row.initialData };
-        row.errors = null;
-      }
-
-      this.gridOptions.api.refreshCells({
-        force: true,
-        suppressFlash: false
-      });
-    },
-
-    /**
-     * Rebuilds rowData with a provided array of jsonapi compliant synonyms
-     *
-     * @param synonyms {array} - Array of JsonAPI Synonym objects
-     *     Sample JsonAPI Synonym
-     *     {
-     *       id: "string"
-     *       attributes: { identifier: "string", qcNotes: "string" },
-     *       relationships: {
-     *         substance: {
-     *           data: { type: "substance", id: "string" }
-     *         },
-     *         source: {
-     *           data: { type: "source", id: "string" }
-     *         },
-     *         synonymQuality: {
-     *           data: { type: "synonymQuality", id: "string" }
-     *         },
-     *         synonymType: {
-     *           data: { type: "synonymType", id: "string" }
-     *         },
-     *       }
-     *     }
-     * @returns {array} - Array of agGrid rowData nodes.
-     */
-    buildRowData: function(synonyms) {
-      let rowData = [];
-      for (let synonym of synonyms) {
-        rowData.push(this.toRowData(synonym));
-      }
-      return rowData;
-    },
 
     /**
      * Adds a new synonym to this.rowData
@@ -409,25 +225,6 @@ export default {
     },
 
     /**
-     * Loops through all rows, checks for changes, and returns promises
-     * to attempt to update each changed row.
-     *
-     * @returns {Array} - Array of promises corresponding to each updated/created row
-     */
-    buildSaveRequests: function() {
-      let responses = [];
-
-      for (let row of this.rowData) {
-        // Clear previous errors
-        if (!_.isEqual(row.data, row.initialData)) {
-          responses.push(this.saveRequest(row));
-        }
-      }
-
-      return responses;
-    },
-
-    /**
      * Builds an update/save request for a single row
      *
      * @param row {obj} - rowData object
@@ -485,11 +282,6 @@ export default {
       this.gridOptions.api.redrawRows();
     },
 
-    saveRow: async function(params) {
-      await this.saveRequest(params.data);
-      this.gridOptions.api.redrawRows();
-    },
-
     /**
      * Loads synonyms by substance id.
      */
@@ -506,20 +298,6 @@ export default {
 
       this.rowData = this.buildRowData(synonyms);
       this.loading = false;
-    },
-
-    /**
-     * Allows the buttons to be interactive and the overlays to display
-     * based on the state the data is in.
-     */
-    manageOverlay: function() {
-      if (this.loading) {
-        this.gridOptions.api.showLoadingOverlay();
-      } else if (!this.loading && _.isEqual(this.rowData, [])) {
-        this.gridOptions.api.showNoRowsOverlay();
-      } else {
-        this.gridOptions.api.hideOverlay();
-      }
     },
 
     /**
@@ -595,26 +373,7 @@ export default {
       return comparison ? 1 : -1;
     }
   },
-  beforeMount() {
-    // Load grid options
-    this.gridOptions = {
-      components: {
-        mappableCellRenderer: MappableCellRenderer,
-        selectObjectCellEditor: SelectObjectCellEditor
-      }
-    };
-    this.frameworkComponents = {
-      btnCellRenderer: BtnCellRenderer
-    };
 
-    // Load grid styling
-    this.defaultColDef = {
-      flex: 1,
-      editable: this.editable,
-      resizable: true,
-      sortable: true
-    };
-  },
   mounted() {
     this.loadSynonyms(this.substanceId);
     if (this.gridOptions.api)
