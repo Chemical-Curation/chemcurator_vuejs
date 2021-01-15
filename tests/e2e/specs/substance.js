@@ -54,10 +54,6 @@ describe("The substance form", () => {
     cy.get("#source").select("Source 1");
     cy.get("#substanceType").select("Substance Type 1");
     cy.get("#save-substance-btn").click();
-    cy.get("[data-cy=alert-box]").should(
-      "contain",
-      `${casrn} is not unique in ['preferred_name', 'display_name', 'casrn']`
-    );
     cy.get("#feedback-preferredName").contains("not unique");
     cy.get("#feedback-displayName").contains("not unique");
     cy.get("#feedback-casrn").contains("not unique");
@@ -104,6 +100,67 @@ describe("The substance form", () => {
     cy.get("@post")
       .its("request.body.data.relationships.substanceType.data.id")
       .should("contain", "1");
+  });
+  it("should save associatedCompound to substance", () => {
+    cy.route({
+      method: "PATCH",
+      url: "/substances/DTXSID202000099",
+      status: 200,
+      response: {
+        data: {
+          id: "DTXSID202000099"
+        }
+      }
+    }).as("post");
+
+    cy.visit("/substance?search=Solo%20substance");
+    cy.get("#save-substance-btn").should("be.disabled");
+    // Create Compound - Hydrogen Peroxide
+    cy.get("#compound-type-dropdown").select("Defined Compound");
+    cy.get("iframe[id=ketcher]")
+      .its("0.contentDocument.body")
+      .should("not.be.empty")
+      .then(cy.wrap)
+      .find("#canvas")
+      .children()
+      .find("text")
+      .should("not.exist");
+
+    // Find the oxygen button
+    cy.get("iframe[id=ketcher]")
+      .its("0.contentDocument.body")
+      .should("not.be.empty")
+      .then(cy.wrap)
+      .find("#atom")
+      .find("button")
+      .eq(6)
+      .click();
+
+    // Select a point. create a H2O there, click and drag to make H2O2
+    cy.get("iframe[id=ketcher]")
+      .its("0.contentDocument.body")
+      .should("not.be.empty")
+      .then(cy.wrap)
+      .find("#canvas")
+      // create first node
+      .click()
+      .find("text")
+      .first()
+      // select first node
+      .trigger("mousedown", { button: 0 })
+      // back up to canvas
+      .parent()
+      // drag to create compound
+      .trigger("mousemove", 500, 500, { force: true })
+      .trigger("mouseup", { force: true });
+
+    cy.get("#save-substance-btn")
+      .should("not.be.disabled")
+      .click();
+    cy.get("[data-cy=alert-box]").should(
+      "contain",
+      "Substance 'DTXSID202000099' updated successfully"
+    );
   });
   it("should alert on unsaved Compounds", () => {
     // quark
