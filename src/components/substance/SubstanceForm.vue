@@ -258,8 +258,6 @@ export default {
       let { id } = this.form;
       let payload = this.buildPayload();
       if (id) {
-        console.log("patch", this.$store.state.compound.type);
-        console.log("patch", payload);
         payload["id"] = id;
         // if there is an id, patch the currently loaded substance.
         this.$store
@@ -270,7 +268,6 @@ export default {
           .then(response => this.handleSuccess(response))
           .catch(err => this.handleFail(err));
       } else {
-        console.log("post", payload);
         // If there is no id, save the new substance.
         this.$store
           .dispatch("substance/post", payload)
@@ -279,7 +276,6 @@ export default {
       }
     },
     handleSuccess(response) {
-      console.log("response", response);
       let action = response.status === 201 ? "created" : "updated";
       let { id } = response.data.data;
       this.validationState = this.clearValidation();
@@ -295,7 +291,6 @@ export default {
     },
     handleFail(err) {
       // `sid` is included here to prevent it's input state from going true
-      console.log("errors", err.response);
       let errd = ["id"];
       let nonField = [];
       for (let error of err.response.data.errors) {
@@ -306,7 +301,6 @@ export default {
         if (attr == "nonFieldErrors") {
           nonField.push(error.detail);
         } else if (attr == "associatedCompound") {
-          console.log(error.detail);
           this.$store.dispatch("alert/alert", {
             message: error.detail,
             color: "warning",
@@ -325,7 +319,6 @@ export default {
           this.$set(this.validationState[field], "state", true);
         });
       // handle nonField errors
-      console.log("nonfield", nonField);
       if (nonField.length > 0) {
         // hard-coding this for now as we might need to make some adjustments
         // to the API to get these fields in the response in a cleaner way

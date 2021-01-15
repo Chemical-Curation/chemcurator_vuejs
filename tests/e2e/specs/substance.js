@@ -188,15 +188,31 @@ describe("The substance page anonymous access", () => {
     cy.get("#compound-type-dropdown").should("not.contain", "Deprecated");
   });
 
-  it("should show depreciated qst if the compound is set to it", () => {
-    cy.get("[data-cy=search-box]").type("Deprecated Substance");
-    cy.get("[data-cy=search-button]").click();
+  it("should disassociate the compound if saved with qst none selected", () => {
+    cy.route({
+      method: "PATCH",
+      url: "/substances/DTXSID502000000",
+      status: 200,
+      response: {}
+    }).as("patch");
 
-    cy.get("#compound-type-dropdown").should("contain", "Deprecated");
-    cy.get("#compound-type-dropdown")
-      .find("[value=deprecated]")
-      .should("be.selected")
-      .should("have.attr", "disabled");
+    cy.adminLogin();
+    cy.visit("/substance/DTXSID502000000");
+
+    cy.get("button:contains('Save Compound')").should("be.disabled");
+    cy.get("#save-substance-btn").should("be.disabled");
+
+    cy.get("#compound-type-dropdown").select("None");
+
+    // Save
+    cy.get("#save-substance-btn")
+      .should("not.be.disabled")
+      .click();
+
+    cy.get("@patch").should("have.property", "status", 200);
+    cy.get("@patch")
+      .its("request.body.data.relationships.associatedCompound.data")
+      .should("be", null);
   });
 
   it("should toggle ketcher/marvinjs on dropdown", () => {
@@ -657,7 +673,7 @@ describe("The substance page authenticated access", () => {
       .should("match", /(<cml).*(><MDocument>).+(<\/MDocument><\/cml>)/);
   });
 
-  it.only("should patch querystructuretype on illdefined compounds", () => {
+  it("should patch querystructuretype on illdefined compounds", () => {
     cy.route({
       method: "PATCH",
       url: "/illDefinedCompounds/*",
@@ -676,7 +692,6 @@ describe("The substance page authenticated access", () => {
       .should("not.be.disabled")
       .click();
 
-    // Verify patch status and regex for structure
     cy.get("@patch").should("have.property", "status", 200);
     cy.get("@patch")
       .its("request.body.data.relationships.queryStructureType.data.id")
