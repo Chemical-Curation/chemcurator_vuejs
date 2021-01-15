@@ -657,6 +657,32 @@ describe("The substance page authenticated access", () => {
       .should("match", /(<cml).*(><MDocument>).+(<\/MDocument><\/cml>)/);
   });
 
+  it.only("should patch querystructuretype on illdefined compounds", () => {
+    cy.route({
+      method: "PATCH",
+      url: "/illDefinedCompounds/*",
+      status: 200,
+      response: {}
+    }).as("patch");
+
+    cy.visit("/substance?search=Sample%20Substance%202");
+
+    cy.get("button:contains('Save Compound')").should("be.disabled");
+
+    cy.get("#compound-type-dropdown").select("Markush-Query");
+
+    // Save
+    cy.get("button:contains('Save Compound')")
+      .should("not.be.disabled")
+      .click();
+
+    // Verify patch status and regex for structure
+    cy.get("@patch").should("have.property", "status", 200);
+    cy.get("@patch")
+      .its("request.body.data.relationships.queryStructureType.data.id")
+      .should("contain", "markush-query");
+  });
+
   it("confirm navigation away from editor changes", () => {
     cy.get("iframe[id=marvin]")
       .its("0.contentDocument.body")
