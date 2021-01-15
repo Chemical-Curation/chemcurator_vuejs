@@ -16,14 +16,8 @@
       @row-selected="onRowSelected"
       rowSelection="single"
     />
-    <div v-show="selectedError" class="mt-3 text-left">
-      <b-table
-        id="relationship-error-table"
-        :items="selectedError"
-        :fields="errorFields"
-        borderless
-        table-variant="danger"
-      ></b-table>
+    <div v-show="selectedError.length > 0" class="mt-3 text-left">
+      <error-table :errors="selectedError" id="relationship-error-table"></error-table>
     </div>
     <div class="d-flex flex-row justify-content-end my-3" v-if="editable">
       <b-button
@@ -44,11 +38,13 @@ import { mapActions, mapGetters, mapState } from "vuex";
 import { AgGridVue } from "ag-grid-vue";
 import { agGridMixin } from "@/components/ag-grid/agGridMixin";
 import SubstanceRelationshipApi from "@/api/substance-relationships";
+import ErrorTable from "@/components/ErrorTable";
 
 export default {
   name: "agSubstanceRelationshipTable",
   components: {
-    AgGridVue
+    AgGridVue,
+    ErrorTable
   },
   mixins: [agGridMixin],
   props: {

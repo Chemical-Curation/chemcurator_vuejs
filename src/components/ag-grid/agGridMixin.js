@@ -15,8 +15,6 @@ export const agGridMixin = {
       loading: false,
       selectedRow: null,
       frameworkComponents: null,
-      // Display options for error table.
-      errorFields: [{ label: "Errors", key: "modifiedDetail" }]
     };
   },
 
