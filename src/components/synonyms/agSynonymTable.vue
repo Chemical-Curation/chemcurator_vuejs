@@ -16,14 +16,8 @@
       @row-selected="onRowSelected"
       rowSelection="single"
     />
-    <div v-show="selectedError" class="mt-3 text-left">
-      <b-table
-        id="synonym-error-table"
-        :items="selectedError"
-        :fields="errorFields"
-        borderless
-        table-variant="danger"
-      ></b-table>
+    <div v-show="selectedError.length > 0" class="mt-3 text-left">
+      <error-table :errors="selectedError" id="synonym-error-table"></error-table>
     </div>
     <div class="d-flex flex-row justify-content-end my-3" v-if="editable">
       <b-button
@@ -49,10 +43,12 @@ import {
 } from "@/components/ag-grid/custom-renderers";
 import BtnCellRenderer from "@/components/ag-grid/BtnCellRenderer";
 import SynonymApi from "@/api/synonym.js";
+import ErrorTable from "@/components/ErrorTable";
 
 export default {
   name: "agSynonymTable",
   components: {
+    ErrorTable,
     AgGridVue
   },
   props: {
@@ -188,12 +184,7 @@ export default {
     },
 
     selectedError: function() {
-      if (this.selectedRow?.errors)
-        return this.selectedRow.errors.map(error => {
-          error.modifiedDetail = this.buildErrorString(error);
-          return error;
-        });
-      return null;
+      return this.selectedRow?.errors ?? [];
     },
 
     /**
@@ -288,40 +279,6 @@ export default {
       if (event.node.isSelected()) {
         this.selectedRow = event.data;
       }
-    },
-
-    /**
-     * Turns a row specific error into readable text
-     *
-     * Prepends a title case of the pointer's attribute to the error string if the error is
-     * field specific.  Pointer values of "nonFieldErrors" will be ignored.
-     *
-     * @param error {Object}: JsonAPI error object containing error detail string and a source.pointer
-     *     Example JsonAPI error
-     *     {
-     *       detail: "This field is required"
-     *       status: "400"
-     *       source: { pointer: "data/attributes/synonymQuality" }
-     *       code: "required"
-     *     }
-     * @returns {string}: Modified error string.
-     *     From above example "Synonym Quality: This field is required"
-     */
-    buildErrorString: function(error) {
-      let readableDetails = error.detail;
-
-      if (error?.source?.pointer) {
-        let pointerField = error.source.pointer
-          .split("/")
-          .slice(-1)
-          .shift();
-        if (pointerField !== "nonFieldErrors") {
-          let result = pointerField.replace(/([A-Z])/g, " $1");
-          let finalResult = result.charAt(0).toUpperCase() + result.slice(1);
-          readableDetails = finalResult + ": " + readableDetails;
-        }
-      }
-      return readableDetails;
     },
 
     /**
