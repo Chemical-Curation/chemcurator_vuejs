@@ -156,12 +156,6 @@ export default {
       };
     }
   },
-  watch: {
-    //    "substance.id": function() {
-    //      this.validationState = this.clearValidation();
-    //      this.formChanged = 0;
-    //    }
-  },
   methods: {
     sumValues(obj) {
       return Object.values(obj).reduce((a, b) => a + b);
@@ -285,10 +279,11 @@ export default {
       }
     },
     handleSuccess(response) {
+      console.log("response", response);
       let action = response.status === 201 ? "created" : "updated";
       let { id } = response.data.data;
       this.validationState = this.clearValidation();
-      this.formChanged = 0;
+      Object.keys(this.formChanged).forEach(v => this.formChanged[v] = 0);
       this.$store.commit("substance/loadDetail", response.data.data);
       // update for the tree
       this.$store.dispatch("substance/getList");
@@ -300,6 +295,7 @@ export default {
     },
     handleFail(err) {
       // `sid` is included here to prevent it's input state from going true
+      console.log("errors", err.response);
       let errd = ["id"];
       let nonField = [];
       for (let error of err.response.data.errors) {
@@ -309,6 +305,13 @@ export default {
           .shift();
         if (attr == "nonFieldErrors") {
           nonField.push(error.detail);
+        } else if(attr == "associatedCompound") {
+          console.log(error.detail);
+          this.$store.dispatch("alert/alert", {
+            message: error.detail,
+            color: "warning",
+            dismissCountDown: 5
+          });
         } else {
           errd.push(attr);
           this.$set(this.validationState[attr], "state", false);
@@ -322,12 +325,8 @@ export default {
           this.$set(this.validationState[field], "state", true);
         });
       // handle nonField errors
+      console.log("nonfield", nonField);
       if (nonField.length > 0) {
-        this.$store.dispatch("alert/alert", {
-          message: nonField.shift(),
-          color: "warning",
-          dismissCountDown: 5
-        });
         // hard-coding this for now as we might need to make some adjustments
         // to the API to get these fields in the response in a cleaner way
         // I think this is the only nonField Error that we have for the moment
