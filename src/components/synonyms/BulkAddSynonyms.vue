@@ -1,7 +1,5 @@
 <template>
-  <div class="border rounded my-5 p-5">
-    <h2>Add Synonyms</h2>
-
+  <div>
     <b-form @submit.prevent="onSubmit">
       <b-form-group label="Source">
         <b-form-select
@@ -23,6 +21,7 @@
         <b-form-select
           v-model="relationships.synonymType"
           :options="typeListOptions()"
+          required
         ></b-form-select>
       </b-form-group>
 

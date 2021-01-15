@@ -1,7 +1,8 @@
 <template>
   <div class="mb-5">
-    <div class="text-left">
+    <div class="d-flex justify-content-between text-left">
       <h3>Synonyms</h3>
+      <b-button v-b-modal.bulk-add-synonyms-modal variant="success" :disabled="!substanceId || loading" class="mb-2">Bulk Add Synonyms</b-button>
     </div>
     <ag-grid-vue
       id="synonym-table"
@@ -30,6 +31,9 @@
         Add Synonym
       </b-button>
     </div>
+    <b-modal id="bulk-add-synonyms-modal" title="Bulk Add Synonyms" size="lg" hide-footer>
+      <BulkAddSynonyms :substance-id="substanceId"> </BulkAddSynonyms>
+    </b-modal>
   </div>
 </template>
 
@@ -38,12 +42,14 @@ import { mapActions, mapGetters, mapState } from "vuex";
 import { AgGridVue } from "ag-grid-vue";
 import SynonymApi from "@/api/synonym.js";
 import { agGridMixin } from "@/components/ag-grid/agGridMixin";
+import BulkAddSynonyms from "@/components/synonyms/BulkAddSynonyms";
 import ErrorTable from "@/components/ErrorTable";
 
 export default {
   name: "agSynonymTable",
   components: {
     ErrorTable,
+    BulkAddSynonyms,
     AgGridVue
   },
   mixins: [agGridMixin],
