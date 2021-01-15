@@ -167,9 +167,9 @@ export default {
       this.checkDataChanges(field);
     },
     clearForm() {
-      this.$store.commit("substance/clearForm");
+      this.$store.commit("substance/clearDetail");
       this.validationState = this.clearValidation();
-      this.formChanged = 0;
+      Object.keys(this.formChanged).forEach(v => this.formChanged[v] = 0);
     },
     clearValidation() {
       let clean = {

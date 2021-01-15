@@ -192,7 +192,7 @@ export default {
     },
     checkCompound: function() {
       let sub_id =
-        this.substance.relationships.associatedCompound?.data?.id || "";
+        this.substance.relationships?.associatedCompound?.data?.id || "";
       return sub_id === this.cid;
     }
   },
