@@ -1,5 +1,5 @@
 <template>
-  <div class="mb-5">
+  <div>
     <div class="d-flex justify-content-between text-left">
       <h3>Synonyms</h3>
       <b-button v-b-modal.bulk-add-synonyms-modal variant="success" :disabled="!substanceId || loading" class="mb-2">Bulk Add Synonyms</b-button>
