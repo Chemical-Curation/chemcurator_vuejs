@@ -1248,6 +1248,50 @@ describe("The substance page's Relationships Table", () => {
       });
   });
 
+  it("should allow deleting", () => {
+    // Queue a simple success message.  Response is a template, not valid data.
+    cy.route({
+      method: "DELETE",
+      url: /substanceRelationships\/\d+/,
+      status: 204,
+      response: ""
+    });
+
+    cy.get("[data-cy=search-box]").type("Sample Substance 2");
+    cy.get("[data-cy=search-button]").click();
+
+    // This is the number of rows before delete
+    let rowCount;
+
+    cy.get("#substance-relationship-table")
+      .find("div.ag-center-cols-clipper")
+      .find("div.ag-row[role=row]")
+      .its("length")
+      .then($rowCount => {
+        rowCount = $rowCount;
+      });
+
+    // Find the first row's delete button, verify enabled and click
+    cy.get("#substance-relationship-table")
+      .find("div.ag-center-cols-clipper")
+      .find("div.ag-row[role=row]")
+      .first()
+      .children()
+      .eq(5)
+      .find("button")
+      .should("be.enabled")
+      .click();
+
+    cy.get("#substance-relationship-table")
+      .find("div.ag-center-cols-clipper")
+      .find("div.ag-row[role=row]")
+      .its("length")
+      .should($newRowCount => {
+        // Verify row count after delete is one less than the rows before change
+        expect($newRowCount).to.equal(rowCount - 1);
+      });
+  });
+
   it("should not show deprecated data", () => {
     // Queue a simple success message (actual response is not currently used)
     cy.route("PATCH", "/synonyms/*", "success");
