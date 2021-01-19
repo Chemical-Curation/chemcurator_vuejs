@@ -317,8 +317,6 @@ export default {
     },
 
     /**
-     * Deletes a single row - not implemented yet
-     *
      * @param row {obj} - rowData object
      * @returns {Promise} - Deletes a row
      */
