@@ -1,9 +1,16 @@
 <template>
   <b-container fluid="true" class="mx-5">
-    <div id="sidebar" v-show="ifSearchParameter">
-      <SubstanceSidebar />
+    <div class="mb-3 d-flex justify-content-between">
+      <div id="sidebar" v-show="ifSearchParameter">
+        <SubstanceSidebar />
+      </div>
+      <div>
+        <SubstanceSearchPanel
+          :headerText="this.$route.query.search"
+          @click="onClick($event)"
+        />
+      </div>
     </div>
-    <SubstanceSearchPanel :headerText="this.$route.query.search" />
     <b-row>
       <b-col cols="12" order="1" lg="4" order-lg="0">
         <SubstanceForm :substance="substance" />
@@ -68,6 +75,9 @@ export default {
         // below only needs to eval to a truthy value
         event.returnValue = "lose your changes?";
       }
+    },
+    onClick: function(result) {
+      console.log(result);
     },
     runSearch: function() {
       this.$store

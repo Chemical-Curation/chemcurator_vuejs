@@ -46,6 +46,7 @@ const defaultState = () => {
     loading: false,
     count: 0,
     list: [],
+    searchResults: [],
     form: {}
   };
 };
@@ -76,8 +77,8 @@ let actions = {
     });
   },
   substanceSearch: async (context, { searchString }) => {
-    let resource = await context.dispatch("getResourceURI");
-
+    // let resource = await context.dispatch("getResourceURI");
+    let resource = "search";
     let promise = await HTTP.get(
       `/${resource}?filter[search]=${encodeURI(searchString)}`
     )
@@ -91,6 +92,7 @@ let actions = {
             loaded_substance.relationships.associatedCompound.data?.type;
 
           context.commit("loadDetail", loaded_substance);
+          context.commit("storeSearchResults", response.data.data);
           if (compound_id) {
             context.dispatch(
               `compound/fetchCompound`,
@@ -157,6 +159,9 @@ const mutations = {
   ...rootMutations,
   loadDetail(state, payload) {
     state.detail = payload;
+  },
+  storeSearchResults(state, payload) {
+    state.searchResults = payload;
   },
   clearForm(state) {
     state.detail = defaultDetail();
