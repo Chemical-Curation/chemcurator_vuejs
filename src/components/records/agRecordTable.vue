@@ -2,7 +2,7 @@
   <div>
     <h3 class="text-left">Lists</h3>
     <ag-grid-vue
-      id="listTable"
+      id="record-table"
       style="height: 250px;"
       class="ag-theme-alpine"
       :columnDefs="columnDefs"
@@ -17,10 +17,6 @@
 import { mapActions, mapGetters, mapState } from "vuex";
 import _ from "lodash";
 import { AgGridVue } from "ag-grid-vue";
-import {
-  MappableCellRenderer,
-  SelectObjectCellEditor
-} from "@/components/ag-grid/custom-renderers";
 
 export default {
   name: "agListTable",
@@ -35,7 +31,7 @@ export default {
     return {
       rowData: null,
       defaultColDef: null,
-      gridOptions: null
+      gridOptions: {}
     };
   },
   computed: {
@@ -180,14 +176,6 @@ export default {
     }
   },
   beforeMount() {
-    // Load grid options
-    this.gridOptions = {
-      components: {
-        mappableCellRenderer: MappableCellRenderer,
-        selectObjectCellEditor: SelectObjectCellEditor
-      }
-    };
-
     // Load grid styling
     this.defaultColDef = {
       flex: 1,

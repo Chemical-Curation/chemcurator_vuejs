@@ -41,6 +41,10 @@ describe("The substance form", () => {
       "The proposed CASRN does not conform to the regular expression ^[0-9]{2,7}-[0-9]{2}-[0-9]$"
     );
   });
+  it("should show unsaved changes", () => {
+    cy.get("#casrn").type("not a casrn");
+    cy.get("#feedback-casrn").contains("This field has unsaved changes.");
+  });
   it("should validate nonFieldErrors", () => {
     let casrn = valid_casrns[Math.floor(Math.random() * valid_casrns.length)];
     cy.get("#preferredName").type(casrn);
@@ -101,6 +105,15 @@ describe("The substance form", () => {
       .its("request.body.data.relationships.substanceType.data.id")
       .should("contain", "1");
   });
+  it("should alert on unsaved Compounds", () => {
+    // quark
+    cy.get("[data-cy=search-box]").type("Hydrogen Peroxide");
+    cy.get("[data-cy=search-button]").click();
+    cy.get("#compound-type-dropdown").select("Ill defined");
+    cy.get("#feedback-cid").contains(
+      "This Compound is not related to the Substance displayed."
+    );
+  });
 });
 
 describe("The substance page anonymous access", () => {
@@ -153,8 +166,8 @@ describe("The substance page anonymous access", () => {
       "have.value",
       "This is the description for the test substance"
     );
-    cy.get("#privateQCNote").should("have.value", "Private QC notes");
-    cy.get("#publicQCNote").should("have.value", "Public QC notes");
+    cy.get("#privateQcNote").should("have.value", "Private QC notes");
+    cy.get("#publicQcNote").should("have.value", "Public QC notes");
   });
 
   it("should load the substance form from tree", () => {
@@ -171,8 +184,8 @@ describe("The substance page anonymous access", () => {
       "have.value",
       "This is the description for the test substance"
     );
-    cy.get("#privateQCNote").should("have.value", "Private QC notes");
-    cy.get("#publicQCNote").should("have.value", "Public QC notes");
+    cy.get("#privateQcNote").should("have.value", "Private QC notes");
+    cy.get("#publicQcNote").should("have.value", "Public QC notes");
   });
 
   it("should show substance link with mismatched DTXCID=>DTXSID", () => {
@@ -642,13 +655,13 @@ describe("The substance page's Synonym Table", () => {
   });
 
   it("should show the substance table", () => {
-    cy.get("#substanceTable").should("contain.text", "No Rows To Show");
+    cy.get("#synonym-table").should("contain.text", "No Rows To Show");
   });
 
   it("should load synonyms", () => {
     cy.get("[data-cy=search-box]").type("Sample Substance 2");
     cy.get("[data-cy=search-button]").click();
-    cy.get("#substanceTable")
+    cy.get("#synonym-table")
       .find("div.ag-center-cols-clipper")
       .find("div.ag-row[role=row]")
       .should("have.length", 8);
@@ -704,7 +717,7 @@ describe("The substance page's Synonym Table", () => {
     cy.get("[data-cy=search-button]").click();
 
     // Button is enabled
-    cy.get("#substanceTable")
+    cy.get("#synonym-table")
       .find("div.ag-center-cols-clipper")
       .find("div.ag-row[role=row]")
       .first()
@@ -749,7 +762,7 @@ describe("The substance page's Synonym Table", () => {
     // This is the number of rows before delete
     let rowCount;
 
-    cy.get("#substanceTable")
+    cy.get("#synonym-table")
       .find("div.ag-center-cols-clipper")
       .find("div.ag-row[role=row]")
       .its("length")
@@ -758,7 +771,7 @@ describe("The substance page's Synonym Table", () => {
       });
 
     // Find the first row's delete button, verify enabled and click
-    cy.get("#substanceTable")
+    cy.get("#synonym-table")
       .find("div.ag-center-cols-clipper")
       .find("div.ag-row[role=row]")
       .first()
@@ -768,7 +781,7 @@ describe("The substance page's Synonym Table", () => {
       .should("be.enabled")
       .click();
 
-    cy.get("#substanceTable")
+    cy.get("#synonym-table")
       .find("div.ag-center-cols-clipper")
       .find("div.ag-row[role=row]")
       .its("length")
@@ -796,31 +809,52 @@ describe("The substance page's Synonym Table", () => {
       .click();
 
     // Find the newly added row's first cell and type
-    cy.get("#substanceTable")
+    cy.get("#synonym-table")
       .find("div.ag-center-cols-clipper")
       .find("div.ag-row[role=row].new-ag-row")
       .first()
-      .within($newRow => {
-        cy.wrap($newRow)
-          .find("div[col-id='data.identifier_1']")
-          .type("Synonym 9");
-        cy.wrap($newRow)
-          .find("div[col-id='data.source_1']")
-          .type("1");
-        cy.wrap($newRow)
-          .find("div[col-id='data.synonymQuality_1']")
-          .type("1");
-        cy.wrap($newRow)
-          .find("div[col-id='data.synonymType_1']")
-          .type("1");
+      .find("div[col-id='data.identifier_1']")
+      .type("Synonym 9");
 
-        // Click Save
-        cy.wrap($newRow)
-          .children()
-          .eq(5)
-          .find("button")
-          .click();
-      });
+    cy.get("#synonym-table")
+      .find("div.ag-center-cols-clipper")
+      .find("div.ag-row[role=row].new-ag-row")
+      .first()
+      .find("div[col-id='data.source_1']")
+      .dblclick();
+    cy.get("#synonym-table")
+      .find("select")
+      .select("down indeed other 4");
+
+    cy.get("#synonym-table")
+      .find("div.ag-center-cols-clipper")
+      .find("div.ag-row[role=row].new-ag-row")
+      .first()
+      .find("div[col-id='data.synonymQuality_1']")
+      .dblclick();
+    cy.get("#synonym-table")
+      .find("select")
+      .select("area professor fromage");
+
+    cy.get("#synonym-table")
+      .find("div.ag-center-cols-clipper")
+      .find("div.ag-row[role=row].new-ag-row")
+      .first()
+      .find("div[col-id='data.synonymType_1']")
+      .dblclick();
+    cy.get("#synonym-table")
+      .find("select")
+      .select("capital performance 4");
+
+    // Click Save
+    cy.get("#synonym-table")
+      .find("div.ag-center-cols-clipper")
+      .find("div.ag-row[role=row].new-ag-row")
+      .first()
+      .children()
+      .eq(5)
+      .find("button")
+      .click();
 
     cy.get("@post")
       .its("request.body.data")
@@ -878,15 +912,16 @@ describe("The substance page's Synonym Table", () => {
 
     // Test Dropdowns
     cy.wrap(test_data).each(param => {
-      cy.get("#substanceTable")
+      cy.get("#synonym-table")
         .find("div.ag-center-cols-clipper")
         .find("div.ag-row[role=row]")
         .first()
         .children()
         .eq(param.column_number)
-        .dblclick()
-        .find("select")
-        .should("not.contain", param.deprecated_name);
+        .dblclick({ force: true });
+      cy.get("#synonym-table")
+        .find("option")
+        .should("not.contain", param.depreciated_label);
     });
   });
 
@@ -914,7 +949,7 @@ describe("The substance page's Synonym Table", () => {
     cy.get("[data-cy=search-button]").click();
 
     // Find the first row's first cell and type
-    cy.get("#substanceTable")
+    cy.get("#synonym-table")
       .find("div.ag-center-cols-clipper")
       .find("div.ag-row[role=row]")
       .first()
@@ -923,7 +958,7 @@ describe("The substance page's Synonym Table", () => {
       .type("Hello World\n");
 
     // Save Row
-    cy.get("#substanceTable")
+    cy.get("#synonym-table")
       .find("div.ag-center-cols-clipper")
       .find("div.ag-row[role=row]")
       .first()
@@ -933,7 +968,7 @@ describe("The substance page's Synonym Table", () => {
       .click();
 
     // Relocate the first row and select
-    cy.get("#substanceTable")
+    cy.get("#synonym-table")
       .should("not.contain.text", "Loading...")
       .find("div.ag-center-cols-clipper")
       .find("div.ag-row[role=row]")
@@ -952,17 +987,10 @@ describe("The substance page's Relationships Table", () => {
     cy.adminLogin();
     cy.visit("/substance");
     cy.server();
-
-    // fixture loading the substance relationships
-    cy.route(
-      "GET",
-      "/substanceRelationships?*",
-      "fx:../responses/substance-relationships.json"
-    );
   });
 
   it("should show the relationships table", () => {
-    cy.get("#substanceRelationshipTable").should(
+    cy.get("#substance-relationship-table").should(
       "contain.text",
       "No Rows To Show"
     );
@@ -974,7 +1002,7 @@ describe("The substance page's Relationships Table", () => {
     cy.get("[data-cy=search-button]").click();
 
     // Verify response contains sids as required.
-    cy.get("#substanceRelationshipTable")
+    cy.get("#substance-relationship-table")
       .find("div.ag-center-cols-clipper")
       .find("div.ag-row[role=row]")
       .should("have.length", 3)
@@ -982,9 +1010,376 @@ describe("The substance page's Relationships Table", () => {
       .should("contain", "DTXSID602000001")
       .should("contain", "DTXSID202000002");
   });
+
+  it("should allow editing (forward and reverse)", () => {
+    // Queue a simple success message.  Response is a template, not valid data.
+    cy.route({
+      method: "PATCH",
+      url: "/substanceRelationships/*",
+      status: 200,
+      response: {} // currently unneeded
+    }).as("patch");
+
+    cy.get("[data-cy=search-box]").type("Sample Substance 2");
+    cy.get("[data-cy=search-button]").click();
+
+    // Button is disabled
+    cy.get("#substance-relationship-table")
+      .find("div.ag-center-cols-clipper")
+      .find("div.ag-row[role=row]")
+      .first()
+      .children()
+      .eq(4)
+      .find("button")
+      .should("be.disabled");
+
+    // Find the first row's first cell and type (SID cell)
+    cy.get("#substance-relationship-table")
+      .find("div.ag-center-cols-clipper")
+      .find("div.ag-row[role=row]")
+      .first()
+      .children()
+      .eq(1)
+      .type("Hello World\n");
+
+    // Change to forward relationship type.  (Relationship Type cell)
+    cy.get("#substance-relationship-table")
+      .find("div.ag-center-cols-clipper")
+      .find("div.ag-row[role=row]")
+      .first()
+      .find("div[col-id='data.relationshipType']")
+      .dblclick();
+    cy.get("#substance-relationship-table")
+      .find("select")
+      .select("central many throw 3");
+
+    // Save the cell edit
+    cy.get("#substance-relationship-table")
+      .find("div.ag-center-cols-clipper")
+      .find("div.ag-row[role=row]")
+      .first()
+      .children()
+      .eq(4)
+      .find("button")
+      .should("be.enabled")
+      .click();
+
+    // Verify fake sid is in "toSubstance" relationship
+    cy.get("@patch")
+      .its("request.body.data.relationships.toSubstance.data.id")
+      .should("eq", "Hello World");
+
+    // Change to reverse relationship type.  (Relationship Type cell)
+    cy.get("#substance-relationship-table")
+      .find("div.ag-center-cols-clipper")
+      .find("div.ag-row[role=row]")
+      .first()
+      .find("div[col-id='data.relationshipType']")
+      .dblclick();
+    cy.get("#substance-relationship-table")
+      .find("select")
+      .select(
+        "Field paper tree where she. Plant project range research be especially half."
+      );
+
+    // Save the cell edit
+    cy.get("#substance-relationship-table")
+      .find("div.ag-center-cols-clipper")
+      .find("div.ag-row[role=row]")
+      .first()
+      .children()
+      .eq(4)
+      .find("button")
+      .should("be.enabled")
+      .click();
+
+    // Verify fake sid is in "fromSubstance" relationship
+    cy.get("@patch")
+      .its("request.body.data.relationships.fromSubstance.data.id")
+      .should("eq", "Hello World");
+  });
+
+  it("should allow adding new substance relationships (forward & reverse)", () => {
+    // Queue a simple success message (actual response is not currently used)
+    cy.route({
+      method: "POST",
+      url: "/substanceRelationships",
+      status: 201,
+      response: {} // currently unneeded
+    }).as("post");
+
+    cy.get("[data-cy=search-box]").type("Sample Substance 2");
+    cy.get("[data-cy=search-button]").click();
+
+    // Click the add button
+    cy.get("#relationship-add-button")
+      .should("be.enabled")
+      .click();
+
+    // Find the newly added row's first cell and type
+    cy.get("#substance-relationship-table")
+      .find("div.ag-center-cols-clipper")
+      .find("div.ag-row[role=row].new-ag-row")
+      .first()
+      .find("div[col-id='data.relatedSubstanceId']")
+      .type("example-dtxsid");
+
+    cy.get("#substance-relationship-table")
+      .find("div.ag-center-cols-clipper")
+      .find("div.ag-row[role=row].new-ag-row")
+      .first()
+      .find("div[col-id='data.source']")
+      .dblclick();
+    cy.get("#substance-relationship-table")
+      .find("select")
+      .select("down indeed other 4");
+
+    cy.get("#substance-relationship-table")
+      .find("div.ag-center-cols-clipper")
+      .find("div.ag-row[role=row].new-ag-row")
+      .first()
+      .find("div[col-id='data.relationshipType']")
+      .dblclick();
+    cy.get("#substance-relationship-table")
+      .find("select")
+      .select("central many throw 3");
+
+    // Click Save
+    cy.get("#substance-relationship-table")
+      .find("div.ag-center-cols-clipper")
+      .find("div.ag-row[role=row].new-ag-row")
+      .first()
+      .children()
+      .eq(4)
+      .find("button")
+      .click();
+
+    cy.get("@post")
+      .its("request.body.data")
+      .should("deep.eq", {
+        type: "substanceRelationship",
+        attributes: {
+          qcNotes: ""
+        },
+        relationships: {
+          source: {
+            data: {
+              type: "source",
+              id: "down-indeed-other-4"
+            }
+          },
+          relationshipType: {
+            data: {
+              type: "relationshipType",
+              id: "central-many-throw-3"
+            }
+          },
+          toSubstance: {
+            data: {
+              type: "substance",
+              id: "example-dtxsid"
+            }
+          },
+          fromSubstance: {
+            data: {
+              type: "substance",
+              id: "DTXSID602000001"
+            }
+          }
+        }
+      });
+
+    // Test reverse relationship
+    cy.get("#substance-relationship-table")
+      .find("div.ag-center-cols-clipper")
+      .find("div.ag-row[role=row].new-ag-row")
+      .first()
+      .find("div[col-id='data.relationshipType']")
+      .dblclick();
+    cy.get("#substance-relationship-table")
+      .find("select")
+      .select(
+        "Field paper tree where she. Plant project range research be especially half."
+      );
+
+    // Click Save
+    cy.get("#substance-relationship-table")
+      .find("div.ag-center-cols-clipper")
+      .find("div.ag-row[role=row].new-ag-row")
+      .first()
+      .children()
+      .eq(4)
+      .find("button")
+      .click();
+
+    cy.get("@post")
+      .its("request.body.data")
+      .should("deep.eq", {
+        type: "substanceRelationship",
+        attributes: {
+          qcNotes: ""
+        },
+        relationships: {
+          source: {
+            data: {
+              type: "source",
+              id: "down-indeed-other-4"
+            }
+          },
+          relationshipType: {
+            data: {
+              type: "relationshipType",
+              id: "central-many-throw-3"
+            }
+          },
+          fromSubstance: {
+            data: {
+              type: "substance",
+              id: "example-dtxsid"
+            }
+          },
+          toSubstance: {
+            data: {
+              type: "substance",
+              id: "DTXSID602000001"
+            }
+          }
+        }
+      });
+  });
+
+  it("should allow deleting", () => {
+    // Queue a simple success message.  Response is a template, not valid data.
+    cy.route({
+      method: "DELETE",
+      url: /substanceRelationships\/\d+/,
+      status: 204,
+      response: ""
+    });
+
+    cy.get("[data-cy=search-box]").type("Sample Substance 2");
+    cy.get("[data-cy=search-button]").click();
+
+    // This is the number of rows before delete
+    let rowCount;
+
+    cy.get("#substance-relationship-table")
+      .find("div.ag-center-cols-clipper")
+      .find("div.ag-row[role=row]")
+      .its("length")
+      .then($rowCount => {
+        rowCount = $rowCount;
+      });
+
+    // Find the first row's delete button, verify enabled and click
+    cy.get("#substance-relationship-table")
+      .find("div.ag-center-cols-clipper")
+      .find("div.ag-row[role=row]")
+      .first()
+      .children()
+      .eq(5)
+      .find("button")
+      .should("be.enabled")
+      .click();
+
+    cy.get("#substance-relationship-table")
+      .find("div.ag-center-cols-clipper")
+      .find("div.ag-row[role=row]")
+      .its("length")
+      .should($newRowCount => {
+        // Verify row count after delete is one less than the rows before change
+        expect($newRowCount).to.equal(rowCount - 1);
+      });
+  });
+
+  it("should not show deprecated data", () => {
+    // Queue a simple success message (actual response is not currently used)
+    cy.route("PATCH", "/synonyms/*", "success");
+
+    cy.get("[data-cy=search-box]").type("Sample Substance 2");
+    cy.get("[data-cy=search-button]").click();
+
+    // Build assertion info
+    let test_data = [
+      { column_number: 1, depreciated_label: "Depreciated Source" }
+    ];
+
+    // Test Dropdowns
+    cy.wrap(test_data).each(param => {
+      cy.get("#substance-relationship-table")
+        .find("div.ag-center-cols-clipper")
+        .find("div.ag-row[role=row]")
+        .first()
+        .children()
+        .eq(param.column_number)
+        .dblclick({ force: true });
+      cy.get("#substance-relationship-table")
+        .find("option")
+        .should("not.contain", param.depreciated_label);
+    });
+  });
+
+  it("should handle errors", () => {
+    let sampleErrorMessage = "Sample Error";
+
+    // Queue a failure response
+    cy.route({
+      method: "PATCH",
+      url: "/substanceRelationships/*",
+      status: 400,
+      response: {
+        errors: [
+          {
+            code: "invalid",
+            detail: sampleErrorMessage,
+            status: "400",
+            source: { pointer: "/data/attributes/nonFieldErrors" }
+          }
+        ]
+      }
+    });
+
+    cy.get("[data-cy=search-box]").type("Sample Substance 2");
+    cy.get("[data-cy=search-button]").click();
+
+    // Find the first row's first cell and type
+    cy.get("#substance-relationship-table")
+      .find("div.ag-center-cols-clipper")
+      .find("div.ag-row[role=row]")
+      .first()
+      .children()
+      .eq(1)
+      .type("Hello World\n");
+
+    // Save Row
+    cy.get("#substance-relationship-table")
+      .find("div.ag-center-cols-clipper")
+      .find("div.ag-row[role=row]")
+      .first()
+      .children()
+      .eq(4)
+      .find("button")
+      .click();
+
+    // Relocate the first row and select
+    cy.get("#substance-relationship-table")
+      .should("not.contain.text", "Loading...")
+      .find("div.ag-center-cols-clipper")
+      .find("div.ag-row[role=row]")
+      .should("have.class", "bg-danger")
+      .first()
+      .children()
+      .eq(1)
+      .click();
+
+    cy.get("#relationship-error-table").should(
+      "contain.text",
+      sampleErrorMessage
+    );
+  });
 });
 
-describe("The substance page's List Table", () => {
+describe("The substance page's Record Table", () => {
   beforeEach(() => {
     cy.adminLogin();
     cy.visit("/substance");
@@ -994,11 +1389,8 @@ describe("The substance page's List Table", () => {
     cy.route("GET", "/records?*", "fx:../responses/records.json");
   });
 
-  it("should show the relationships table", () => {
-    cy.get("#substanceRelationshipTable").should(
-      "contain.text",
-      "No Rows To Show"
-    );
+  it("should show the record table", () => {
+    cy.get("#record-table").should("contain.text", "No Rows To Show");
   });
 
   it("should load records", () => {
@@ -1007,7 +1399,7 @@ describe("The substance page's List Table", () => {
     cy.get("[data-cy=search-button]").click();
 
     // Verify response contains rids as required.
-    cy.get("#listTable")
+    cy.get("#record-table")
       .find("div.ag-center-cols-clipper")
       .find("div.ag-row[role=row]")
       .should("have.length", 3)
