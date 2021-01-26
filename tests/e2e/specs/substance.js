@@ -676,12 +676,12 @@ describe("The substance page authenticated access", () => {
   it("should patch querystructuretype on illdefined compounds", () => {
     cy.route({
       method: "PATCH",
-      url: "/illDefinedCompounds/*",
+      url: "/illDefinedCompounds/DTXCID502000009",
       status: 200,
       response: {}
     }).as("patch");
 
-    cy.visit("/substance?search=Sample%20Substance%202");
+    cy.visit("/substance/DTXSID602000001");
 
     cy.get("button:contains('Save Compound')").should("be.disabled");
 
