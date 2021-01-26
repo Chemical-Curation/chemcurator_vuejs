@@ -156,7 +156,7 @@ export default {
       };
     }
   },
-    watch: {
+  watch: {
     "substance.id": function() {
       this.validationState = this.clearValidation();
       Object.keys(this.formChanged).forEach(v => (this.formChanged[v] = 0));
