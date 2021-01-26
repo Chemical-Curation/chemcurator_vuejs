@@ -7,6 +7,7 @@
         label-cols="3"
         :label-for="field"
         class="pb-3"
+        :class="field"
       >
         <template v-if="dropdowns.includes(field)">
           <b-form-select
@@ -58,13 +59,29 @@
 </template>
 
 <script>
-import { mapGetters, mapState } from "vuex";
-
 export default {
   name: "SubstanceForm",
+  props: [
+    "substance",
+    "compound",
+    "isAuthenticated",
+    "qcLevelOptions",
+    "sourceOptions",
+    "substanceTypeOptions"
+  ],
   data() {
     return {
-      changed: 0,
+      formChanged: {
+        preferredName: 0,
+        displayName: 0,
+        casrn: 0,
+        description: 0,
+        privateQcNote: 0,
+        publicQcNote: 0,
+        qcLevel: 0,
+        source: 0,
+        substanceType: 0
+      },
       validationState: this.clearValidation(),
       textareas: ["description", "privateQcNote", "publicQcNote"],
       dropdowns: ["qcLevel", "source", "substanceType"],
@@ -83,25 +100,43 @@ export default {
     };
   },
   computed: {
-    ...mapState("substance", { substance: "detail" }),
-    ...mapGetters("auth", ["isAuthenticated"]),
-    ...mapGetters("qcLevel", { qcLevelOptions: "getOptions" }),
-    ...mapGetters("source", { sourceOptions: "getOptions" }),
-    ...mapGetters("substanceType", { substanceTypeOptions: "getOptions" }),
+    compoundChanged: function() {
+      if (
+        this.$store.state.compound.type == "none" &&
+        Boolean(this.substance.relationships.associatedCompound.data)
+      ) {
+        return true;
+      } else if (
+        this.$store.state.compound.type == "none" &&
+        !this.substance.relationships.associatedCompound.data
+      ) {
+        return false;
+      } else if (
+        this.compound.id &&
+        this.compound.id !==
+          this.substance.relationships.associatedCompound?.data?.id
+      ) {
+        return true;
+      } else {
+        return false;
+      }
+    },
 
     btnDisabled: function() {
-      return !(this.changed > 0);
+      if (this.compoundChanged) {
+        return false;
+      } else return this.sumValues(this.formChanged) === 0;
     },
     options: function() {
       return {
         qcLevel: this.qcLevelOptions(
-          this.substance?.relationships.qcLevel.data?.id
+          this.substance?.relationships?.qcLevel?.data?.id
         ),
         source: this.sourceOptions(
-          this.substance?.relationships.source.data?.id
+          this.substance?.relationships?.source?.data?.id
         ),
         substanceType: this.substanceTypeOptions(
-          this.substance?.relationships.substanceType.data?.id
+          this.substance?.relationships?.substanceType?.data?.id
         )
       };
     },
@@ -122,12 +157,15 @@ export default {
     }
   },
   watch: {
-    "form.id": function() {
+    "substance.id": function() {
       this.validationState = this.clearValidation();
-      this.changed = 0;
+      Object.keys(this.formChanged).forEach(v => (this.formChanged[v] = 0));
     }
   },
   methods: {
+    sumValues(obj) {
+      return Object.values(obj).reduce((a, b) => a + b);
+    },
     editable(fld) {
       return fld === "id" ? true : !this.isAuthenticated;
     },
@@ -135,9 +173,9 @@ export default {
       this.checkDataChanges(field);
     },
     clearForm() {
-      this.$store.commit("substance/clearForm");
+      this.$store.commit("substance/clearDetail");
       this.validationState = this.clearValidation();
-      this.changed = 0;
+      Object.keys(this.formChanged).forEach(v => (this.formChanged[v] = 0));
     },
     clearValidation() {
       let clean = {
@@ -175,7 +213,7 @@ export default {
       if (id) {
         let { attributes } = this.substance;
         Object.keys(attrs).forEach(key => {
-          if (attrs[key] == attributes[key]) delete attrs[key];
+          if (attrs[key] === attributes[key]) delete attrs[key];
         });
       } else {
         Object.keys(attrs).forEach(key => {
@@ -194,8 +232,8 @@ export default {
         "substanceType"
       )(data);
       // filter out the relationships that haven't been changed
+      let { relationships } = this.substance;
       if (id) {
-        let { relationships } = this.substance;
         Object.keys(related).forEach(key => {
           if (related[key].data.id == relationships[key].data.id)
             delete related[key];
@@ -204,6 +242,16 @@ export default {
         Object.keys(related).forEach(key => {
           if (related[key].data.id == null) delete related[key];
         });
+      }
+      if (this.compound.id) {
+        related["associatedCompound"] = {
+          data: {
+            id: this.compound.id,
+            type: this.compound.type
+          }
+        };
+      } else {
+        related["associatedCompound"] = { data: null };
       }
       let payload = {
         type: "substance",
@@ -237,7 +285,7 @@ export default {
       let action = response.status === 201 ? "created" : "updated";
       let { id } = response.data.data;
       this.validationState = this.clearValidation();
-      this.changed = 0;
+      Object.keys(this.formChanged).forEach(v => (this.formChanged[v] = 0));
       this.$store.commit("substance/loadDetail", response.data.data);
       // update for the tree
       this.$store.dispatch("substance/getList");
@@ -258,6 +306,12 @@ export default {
           .shift();
         if (attr == "nonFieldErrors") {
           nonField.push(error.detail);
+        } else if (attr == "associatedCompound") {
+          this.$store.dispatch("alert/alert", {
+            message: error.detail,
+            color: "warning",
+            dismissCountDown: 5
+          });
         } else {
           errd.push(attr);
           this.$set(this.validationState[attr], "state", false);
@@ -272,11 +326,6 @@ export default {
         });
       // handle nonField errors
       if (nonField.length > 0) {
-        this.$store.dispatch("alert/alert", {
-          message: nonField.shift(),
-          color: "warning",
-          dismissCountDown: 5
-        });
         // hard-coding this for now as we might need to make some adjustments
         // to the API to get these fields in the response in a cleaner way
         // I think this is the only nonField Error that we have for the moment
@@ -299,9 +348,11 @@ export default {
         "message",
         "This field has unsaved changes."
       );
+      this.formChanged[field]++;
     },
     unmarkChanges(field) {
       this.$set(this.validationState[field], "state", null);
+      this.formChanged[field] = 0;
     },
     checkDataChanges(field) {
       let initialValue;
@@ -310,10 +361,8 @@ export default {
       } else initialValue = this.substance.attributes[field] || "";
       if (this.form[field] !== initialValue) {
         this.markUnsavedChanges(field);
-        this.changed++;
       } else {
         this.unmarkChanges(field);
-        this.changed--;
       }
     }
   }
