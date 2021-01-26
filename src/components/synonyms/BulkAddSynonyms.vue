@@ -100,7 +100,7 @@ export default {
       }
       await Promise.allSettled(promises)
 
-      if (!this.errors)
+      if (this.errors.length === 0)
         this.alert={ style: "success", message: "All Identifiers Saved", timer: this.maxTimer }
       else
         this.alert={ style: "warning", message: "The below identifiers were not saved. Review the errors and reattempt.", timer: this.maxTimer }
