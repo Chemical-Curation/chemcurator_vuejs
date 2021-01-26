@@ -3,7 +3,13 @@ import rootMutations from "../mutations.js";
 
 const defaultState = () => {
   return {
-    data: {},
+    data: {
+      id: "",
+      type: "illDefinedCompound",
+      attributes: {
+        mrvfile: "<MDocument/>"
+      }
+    },
     included: {},
     changed: false
   };

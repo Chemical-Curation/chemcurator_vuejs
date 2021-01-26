@@ -54,10 +54,6 @@ describe("The substance form", () => {
     cy.get("#source").select("Source 1");
     cy.get("#substanceType").select("Substance Type 1");
     cy.get("#save-substance-btn").click();
-    cy.get("[data-cy=alert-box]").should(
-      "contain",
-      `${casrn} is not unique in ['preferred_name', 'display_name', 'casrn']`
-    );
     cy.get("#feedback-preferredName").contains("not unique");
     cy.get("#feedback-displayName").contains("not unique");
     cy.get("#feedback-casrn").contains("not unique");
@@ -105,6 +101,67 @@ describe("The substance form", () => {
       .its("request.body.data.relationships.substanceType.data.id")
       .should("contain", "1");
   });
+  it("should save associatedCompound to substance", () => {
+    cy.route({
+      method: "PATCH",
+      url: "/substances/DTXSID202000099",
+      status: 200,
+      response: {
+        data: {
+          id: "DTXSID202000099"
+        }
+      }
+    }).as("post");
+
+    cy.visit("/substance?search=Solo%20substance");
+    cy.get("#save-substance-btn").should("be.disabled");
+    // Create Compound - Hydrogen Peroxide
+    cy.get("#compound-type-dropdown").select("Defined Compound");
+    cy.get("iframe[id=ketcher]")
+      .its("0.contentDocument.body")
+      .should("not.be.empty")
+      .then(cy.wrap)
+      .find("#canvas")
+      .children()
+      .find("text")
+      .should("not.exist");
+
+    // Find the oxygen button
+    cy.get("iframe[id=ketcher]")
+      .its("0.contentDocument.body")
+      .should("not.be.empty")
+      .then(cy.wrap)
+      .find("#atom")
+      .find("button")
+      .eq(6)
+      .click();
+
+    // Select a point. create a H2O there, click and drag to make H2O2
+    cy.get("iframe[id=ketcher]")
+      .its("0.contentDocument.body")
+      .should("not.be.empty")
+      .then(cy.wrap)
+      .find("#canvas")
+      // create first node
+      .click()
+      .find("text")
+      .first()
+      // select first node
+      .trigger("mousedown", { button: 0 })
+      // back up to canvas
+      .parent()
+      // drag to create compound
+      .trigger("mousemove", 500, 500, { force: true })
+      .trigger("mouseup", { force: true });
+
+    cy.get("#save-substance-btn")
+      .should("not.be.disabled")
+      .click();
+    cy.get("[data-cy=alert-box]").should(
+      "contain",
+      "Substance 'DTXSID202000099' updated successfully"
+    );
+  });
   it("should alert on unsaved Compounds", () => {
     // quark
     cy.get("[data-cy=search-box]").type("Hydrogen Peroxide");
@@ -131,15 +188,31 @@ describe("The substance page anonymous access", () => {
     cy.get("#compound-type-dropdown").should("not.contain", "Deprecated");
   });
 
-  it("should show depreciated qst if the compound is set to it", () => {
-    cy.get("[data-cy=search-box]").type("Deprecated Substance");
-    cy.get("[data-cy=search-button]").click();
+  it("should disassociate the compound if saved with qst none selected", () => {
+    cy.route({
+      method: "PATCH",
+      url: "/substances/DTXSID502000000",
+      status: 200,
+      response: {}
+    }).as("patch");
 
-    cy.get("#compound-type-dropdown").should("contain", "Deprecated");
-    cy.get("#compound-type-dropdown")
-      .find("[value=deprecated]")
-      .should("be.selected")
-      .should("have.attr", "disabled");
+    cy.adminLogin();
+    cy.visit("/substance/DTXSID502000000");
+
+    cy.get("button:contains('Save Compound')").should("be.disabled");
+    cy.get("#save-substance-btn").should("be.disabled");
+
+    cy.get("#compound-type-dropdown").select("None");
+
+    // Save
+    cy.get("#save-substance-btn")
+      .should("not.be.disabled")
+      .click();
+
+    cy.get("@patch").should("have.property", "status", 200);
+    cy.get("@patch")
+      .its("request.body.data.relationships.associatedCompound.data")
+      .should("be", null);
   });
 
   it("should toggle ketcher/marvinjs on dropdown", () => {
@@ -598,6 +671,31 @@ describe("The substance page authenticated access", () => {
       // This regex wont accept an empty structure but will accept anything else
       // Verifying the exact structure would make this test brittle
       .should("match", /(<cml).*(><MDocument>).+(<\/MDocument><\/cml>)/);
+  });
+
+  it("should patch querystructuretype on illdefined compounds", () => {
+    cy.route({
+      method: "PATCH",
+      url: "/illDefinedCompounds/DTXCID502000009",
+      status: 200,
+      response: {}
+    }).as("patch");
+
+    cy.visit("/substance/DTXSID602000001");
+
+    cy.get("button:contains('Save Compound')").should("be.disabled");
+
+    cy.get("#compound-type-dropdown").select("Markush-Query");
+
+    // Save
+    cy.get("button:contains('Save Compound')")
+      .should("not.be.disabled")
+      .click();
+
+    cy.get("@patch").should("have.property", "status", 200);
+    cy.get("@patch")
+      .its("request.body.data.relationships.queryStructureType.data.id")
+      .should("contain", "markush-query");
   });
 
   it("confirm navigation away from editor changes", () => {
