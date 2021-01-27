@@ -185,19 +185,17 @@ export default {
               initialValue = this.substance.attributes[field] || "";
               mapping = "attributes";
               };
-            
-            // if (this.form[field] !== initialValue) {
-              // console.log(this.form[field], ":b:", initialValue);
+            if (this.form[field] !== initialValue) {
               let mix = {mapping,field,initialValue};
               this.$store.commit("substance/resetDetail", mix);
-            // }
+            }
           }}
       );
      
 
       
-      // this.validationState = this.clearValidation();
-      // Object.keys(this.formChanged).forEach(v => (this.formChanged[v] = 0));
+      this.validationState = this.clearValidation();
+      Object.keys(this.formChanged).forEach(v => (this.formChanged[v] = 0));
     },
     clearValidation() {
       let clean = {
