@@ -138,10 +138,14 @@ const mutations = {
     state.detail = payload;
   },
   resetDetail(state, mix) {
-    if (mix.mapping === "attributes" ) {
-      state.detail.attributes[mix.field] = mix.initialValue
+    if (mix.mapping === "attributes") {
+      state.detail.attributes[mix.field] = mix.initialValue;
+    } else {
+      state.detail.relationships[mix.field].data = {
+        id: mix.initialValue,
+        type: mix.field
+      };
     }
-    else {state.detail.relationships[mix.field].data = {id: mix.initialValue, type: mix.field}}
   },
   clearState(state) {
     Object.assign(state, defaultState());

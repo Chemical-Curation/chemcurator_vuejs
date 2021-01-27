@@ -172,28 +172,24 @@ export default {
       this.checkDataChanges(field);
     },
     resetForm() {
+      Object.keys(this.form).forEach(field => {
+        let initialValue;
+        let mapping;
+        if (field !== "id") {
+          if (this.dropdowns.includes(field)) {
+            initialValue = this.substance.relationships[field].data.id;
+            mapping = "relationships";
+          } else {
+            initialValue = this.substance.attributes[field] || "";
+            mapping = "attributes";
+          }
+          if (this.form[field] !== initialValue) {
+            let mix = { mapping, field, initialValue };
+            this.$store.commit("substance/resetDetail", mix);
+          }
+        }
+      });
 
-      Object.keys(this.form).forEach(
-        field => {
-          let initialValue;
-          let mapping;
-          if (field !== "id"){
-            if (this.dropdowns.includes(field)) {
-              initialValue = this.substance.relationships[field].data.id;
-              mapping = "relationships";
-            } else {
-              initialValue = this.substance.attributes[field] || "";
-              mapping = "attributes";
-              };
-            if (this.form[field] !== initialValue) {
-              let mix = {mapping,field,initialValue};
-              this.$store.commit("substance/resetDetail", mix);
-            }
-          }}
-      );
-     
-
-      
       this.validationState = this.clearValidation();
       Object.keys(this.formChanged).forEach(v => (this.formChanged[v] = 0));
     },
