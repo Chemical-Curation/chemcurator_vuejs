@@ -171,6 +171,14 @@ describe("The substance form", () => {
       "This Compound is not related to the Substance displayed."
     );
   });
+  it("should reset field changes", () => {
+    // quark
+    cy.get("[data-cy=search-box]").type("Hydrogen Peroxide");
+    cy.get("[data-cy=search-button]").click();
+    cy.get("#preferredName").type("Fake Name");
+    cy.get("#reset-substance-btn").click();
+    cy.get("#preferredName").contains("Hydrogen Peroxide");
+  });
 });
 
 describe("The substance page anonymous access", () => {

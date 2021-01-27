@@ -52,7 +52,11 @@
       :disabled="btnDisabled"
       >Save Substance</b-button
     >
-    <b-button class="ml-2" @click="resetForm" variant="secondary"
+    <b-button
+      id="reset-substance-btn"
+      class="ml-2"
+      @click="resetForm"
+      variant="secondary"
       >Reset Form</b-button
     >
   </b-form>
@@ -71,6 +75,7 @@ export default {
   ],
   data() {
     return {
+      form: {},
       formChanged: {
         preferredName: 0,
         displayName: 0,
@@ -138,10 +143,19 @@ export default {
           this.substance?.relationships?.substanceType?.data?.id
         )
       };
-    },
-    form: function() {
-      let { attributes, relationships } = this.substance;
-      return {
+    }
+  },
+  watch: {
+    "substance.id": function() {
+      this.loadForm(this.substance);
+      this.validationState = this.clearValidation();
+      Object.keys(this.formChanged).forEach(v => (this.formChanged[v] = 0));
+    }
+  },
+  methods: {
+    loadForm(obj) {
+      let { attributes, relationships } = obj;
+      this.form = {
         id: this.substance.id, // sid
         preferredName: attributes.preferredName,
         displayName: attributes.displayName,
@@ -153,15 +167,7 @@ export default {
         privateQcNote: attributes.privateQcNote,
         publicQcNote: attributes.publicQcNote
       };
-    }
-  },
-  watch: {
-    "substance.id": function() {
-      this.validationState = this.clearValidation();
-      Object.keys(this.formChanged).forEach(v => (this.formChanged[v] = 0));
-    }
-  },
-  methods: {
+    },
     sumValues(obj) {
       return Object.values(obj).reduce((a, b) => a + b);
     },
@@ -172,24 +178,7 @@ export default {
       this.checkDataChanges(field);
     },
     resetForm() {
-      Object.keys(this.form).forEach(field => {
-        let initialValue;
-        let mapping;
-        if (field !== "id") {
-          if (this.dropdowns.includes(field)) {
-            initialValue = this.substance.relationships[field].data.id;
-            mapping = "relationships";
-          } else {
-            initialValue = this.substance.attributes[field] || "";
-            mapping = "attributes";
-          }
-          if (this.form[field] !== initialValue) {
-            let mix = { mapping, field, initialValue };
-            this.$store.commit("substance/resetDetail", mix);
-          }
-        }
-      });
-
+      this.loadForm(this.substance);
       this.validationState = this.clearValidation();
       Object.keys(this.formChanged).forEach(v => (this.formChanged[v] = 0));
     },
