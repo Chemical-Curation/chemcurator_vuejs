@@ -71,6 +71,7 @@ export default {
   ],
   data() {
     return {
+      form: {},
       formChanged: {
         preferredName: 0,
         displayName: 0,
@@ -139,10 +140,19 @@ export default {
           this.substance?.relationships?.substanceType?.data?.id
         )
       };
-    },
-    form: function() {
-      let { attributes, relationships } = this.substance;
-      return {
+    }
+  },
+  watch: {
+    "substance.id": function() {
+      this.loadForm(this.substance);
+      this.validationState = this.clearValidation();
+      Object.keys(this.formChanged).forEach(v => (this.formChanged[v] = 0));
+    }
+  },
+  methods: {
+    loadForm(obj) {
+      let { attributes, relationships } = obj;
+      this.form =  {
         id: this.substance.id, // sid
         preferredName: attributes.preferredName,
         displayName: attributes.displayName,
@@ -154,15 +164,7 @@ export default {
         privateQcNote: attributes.privateQcNote,
         publicQcNote: attributes.publicQcNote
       };
-    }
-  },
-  watch: {
-    "substance.id": function() {
-      this.validationState = this.clearValidation();
-      Object.keys(this.formChanged).forEach(v => (this.formChanged[v] = 0));
-    }
-  },
-  methods: {
+    },
     sumValues(obj) {
       return Object.values(obj).reduce((a, b) => a + b);
     },
@@ -173,7 +175,7 @@ export default {
       this.checkDataChanges(field);
     },
     clearForm() {
-      this.$store.commit("substance/clearDetail");
+      this.loadForm(this.substance);
       this.validationState = this.clearValidation();
       Object.keys(this.formChanged).forEach(v => (this.formChanged[v] = 0));
     },
@@ -365,6 +367,9 @@ export default {
         this.unmarkChanges(field);
       }
     }
+  },
+  mounted() {
+    this.loadForm(this.substance);
   }
 };
 </script>
