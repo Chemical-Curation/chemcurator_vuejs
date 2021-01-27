@@ -1,6 +1,11 @@
 <template>
   <div>
-    <b-alert :variant="alert.style" :show="alert.timer" @dismiss-count-down="countDownChanged">{{ alert.message }}</b-alert>
+    <b-alert
+      :variant="alert.style"
+      :show="alert.timer"
+      @dismiss-count-down="countDownChanged"
+      >{{ alert.message }}</b-alert
+    >
     <b-form @submit.prevent="onSubmit">
       <b-form-group label="Source">
         <b-form-select
@@ -70,14 +75,14 @@ export default {
       alert: {
         style: "success",
         message: "",
-        timer: 0,
+        timer: 0
       },
-      maxTimer: 10,
+      maxTimer: 10
     };
   },
   methods: {
-    countDownChanged: function(countdown){
-      this.alert.timer = countdown
+    countDownChanged: function(countdown) {
+      this.alert.timer = countdown;
     },
 
     onSubmit: async function() {
@@ -90,28 +95,40 @@ export default {
       let promises = [];
       for (let ident of identArr) {
         if (ident !== "") {
-          promises.push(SynonymAPI.post(this.buildRequestBody(ident))
-            .then()
-              .catch(err =>
-              this.onReject(err.response.data.errors, ident)
-            )
-          )
+          promises.push(
+            SynonymAPI.post(this.buildRequestBody(ident))
+              .then()
+              .catch(err => this.onReject(err.response.data.errors, ident))
+          );
         }
       }
-      await Promise.allSettled(promises)
+      await Promise.allSettled(promises);
 
-      if (this.errors.length === 0 && promises.length !== 0)   // Only warn if at least one identifier attempted to save.
-        this.alert={ style: "success", message: "All Identifiers Saved", timer: this.maxTimer }
+      if (this.errors.length === 0 && promises.length !== 0)
+        // Only warn if at least one identifier attempted to save.
+        this.alert = {
+          style: "success",
+          message: "All Identifiers Saved",
+          timer: this.maxTimer
+        };
       else if (promises.length !== 0)
-        this.alert={ style: "warning", message: "The below identifiers were not saved. Review the errors and reattempt.", timer: this.maxTimer }
+        this.alert = {
+          style: "warning",
+          message:
+            "The below identifiers were not saved. Review the errors and reattempt.",
+          timer: this.maxTimer
+        };
 
-      this.$emit("save")
+      this.$emit("save");
     },
     onReject: function(errors, ident) {
       this.attributes.identifiers += `${ident}\n`;
 
       for (let error of errors) {
-        if (!this.errors.find(element => element.code === error.code) || error.code === "invalid") {
+        if (
+          !this.errors.find(element => element.code === error.code) ||
+          error.code === "invalid"
+        ) {
           this.errors.push(error);
         }
       }

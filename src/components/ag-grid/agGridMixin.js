@@ -14,7 +14,7 @@ export const agGridMixin = {
       gridOptions: {},
       loading: false,
       selectedRow: null,
-      frameworkComponents: null,
+      frameworkComponents: null
     };
   },
 

@@ -2,7 +2,13 @@
   <div>
     <div class="d-flex justify-content-between text-left">
       <h3>Synonyms</h3>
-      <b-button v-b-modal.bulk-add-synonyms-modal variant="success" :disabled="!substanceId || loading" class="mb-2">Bulk Add Synonyms</b-button>
+      <b-button
+        v-b-modal.bulk-add-synonyms-modal
+        variant="success"
+        :disabled="!substanceId || loading"
+        class="mb-2"
+        >Bulk Add Synonyms</b-button
+      >
     </div>
     <ag-grid-vue
       id="synonym-table"
@@ -18,7 +24,10 @@
       rowSelection="single"
     />
     <div v-show="selectedError.length > 0" class="mt-3 text-left">
-      <error-table :errors="selectedError" id="synonym-error-table"></error-table>
+      <error-table
+        :errors="selectedError"
+        id="synonym-error-table"
+      ></error-table>
     </div>
     <div class="d-flex flex-row justify-content-end my-3" v-if="editable">
       <b-button
@@ -31,8 +40,17 @@
         Add Synonym
       </b-button>
     </div>
-    <b-modal id="bulk-add-synonyms-modal" title="Bulk Add Synonyms" size="lg" hide-footer>
-      <BulkAddSynonyms :substance-id="substanceId" @save="loadSynonyms(substanceId)"> </BulkAddSynonyms>
+    <b-modal
+      id="bulk-add-synonyms-modal"
+      title="Bulk Add Synonyms"
+      size="lg"
+      hide-footer
+    >
+      <BulkAddSynonyms
+        :substance-id="substanceId"
+        @save="loadSynonyms(substanceId)"
+      >
+      </BulkAddSynonyms>
     </b-modal>
   </div>
 </template>

@@ -17,7 +17,11 @@
         />
       </b-col>
     </b-row>
-    <SynonymTable :substance-id="substance.id" :editable="isAuthenticated" class="my-5" />
+    <SynonymTable
+      :substance-id="substance.id"
+      :editable="isAuthenticated"
+      class="my-5"
+    />
     <SubstanceRelationshipTable
       class="mb-5"
       :substance-id="substance.id"

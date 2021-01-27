@@ -17,7 +17,10 @@
       rowSelection="single"
     />
     <div v-show="selectedError.length > 0" class="mt-3 text-left">
-      <error-table :errors="selectedError" id="relationship-error-table"></error-table>
+      <error-table
+        :errors="selectedError"
+        id="relationship-error-table"
+      ></error-table>
     </div>
     <div class="d-flex flex-row justify-content-end my-3" v-if="editable">
       <b-button
