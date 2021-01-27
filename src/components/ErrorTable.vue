@@ -1,5 +1,6 @@
 <template>
   <b-table
+    :id="id"
     :items="modifiedErrors"
     :fields="[{ label: 'Errors', key: 'modifiedDetail' }]"
     borderless
@@ -13,6 +14,7 @@ import _ from "lodash";
 export default {
   name: "ErrorTable",
   props: {
+    id: String,
     errors: Array
   },
   computed: {
