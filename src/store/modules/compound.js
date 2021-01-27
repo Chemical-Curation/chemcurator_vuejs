@@ -23,7 +23,8 @@ const getters = {
       return definedcompound.state.data;
     } else if (state.type === "none") {
       return {
-        id: ""
+        id: "",
+        type: "none"
       };
     } else {
       return illdefinedcompound.state.data;

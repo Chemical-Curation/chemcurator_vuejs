@@ -176,6 +176,7 @@ export default {
     },
     clearForm() {
       this.loadForm(this.substance);
+      this.$store.commit("compound/setType", this.substance.relationships.associatedCompound?.data?.type || "none");
       this.validationState = this.clearValidation();
       Object.keys(this.formChanged).forEach(v => (this.formChanged[v] = 0));
     },
