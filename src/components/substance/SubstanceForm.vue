@@ -152,6 +152,9 @@ export default {
       Object.keys(this.formChanged).forEach(v => (this.formChanged[v] = 0));
     }
   },
+  mounted() {
+    this.loadForm(this.substance);
+  },
   methods: {
     loadForm(obj) {
       let { attributes, relationships } = obj;
