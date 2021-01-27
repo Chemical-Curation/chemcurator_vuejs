@@ -40,7 +40,7 @@
           },
           "data": {
             "type": "source",
-            "id": "1"
+            "id": "source-1"
           }
         },
         "relationshipType": {
@@ -50,7 +50,7 @@
           },
           "data": {
             "type": "relationshipType",
-            "id": "1"
+            "id": "area-professor-home"
           }
         }
       },
@@ -92,7 +92,7 @@
           },
           "data": {
             "type": "source",
-            "id": "1"
+            "id": "source-1"
           }
         },
         "relationshipType": {
@@ -102,7 +102,7 @@
           },
           "data": {
             "type": "relationshipType",
-            "id": "1"
+            "id": "area-professor-home"
           }
         }
       },
@@ -144,7 +144,7 @@
           },
           "data": {
             "type": "source",
-            "id": "1"
+            "id": "source-1"
           }
         },
         "relationshipType": {
@@ -154,7 +154,7 @@
           },
           "data": {
             "type": "relationshipType",
-            "id": "1"
+            "id": "area-professor-home"
           }
         }
       },
@@ -184,7 +184,7 @@
           },
           "data": {
             "type": "source",
-            "id": "1"
+            "id": "source-1"
           }
         },
         "substanceType": {

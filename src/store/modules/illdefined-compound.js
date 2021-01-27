@@ -5,6 +5,7 @@ const defaultState = () => {
   return {
     data: {
       id: "",
+      type: "illDefinedCompound",
       attributes: {
         mrvfile: "<MDocument/>"
       }

@@ -16,7 +16,7 @@
             :state="validationState[field].state"
             :options="options[field]"
             :disabled="!isAuthenticated"
-            @change="markChanged"
+            @change="markChanged(field)"
           />
         </template>
         <template v-else-if="textareas.includes(field)">
@@ -25,7 +25,7 @@
             v-model="form[field]"
             :state="validationState[field].state"
             :disabled="!isAuthenticated"
-            @input="markChanged"
+            @input="markChanged(field)"
           />
         </template>
         <template v-else-if="field == 'associatedCompound'">
@@ -43,12 +43,15 @@
             v-model="form[field]"
             :state="validationState[field].state"
             :disabled="editable(field)"
-            @input="markChanged"
+            @input="markChanged(field)"
           />
         </template>
         <b-form-invalid-feedback :id="'feedback-' + field">
           {{ validationState[field].message }}
         </b-form-invalid-feedback>
+        <b-form-valid-feedback :id="'feedback-' + field">
+          {{ validationState[field].message }}
+        </b-form-valid-feedback>
       </b-form-group>
     </div>
     <b-button
@@ -65,16 +68,31 @@
 </template>
 
 <script>
-import { mapGetters } from "vuex";
-
 export default {
   name: "SubstanceForm",
-  props: ["substance"],
+  props: [
+    "substance",
+    "compound",
+    "isAuthenticated",
+    "qcLevelOptions",
+    "sourceOptions",
+    "substanceTypeOptions"
+  ],
   data() {
     return {
-      changed: 0,
+      formChanged: {
+        preferredName: 0,
+        displayName: 0,
+        casrn: 0,
+        description: 0,
+        privateQcNote: 0,
+        publicQcNote: 0,
+        qcLevel: 0,
+        source: 0,
+        substanceType: 0
+      },
       validationState: this.clearValidation(),
-      textareas: ["description", "privateQCNote", "publicQCNote"],
+      textareas: ["description", "privateQcNote", "publicQcNote"],
       dropdowns: ["qcLevel", "source", "substanceType"],
       labels: {
         id: "Substance ID:",
@@ -82,8 +100,8 @@ export default {
         displayName: "Display Name:",
         casrn: "CAS-RN:",
         description: "Substance Description:",
-        privateQCNote: "Private QC Notes:",
-        publicQCNote: "Public QC Notes:",
+        privateQcNote: "Private QC Notes:",
+        publicQcNote: "Public QC Notes:",
         qcLevel: "QC Level:",
         source: "Source:",
         substanceType: "Substance Type:"
@@ -91,16 +109,32 @@ export default {
     };
   },
   computed: {
-    //...mapGetters("substance", ["form"]),
-    //...mapState("substance", ["detail"]),
-    ...mapGetters("auth", ["isAuthenticated"]),
-    ...mapGetters("qcLevel", { qcLevelOptions: "getOptions" }),
-    ...mapGetters("source", { sourceOptions: "getOptions" }),
-    ...mapGetters("substanceType", { substanceTypeOptions: "getOptions" }),
-    ...mapGetters("compound", { compound: "getCompound" }),
+    compoundChanged: function() {
+      if (
+        this.$store.state.compound.type == "none" &&
+        Boolean(this.substance.relationships.associatedCompound.data)
+      ) {
+        return true;
+      } else if (
+        this.$store.state.compound.type == "none" &&
+        !this.substance.relationships.associatedCompound.data
+      ) {
+        return false;
+      } else if (
+        this.compound.id &&
+        this.compound.id !==
+          this.substance.relationships.associatedCompound?.data?.id
+      ) {
+        return true;
+      } else {
+        return false;
+      }
+    },
 
     btnDisabled: function() {
-      return !(this.changed > 0);
+      if (this.compoundChanged) {
+        return false;
+      } else return this.sumValues(this.formChanged) === 0;
     },
     options: function() {
       return {
@@ -126,29 +160,31 @@ export default {
         source: relationships.source.data.id,
         substanceType: relationships.substanceType.data.id,
         description: attributes.description,
-        privateQCNote: attributes.privateQcNote,
-        publicQCNote: attributes.publicQcNote,
-        associatedCompound: this.compound?.id
+        privateQcNote: attributes.privateQcNote,
+        publicQcNote: attributes.publicQcNote
       };
     }
   },
   watch: {
-    //    "substance.id": function() {
-    //      this.validationState = this.clearValidation();
-    //      this.changed = 0;
-    //    }
+    "substance.id": function() {
+      this.validationState = this.clearValidation();
+      Object.keys(this.formChanged).forEach(v => (this.formChanged[v] = 0));
+    }
   },
   methods: {
+    sumValues(obj) {
+      return Object.values(obj).reduce((a, b) => a + b);
+    },
     editable(fld) {
       return fld === "id" ? true : !this.isAuthenticated;
     },
-    markChanged() {
-      this.changed++;
+    markChanged(field) {
+      this.checkDataChanges(field);
     },
     clearForm() {
-      this.$store.commit("substance/clearForm");
+      this.$store.commit("substance/clearDetail");
       this.validationState = this.clearValidation();
-      this.changed = 0;
+      Object.keys(this.formChanged).forEach(v => (this.formChanged[v] = 0));
     },
     clearValidation() {
       let clean = {
@@ -160,8 +196,8 @@ export default {
         casrn: { ...clean },
         preferredName: { ...clean },
         displayName: { ...clean },
-        privateQCNote: { ...clean },
-        publicQCNote: { ...clean },
+        privateQcNote: { ...clean },
+        publicQcNote: { ...clean },
         qcLevel: { ...clean },
         source: { ...clean },
         description: { ...clean },
@@ -180,15 +216,14 @@ export default {
         "displayName",
         "casrn",
         "description",
-        "publicQCNote",
-        "privateQCNote"
+        "publicQcNote",
+        "privateQcNote"
       )(data);
       // filter out attributes that have not been changed
       if (id) {
-        // this is all going to need to change
         let { attributes } = this.substance;
         Object.keys(attrs).forEach(key => {
-          if (attrs[key] == attributes[key]) delete attrs[key];
+          if (attrs[key] === attributes[key]) delete attrs[key];
         });
       } else {
         Object.keys(attrs).forEach(key => {
@@ -207,8 +242,8 @@ export default {
         "substanceType"
       )(data);
       // filter out the relationships that haven't been changed
+      let { relationships } = this.substance;
       if (id) {
-        let { relationships } = this.substance;
         Object.keys(related).forEach(key => {
           if (related[key].data.id == relationships[key].data.id)
             delete related[key];
@@ -217,6 +252,16 @@ export default {
         Object.keys(related).forEach(key => {
           if (related[key].data.id == null) delete related[key];
         });
+      }
+      if (this.compound.id) {
+        related["associatedCompound"] = {
+          data: {
+            id: this.compound.id,
+            type: this.compound.type
+          }
+        };
+      } else {
+        related["associatedCompound"] = { data: null };
       }
       let payload = {
         type: "substance",
@@ -250,7 +295,7 @@ export default {
       let action = response.status === 201 ? "created" : "updated";
       let { id } = response.data.data;
       this.validationState = this.clearValidation();
-      this.changed = 0;
+      Object.keys(this.formChanged).forEach(v => (this.formChanged[v] = 0));
       this.$store.commit("substance/loadDetail", response.data.data);
       // update for the tree
       this.$store.dispatch("substance/getList");
@@ -271,6 +316,12 @@ export default {
           .shift();
         if (attr == "nonFieldErrors") {
           nonField.push(error.detail);
+        } else if (attr == "associatedCompound") {
+          this.$store.dispatch("alert/alert", {
+            message: error.detail,
+            color: "warning",
+            dismissCountDown: 5
+          });
         } else {
           errd.push(attr);
           this.$set(this.validationState[attr], "state", false);
@@ -285,11 +336,6 @@ export default {
         });
       // handle nonField errors
       if (nonField.length > 0) {
-        this.$store.dispatch("alert/alert", {
-          message: nonField.shift(),
-          color: "warning",
-          dismissCountDown: 5
-        });
         // hard-coding this for now as we might need to make some adjustments
         // to the API to get these fields in the response in a cleaner way
         // I think this is the only nonField Error that we have for the moment
@@ -303,6 +349,30 @@ export default {
         this.$set(this.validationState["displayName"], "message", "not unique");
         this.$set(this.validationState["casrn"], "state", false);
         this.$set(this.validationState["casrn"], "message", "not unique");
+      }
+    },
+    markUnsavedChanges(field) {
+      this.$set(this.validationState[field], "state", true);
+      this.$set(
+        this.validationState[field],
+        "message",
+        "This field has unsaved changes."
+      );
+      this.formChanged[field]++;
+    },
+    unmarkChanges(field) {
+      this.$set(this.validationState[field], "state", null);
+      this.formChanged[field] = 0;
+    },
+    checkDataChanges(field) {
+      let initialValue;
+      if (this.dropdowns.includes(field)) {
+        initialValue = this.substance.relationships[field].data.id;
+      } else initialValue = this.substance.attributes[field] || "";
+      if (this.form[field] !== initialValue) {
+        this.markUnsavedChanges(field);
+      } else {
+        this.unmarkChanges(field);
       }
     }
   }

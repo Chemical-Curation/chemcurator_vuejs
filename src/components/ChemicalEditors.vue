@@ -9,6 +9,9 @@
         class="col"
       >
         <b-form-input id="recordCompoundID" :value="cid" disabled />
+        <b-form-invalid-feedback id="feedback-cid" :state="checkCompound">
+          This Compound is not related to the Substance displayed.
+        </b-form-invalid-feedback>
         <template v-if="showSubstanceLink">
           <router-link
             id="substanceLink"
@@ -93,7 +96,6 @@
 <script>
 import KetcherWindow from "@/components/KetcherWindow";
 import MarvinWindow from "@/components/MarvinWindow";
-import { mapGetters } from "vuex";
 
 export default {
   name: "ChemicalEditors",
@@ -105,7 +107,8 @@ export default {
     initialCompound: Object,
     editable: Boolean,
     substance: Object,
-    urlParam: Boolean
+    urlParam: Boolean,
+    options: Function
   },
   data() {
     return {
@@ -115,7 +118,7 @@ export default {
   },
   watch: {
     initialCompound: function() {
-      if (this.type === "none") {
+      if (this.type === "none" && !this.substance.id) {
         // this block empties out the ketcher window when substance is
         // hit in the NavBar
         this.$refs["ketcher"].clearMolfile();
@@ -136,7 +139,6 @@ export default {
     }
   },
   computed: {
-    ...mapGetters("queryStructureType", { options: "getOptions" }),
     type: {
       get: function() {
         return this.$store.state.compound.type;
@@ -175,13 +177,23 @@ export default {
       }
     },
     editorChanged: function() {
-      return (
-        (this.marvinChanged && this.type !== "definedCompound") ||
-        (this.ketcherChanged && this.type === "definedCompound")
-      );
+      if (this.initialCompound?.type === "illDefinedCompound") {
+        if (
+          this.initialCompound.id &&
+          this.type !==
+            this.initialCompound?.relationships?.queryStructureType.data.id
+        ) {
+          return true;
+        } else return this.marvinChanged;
+      } else return this.ketcherChanged;
     },
     showSubstanceLink: function() {
       return this.sid && this.sid !== this.substance?.id;
+    },
+    checkCompound: function() {
+      let sub_id =
+        this.substance.relationships?.associatedCompound?.data?.id || "";
+      return sub_id === this.cid;
     }
   },
   methods: {
@@ -247,19 +259,27 @@ export default {
             id: compoundId,
             body: { ...requestBody, id: compoundId }
           })
+          .then(response => {
+            this.$store.commit(
+              "compound/illdefinedcompound/storeFetch",
+              response.data.data
+            );
+            this.marvinChanged = false;
+          })
           .catch(err => this.handleError(err));
       } else {
         // If there is no id, save the new compound
         this.$store
           .dispatch("compound/illdefinedcompound/post", requestBody)
-          .then(response =>
+          .then(response => {
             // Load the newly created compound.  We could bypass this action by
             // storing the response but this verifies the compound is the same and
             // further searches will work
             this.$store.dispatch("compound/fetchCompound", {
               id: response.data.data.id
-            })
-          )
+            });
+            this.marvinChanged = false;
+          })
           .catch(err => this.handleError(err));
       }
     },

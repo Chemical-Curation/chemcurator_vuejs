@@ -11,8 +11,8 @@ const defaultDetail = () => {
       displayName: null,
       casrn: null,
       description: null,
-      privateQCNote: null,
-      publicQCNote: null
+      privateQcNote: null,
+      publicQcNote: null
     },
     relationships: {
       source: {
@@ -31,9 +31,7 @@ const defaultDetail = () => {
         }
       },
       associatedCompound: {
-        data: {
-          id: null
-        }
+        data: null
       }
     }
   };
@@ -45,9 +43,8 @@ const defaultState = () => {
     included: {},
     loading: false,
     count: 0,
-    list: [],
     searchResults: [],
-    form: {}
+    list: []
   };
 };
 
@@ -114,6 +111,7 @@ let actions = {
             color: "warning",
             dismissCountDown: 4
           };
+          // ?: should getting a failed search result clear what you have loaded?
           context.commit("clearState");
           context.dispatch(`compound/clearAllStates`, {}, { root: true });
           context.dispatch("alert/alert", alert, {
@@ -135,25 +133,6 @@ let actions = {
   }
 };
 
-// getters
-const getters = {
-  form: state => {
-    let { detail } = state;
-    return {
-      id: detail.id, // sid
-      preferredName: detail.attributes.preferredName,
-      displayName: detail.attributes.displayName,
-      casrn: detail.attributes.casrn,
-      qcLevel: detail.relationships.qcLevel.data.id,
-      source: detail.relationships.source.data.id,
-      substanceType: detail.relationships.substanceType.data.id,
-      description: detail.attributes.description,
-      privateQCNote: detail.attributes.privateQcNote,
-      publicQCNote: detail.attributes.publicQcNote
-    };
-  }
-};
-
 // mutations
 const mutations = {
   ...rootMutations,
@@ -163,7 +142,7 @@ const mutations = {
   storeSearchResults(state, payload) {
     state.searchResults = payload;
   },
-  clearForm(state) {
+  clearDetail(state) {
     state.detail = defaultDetail();
   },
   clearState(state) {
@@ -175,6 +154,5 @@ export default {
   namespaced: true,
   state,
   actions,
-  getters,
   mutations
 };
