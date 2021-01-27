@@ -30,7 +30,7 @@
         <b-form-textarea
           v-model="attributes.identifiers"
           placeholder="Please provide list of identifiers..."
-          required
+          :state="errors.length === 0 ? null : false"
         ></b-form-textarea>
       </b-form-group>
 
@@ -100,9 +100,9 @@ export default {
       }
       await Promise.allSettled(promises)
 
-      if (this.errors.length === 0)
+      if (this.errors.length === 0 && promises.length !== 0)   // Only warn if at least one identifier attempted to save.
         this.alert={ style: "success", message: "All Identifiers Saved", timer: this.maxTimer }
-      else
+      else if (promises.length !== 0)
         this.alert={ style: "warning", message: "The below identifiers were not saved. Review the errors and reattempt.", timer: this.maxTimer }
 
       this.$emit("save")
