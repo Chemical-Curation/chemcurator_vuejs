@@ -52,8 +52,8 @@
       :disabled="btnDisabled"
       >Save Substance</b-button
     >
-    <b-button class="ml-2" @click="clearForm" variant="secondary"
-      >Clear Form</b-button
+    <b-button class="ml-2" @click="resetForm" variant="secondary"
+      >Reset Form</b-button
     >
   </b-form>
 </template>
@@ -121,7 +121,6 @@ export default {
         return false;
       }
     },
-
     btnDisabled: function() {
       if (this.compoundChanged) {
         return false;
@@ -172,10 +171,33 @@ export default {
     markChanged(field) {
       this.checkDataChanges(field);
     },
-    clearForm() {
-      this.$store.commit("substance/clearDetail");
-      this.validationState = this.clearValidation();
-      Object.keys(this.formChanged).forEach(v => (this.formChanged[v] = 0));
+    resetForm() {
+
+      Object.keys(this.form).forEach(
+        field => {
+          let initialValue;
+          let mapping;
+          if (field !== "id"){
+            if (this.dropdowns.includes(field)) {
+              initialValue = this.substance.relationships[field].data.id;
+              mapping = "relationships";
+            } else {
+              initialValue = this.substance.attributes[field] || "";
+              mapping = "attributes";
+              };
+            
+            // if (this.form[field] !== initialValue) {
+              // console.log(this.form[field], ":b:", initialValue);
+              let mix = {mapping,field,initialValue};
+              this.$store.commit("substance/resetDetail", mix);
+            // }
+          }}
+      );
+     
+
+      
+      // this.validationState = this.clearValidation();
+      // Object.keys(this.formChanged).forEach(v => (this.formChanged[v] = 0));
     },
     clearValidation() {
       let clean = {

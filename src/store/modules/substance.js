@@ -137,8 +137,25 @@ const mutations = {
   loadDetail(state, payload) {
     state.detail = payload;
   },
-  clearDetail(state) {
-    state.detail = defaultDetail();
+  resetDetail(state, mix) {
+    console.log(mix);
+    // let pt1 = mix.mapping;
+    // let pt2 = mix.field;
+    let pt3 = mix.initialValue;
+    console.log(pt3)
+    if (mix.mapping === "attributes" ) {
+      state.detail.attributes[mix.field] = pt3;
+    }
+    
+    // console.log(state.detail);
+    // state.detail.attributes.displayName = "";
+
+    // Object.keys(state.detail).forEach(f => console.log(f))
+    // console.log(mix.mapping);
+
+
+
+
   },
   clearState(state) {
     Object.assign(state, defaultState());
