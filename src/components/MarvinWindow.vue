@@ -32,9 +32,13 @@ export default {
   },
   methods: {
     resetMarvin: function() {
-      // something like ...
-      // this.loadMrvfile(this.localMrvfile);
-      // ? 
+      this.marvinFrame.contentWindow.postMessage(
+        {
+          type: "importMrvfile",
+          mrvfile: this.loadedMrvfile
+        },
+        "*"
+      );
     },
     loadMrvfile: function(mrvfile) {
       this.loadedMrvfile = "";
