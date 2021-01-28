@@ -57,7 +57,7 @@
       class="ml-2"
       @click="resetForm"
       variant="secondary"
-      >Reset Form</b-button
+      >Reset Substance</b-button
     >
   </b-form>
 </template>

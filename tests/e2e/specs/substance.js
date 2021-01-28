@@ -177,8 +177,7 @@ describe("The substance form", () => {
     cy.get("[data-cy=search-button]").click();
     cy.get("#preferredName").type("Fake Name");
     cy.get("#reset-substance-btn").click();
-    cy.get("#preferredName").should("have.value","Hydrogen Peroxide");
-    
+    cy.get("#preferredName").should("have.value", "Hydrogen Peroxide");
   });
 });
 

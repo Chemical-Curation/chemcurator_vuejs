@@ -39,6 +39,9 @@ export default {
     };
   },
   methods: {
+    resetKetcher: function() {
+      this.loadMolfile(this.loadedMolfile);
+    },
     loadMolfile: function(molfile, loaded) {
       if (molfile) {
         this.ketcherFrame.contentWindow.postMessage(
