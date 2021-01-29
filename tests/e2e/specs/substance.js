@@ -879,6 +879,8 @@ describe("The substance page's Synonym Table", () => {
       .should("be.enabled")
       .click();
 
+    cy.get("#synonym-alert").should("be.visible");
+
     cy.get("#synonym-table")
       .find("div.ag-center-cols-clipper")
       .find("div.ag-row[role=row]")
@@ -895,7 +897,61 @@ describe("The substance page's Synonym Table", () => {
       method: "POST",
       url: "/synonyms",
       status: 201,
-      response: {} // currently unneeded
+      response: {
+        data: {
+          id: "9",
+          type: "synonym",
+          attributes: {
+            identifiers: "Synonym 9",
+            qcNotes: ""
+          },
+          relationships: {
+            source: {
+              links: {
+                self: "http://localhost:8000/synonyms/3/relationships/source",
+                related: "http://localhost:8000/synonyms/3/source"
+              },
+              data: {
+                type: "source",
+                id: "7"
+              }
+            },
+            substance: {
+              links: {
+                self:
+                  "http://localhost:8000/synonyms/3/relationships/substance",
+                related: "http://localhost:8000/synonyms/3/substance"
+              },
+              data: {
+                type: "substance",
+                id: "2"
+              }
+            },
+            synonymQuality: {
+              links: {
+                self:
+                  "http://localhost:8000/synonyms/3/relationships/synonymQuality",
+                related: "http://localhost:8000/synonyms/3/synonymQuality"
+              },
+              data: {
+                type: "synonymQuality",
+                id: "8"
+              }
+            },
+            synonymType: {
+              links: {
+                self:
+                  "http://localhost:8000/synonyms/3/relationships/synonymType",
+                related: "http://localhost:8000/synonyms/3/synonymType"
+              },
+              data: {
+                type: "synonymType",
+                id: "5"
+              }
+            }
+          }
+        }
+      }
     }).as("post");
 
     cy.get("[data-cy=search-box]").type("Sample Substance 2");
@@ -953,6 +1009,8 @@ describe("The substance page's Synonym Table", () => {
       .eq(5)
       .find("button")
       .click();
+
+    cy.get("#synonym-alert").should("be.visible");
 
     cy.get("@post")
       .its("request.body.data")
