@@ -1135,7 +1135,6 @@ describe("The substance page's Synonym Table", () => {
       .click();
 
     cy.get("#synonym-error-table").should("contain.text", sampleErrorMessage);
-    cy.get("#synonym-alert").should("not.be.visible");
   });
 });
 
