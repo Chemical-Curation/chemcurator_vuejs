@@ -18,6 +18,7 @@
     />
     <b-alert
       class="mt-3"
+      id="synonym-alert"
       :variant="alert.style"
       :show="alert.timer"
       @dismiss-count-down="countDownChanged"
@@ -253,17 +254,17 @@ export default {
         row.initialData = { ...row.data };
         row.errors = null;
 
-        this.addAlert(`${row.data.identifier} was saved`, "success")
+        this.addAlert(`${row.data.identifier} was saved`, "success");
 
         return res;
-      }
+      };
 
       let onFailure = err => {
         row.errors = err.response.data.errors;
         return {
           failed: true
         };
-      }
+      };
 
       let requestBody = this.buildRequestBody(row.data);
 
@@ -287,7 +288,7 @@ export default {
         SynonymApi.delete(row.data.id)
           .then(() => {
             this.gridOptions.rowData.splice(row.rowIndex, 1);
-            this.addAlert(`${row.data.data.identifier} deleted`, "warning")
+            this.addAlert(`${row.data.data.identifier} deleted`, "warning");
           })
           .catch(err => {
             row.data.errors = err.response.data.errors;

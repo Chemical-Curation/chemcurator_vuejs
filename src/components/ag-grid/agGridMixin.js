@@ -124,9 +124,9 @@ export const agGridMixin = {
      *       the state alert might be better than this approach
      */
     addAlert(message, style) {
-      this.alert.message = message
-      this.alert.style = style
-      this.alert.timer = this.maxTimer
+      this.alert.message = message;
+      this.alert.style = style;
+      this.alert.timer = this.maxTimer;
     },
 
     /**
