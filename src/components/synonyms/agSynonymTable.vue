@@ -16,6 +16,14 @@
       @row-selected="onRowSelected"
       rowSelection="single"
     />
+    <b-alert
+      class="mt-3"
+      id="synonym-alert"
+      :variant="alert.style"
+      :show="alert.timer"
+      @dismiss-count-down="countDownChanged"
+      >{{ alert.message }}</b-alert
+    >
     <div v-show="selectedError" class="mt-3 text-left">
       <b-table
         id="synonym-error-table"
@@ -239,21 +247,24 @@ export default {
      */
     saveRequest: function(row) {
       // Local functions to deal with successful saves and failures
-      function onSuccess(res) {
+      let onSuccess = res => {
         // Save the id of the potentially newly minted row.
         row.id = res.data.data.id;
         row.created = false;
         row.initialData = { ...row.data };
         row.errors = null;
-        return res;
-      }
 
-      function onFailure(err) {
+        this.addAlert(`${row.data.identifier} was saved`, "success");
+
+        return res;
+      };
+
+      let onFailure = err => {
         row.errors = err.response.data.errors;
         return {
           failed: true
         };
-      }
+      };
 
       let requestBody = this.buildRequestBody(row.data);
 
@@ -277,6 +288,7 @@ export default {
         SynonymApi.delete(row.data.id)
           .then(() => {
             this.gridOptions.rowData.splice(row.rowIndex, 1);
+            this.addAlert(`${row.data.data.identifier} deleted`, "warning");
           })
           .catch(err => {
             row.data.errors = err.response.data.errors;
