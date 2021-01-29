@@ -163,7 +163,6 @@ describe("The substance form", () => {
     );
   });
   it("should alert on unsaved Compounds", () => {
-    // quark
     cy.get("[data-cy=search-box]").type("Hydrogen Peroxide");
     cy.get("[data-cy=search-button]").click();
     cy.get("#compound-type-dropdown").select("Ill defined");
@@ -172,7 +171,6 @@ describe("The substance form", () => {
     );
   });
   it("should reset field changes on the Substance Form", () => {
-    // quark
     cy.get("[data-cy=search-box]").type("Hydrogen Peroxide");
     cy.get("[data-cy=search-button]").click();
     cy.get("#preferredName").type("Fake Name");
