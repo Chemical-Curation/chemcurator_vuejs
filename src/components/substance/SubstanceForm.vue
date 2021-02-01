@@ -52,8 +52,12 @@
       :disabled="btnDisabled"
       >Save Substance</b-button
     >
-    <b-button class="ml-2" @click="clearForm" variant="secondary"
-      >Clear Form</b-button
+    <b-button
+      id="reset-substance-btn"
+      class="ml-2"
+      @click="resetForm"
+      variant="secondary"
+      >Reset Substance</b-button
     >
   </b-form>
 </template>
@@ -71,6 +75,7 @@ export default {
   ],
   data() {
     return {
+      form: {},
       formChanged: {
         preferredName: 0,
         displayName: 0,
@@ -121,7 +126,6 @@ export default {
         return false;
       }
     },
-
     btnDisabled: function() {
       if (this.compoundChanged) {
         return false;
@@ -139,10 +143,22 @@ export default {
           this.substance?.relationships?.substanceType?.data?.id
         )
       };
-    },
-    form: function() {
-      let { attributes, relationships } = this.substance;
-      return {
+    }
+  },
+  watch: {
+    "substance.id": function() {
+      this.loadForm(this.substance);
+      this.validationState = this.clearValidation();
+      Object.keys(this.formChanged).forEach(v => (this.formChanged[v] = 0));
+    }
+  },
+  mounted() {
+    this.loadForm(this.substance);
+  },
+  methods: {
+    loadForm(obj) {
+      let { attributes, relationships } = obj;
+      this.form = {
         id: this.substance.id, // sid
         preferredName: attributes.preferredName,
         displayName: attributes.displayName,
@@ -154,15 +170,7 @@ export default {
         privateQcNote: attributes.privateQcNote,
         publicQcNote: attributes.publicQcNote
       };
-    }
-  },
-  watch: {
-    "substance.id": function() {
-      this.validationState = this.clearValidation();
-      Object.keys(this.formChanged).forEach(v => (this.formChanged[v] = 0));
-    }
-  },
-  methods: {
+    },
     sumValues(obj) {
       return Object.values(obj).reduce((a, b) => a + b);
     },
@@ -172,8 +180,8 @@ export default {
     markChanged(field) {
       this.checkDataChanges(field);
     },
-    clearForm() {
-      this.$store.commit("substance/clearDetail");
+    resetForm() {
+      this.loadForm(this.substance);
       this.validationState = this.clearValidation();
       Object.keys(this.formChanged).forEach(v => (this.formChanged[v] = 0));
     },

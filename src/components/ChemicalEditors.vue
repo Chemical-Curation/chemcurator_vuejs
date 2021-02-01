@@ -89,6 +89,15 @@
         v-if="editable && type !== 'none'"
         >Save Compound</b-button
       >
+      <b-button
+        id="reset-compound-btn"
+        class="ml-2"
+        @click="resetCompound"
+        variant="secondary"
+        :disabled="!editorChanged"
+        v-if="editable && type !== 'none'"
+        >Reset Compound</b-button
+      >
     </div>
   </div>
 </template>
@@ -197,6 +206,13 @@ export default {
     }
   },
   methods: {
+    resetCompound() {
+      if (this.type === "definedCompound") {
+        this.$refs["ketcher"].resetKetcher();
+      } else {
+        this.$refs["marvin"].resetMarvin();
+      }
+    },
     saveCompound(type) {
       if (type === "definedCompound") {
         this.saveDefinedCompound();
