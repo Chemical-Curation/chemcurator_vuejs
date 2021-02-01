@@ -44,7 +44,9 @@
       </div>
 
       <div class="d-flex flex-row-reverse">
-        <b-button type="submit" variant="primary">Save</b-button>
+        <b-button type="submit" variant="primary" :disabled="!savable"
+          >Save</b-button
+        >
       </div>
     </b-form>
   </div>
@@ -169,7 +171,23 @@ export default {
   computed: {
     ...mapGetters("synonymQuality", { qualityListOptions: "getOptions" }),
     ...mapGetters("source", { sourceListOptions: "getOptions" }),
-    ...mapGetters("synonymType", { typeListOptions: "getOptions" })
+    ...mapGetters("synonymType", { typeListOptions: "getOptions" }),
+
+    /**
+     * Returns whether the form data is considered savable
+     *
+     * Savable if there are identifiers and none of the relationships are null
+     *
+     * @return {boolean} True if savable, False if not savable (missing required field).
+     */
+    savable: function() {
+      return (
+        this.attributes.identifiers !== "" &&
+        Object.entries(this.relationships).filter(entry => {
+          return entry[1] === null;  // return true if the current relationship value is null
+        }).length === 0
+      );
+    }
   }
 };
 </script>
