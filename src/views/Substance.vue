@@ -1,19 +1,27 @@
 <template>
   <b-container fluid="true" class="mx-5">
-    <div id="sidebar" v-show="ifNoSubstance">
+    <div id="sidebar" v-show="ifSearchParameter">
       <SubstanceSidebar />
     </div>
     <b-row>
       <b-col cols="12" order="1" lg="4" order-lg="0">
-        <SubstanceForm />
+        <SubstanceForm
+          :compound="compound"
+          :substance="substance"
+          :isAuthenticated="isAuthenticated"
+          :qcLevelOptions="qcLevelOptions"
+          :sourceOptions="sourceOptions"
+          :substanceTypeOptions="substanceTypeOptions"
+        />
       </b-col>
       <b-col>
         <ChemicalEditors
           :initial-compound="compound"
           :editable="isAuthenticated"
           :substance="substance"
+          :urlParam="urlParam"
+          :options="options"
           @change="changed = $event"
-          @compoundUpdate="fetchCompound($event.data.id)"
         />
       </b-col>
     </b-row>
@@ -39,42 +47,57 @@ import SynonymTable from "@/components/synonyms/agSynonymTable";
 import SubstanceRelationshipTable from "@/components/substance/agSubstanceRelationshipTable";
 import ListTable from "@/components/records/agRecordTable";
 import { mapGetters, mapState } from "vuex";
-import compoundApi from "@/api/compound";
 
 export default {
   name: "home",
   data() {
     return {
-      compound: {},
       changed: false
     };
   },
   computed: {
     ...mapGetters("auth", ["isAuthenticated"]),
+    ...mapGetters("compound", { compound: "getCompound" }),
+    ...mapGetters("qcLevel", { qcLevelOptions: "getOptions" }),
+    ...mapGetters("queryStructureType", { options: "getOptions" }),
+    ...mapGetters("source", { sourceOptions: "getOptions" }),
+    ...mapGetters("substanceType", { substanceTypeOptions: "getOptions" }),
     ...mapState("substance", { substance: "detail" }),
     ...mapState("queryStructureType", { qstList: "list" }),
-    ifNoSubstance() {
-      return !this.substance?.id;
+
+    ifSearchParameter() {
+      return !this.$route.query.search;
+    },
+    urlParam: function() {
+      return (
+        Boolean(this.$route.params.sid) || Boolean(this.$route.query.search)
+      );
     }
   },
   watch: {
-    substance: function() {
-      if (this.substance?.relationships?.associatedCompound?.data) {
-        this.fetchCompound(
-          this.substance.relationships.associatedCompound.data.id
-        );
-      } else this.compound = {};
+    $route: function(to, from) {
+      if (from.query !== to.query && to.query.search) {
+        this.runSearch();
+      }
     }
   },
   methods: {
-    fetchCompound: async function(cid) {
-      this.compound = await compoundApi.fetchCompound(cid);
-    },
     checkChanged: function(event) {
       if (this.changed) {
         // below only needs to eval to a truthy value
         event.returnValue = "lose your changes?";
       }
+    },
+    runSearch: function() {
+      this.$store
+        .dispatch("substance/substanceSearch", {
+          searchString: this.$route.query.search
+        })
+        .then(compound_type => {
+          if (!compound_type || compound_type === "definedCompound") {
+            this.$store.commit("compound/illdefinedcompound/clearState");
+          }
+        });
     }
   },
   components: {
@@ -85,15 +108,15 @@ export default {
     SubstanceRelationshipTable,
     ListTable
   },
+  beforeCreate() {},
   created() {
     window.addEventListener("beforeunload", this.checkChanged);
   },
   mounted() {
     if (this.$route.params.sid) {
-      this.$store.dispatch("substance/substanceSearch", {
-        searchString: this.$route.params.sid,
-        push: false
-      });
+      this.$store.dispatch("substance/fetchSubstance", this.$route.params.sid);
+    } else if (this.$route.query.search) {
+      this.runSearch();
     }
     this.$store.dispatch("queryStructureType/getList");
     this.$store.dispatch("source/getList");

@@ -1,7 +1,6 @@
 import rootActions from "../actions.js";
 import rootMutations from "../mutations.js";
 import { HTTP } from "@/store/http-common";
-import router from "@/router";
 
 const defaultDetail = () => {
   return {
@@ -32,9 +31,7 @@ const defaultDetail = () => {
         }
       },
       associatedCompound: {
-        data: {
-          id: ""
-        }
+        data: null
       }
     }
   };
@@ -46,8 +43,7 @@ const defaultState = () => {
     included: {},
     loading: false,
     count: 0,
-    list: [],
-    form: {}
+    list: []
   };
 };
 
@@ -63,21 +59,33 @@ let actions = {
     let payload = state.list.filter(sub => sub.id === id).shift();
     commit("loadDetail", payload);
   },
-  substanceSearch: async (context, { searchString, push }) => {
+  fetchSubstance: async (context, sid) => {
+    HTTP.get(`substances/${sid}`).then(res => {
+      context.commit("loadDetail", res.data.data);
+      let compound_id = res.data.data.relationships.associatedCompound.data.id;
+      if (compound_id) {
+        context.dispatch(
+          "compound/fetchCompound",
+          { id: compound_id },
+          { root: true }
+        );
+      }
+    });
+  },
+  substanceSearch: async (context, { searchString }) => {
     let resource = await context.dispatch("getResourceURI");
 
-    if (push && router.currentRoute.name !== "substance")
-      await router.push("substance");
-
-    await HTTP.get(`/${resource}?filter[search]=${encodeURI(searchString)}`)
+    let promise = await HTTP.get(
+      `/${resource}?filter[search]=${encodeURI(searchString)}`
+    )
       .then(response => {
-        context.commit("storeList", response.data.data);
-        context.commit("storeCount", response.data.meta.pagination.count);
-
         if (response.data.data.length > 0) {
           let loaded_substance = response.data.data[0];
+          context.commit("loadDetail", loaded_substance);
           let compound_id =
             loaded_substance.relationships.associatedCompound.data?.id;
+          let compound_type =
+            loaded_substance.relationships.associatedCompound.data?.type;
 
           context.commit("loadDetail", loaded_substance);
           if (compound_id) {
@@ -86,6 +94,13 @@ let actions = {
               { id: compound_id },
               { root: true }
             );
+            return compound_type;
+          } else {
+            context.commit("compound/setType", "none", { root: true });
+            context.commit("compound/definedcompound/setLoadable", false, {
+              root: true
+            });
+            return false;
           }
         } else {
           // Handle no rows returned
@@ -112,19 +127,15 @@ let actions = {
           root: true
         });
       });
+    return promise;
   }
 };
-
-// getters
 
 // mutations
 const mutations = {
   ...rootMutations,
   loadDetail(state, payload) {
     state.detail = payload;
-  },
-  clearForm(state) {
-    state.detail = defaultDetail();
   },
   clearState(state) {
     Object.assign(state, defaultState());
@@ -135,6 +146,5 @@ export default {
   namespaced: true,
   state,
   actions,
-  // getters,
   mutations
 };

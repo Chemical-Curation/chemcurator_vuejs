@@ -47,25 +47,31 @@
       <div id="substanceInfoPanel" class="border rounded mb-3">
         <dl class="row my-1 p-2">
           <dt class="col-lg-2">Molecular Weight</dt>
-          <dd class="col-lg-4 overflow-auto">{{ molecularWeight }}</dd>
+          <dd class="col-lg-4 overflow-auto">
+            {{ molecularWeight }}
+          </dd>
 
           <dt class="col-lg-2">Molecular Formula</dt>
-          <dd class="col-lg-4 overflow-auto">{{ molecularFormula }}</dd>
+          <dd class="col-lg-4 overflow-auto">
+            {{ molecularFormula }}
+          </dd>
 
           <dt class="col-lg-2">SMILES</dt>
-          <dd class="col-lg-4 overflow-auto">{{ smiles }}</dd>
+          <dd class="col-lg-4 overflow-auto">
+            {{ smiles }}
+          </dd>
 
           <dt class="col-lg-2">Inchikey</dt>
-          <dd class="col-lg-4 overflow-auto">{{ inchikey }}</dd>
+          <dd class="col-lg-4 overflow-auto">
+            {{ inchikey }}
+          </dd>
         </dl>
       </div>
       <KetcherWindow
         ref="ketcher"
         :initial-molfile="initialMolfile"
-        @molfileUpdate="
-          fetchByMolfile($event.molfileV3000);
-          ketcherChanged = $event.changed;
-        "
+        :urlParam="urlParam"
+        @molfileUpdate="ketcherChanged = $event.changed"
       />
     </div>
     <div v-show="type !== 'definedCompound' && type !== 'none'">
@@ -83,6 +89,15 @@
         v-if="editable && type !== 'none'"
         >Save Compound</b-button
       >
+      <b-button
+        id="reset-compound-btn"
+        class="ml-2"
+        @click="resetCompound"
+        variant="secondary"
+        :disabled="!editorChanged"
+        v-if="editable && type !== 'none'"
+        >Reset Compound</b-button
+      >
     </div>
   </div>
 </template>
@@ -90,8 +105,6 @@
 <script>
 import KetcherWindow from "@/components/KetcherWindow";
 import MarvinWindow from "@/components/MarvinWindow";
-import compoundApi from "@/api/compound";
-import { mapGetters } from "vuex";
 
 export default {
   name: "ChemicalEditors",
@@ -102,32 +115,31 @@ export default {
   props: {
     initialCompound: Object,
     editable: Boolean,
-    substance: Object
+    substance: Object,
+    urlParam: Boolean,
+    options: Function
   },
   data() {
     return {
-      type: "none",
-      definedCompound: {},
-      illDefinedCompound: {},
       ketcherChanged: false,
       marvinChanged: false
     };
   },
   watch: {
     initialCompound: function() {
-      if (!this.initialCompound?.id) {
-        this.type = "none";
+      if (this.type === "none" && !this.substance.id) {
+        // this block empties out the ketcher window when substance is
+        // hit in the NavBar
         this.$refs["ketcher"].clearMolfile();
-        this.$refs["marvin"].clearMarvin();
-      } else if (this.initialCompound?.type === "definedCompound") {
-        this.definedCompound = this.initialCompound;
-        this.type = "definedCompound";
-        // Attempt to load the new molfile
-        this.$refs["ketcher"].loadMolfile(this.initialMolfile);
+        this.changed = false;
+      } else if (
+        this.initialCompound?.type === "definedCompound" &&
+        this.urlParam &&
+        this.$store.state.compound.definedcompound.loadable
+      ) {
+        this.$refs["ketcher"].loadMolfile(this.initialMolfile, true);
+        this.$store.commit("compound/definedcompound/setLoadable", false);
       } else {
-        this.illDefinedCompound = this.initialCompound;
-        this.type = this.illDefinedCompound?.relationships?.queryStructureType?.data?.id;
-        // Attempt to load the new mrvfile
         this.$refs["marvin"].loadMrvfile(this.initialMrvfile);
       }
     },
@@ -136,8 +148,14 @@ export default {
     }
   },
   computed: {
-    ...mapGetters("queryStructureType", { options: "getOptions" }),
-
+    type: {
+      get: function() {
+        return this.$store.state.compound.type;
+      },
+      set: function(newValue) {
+        this.$store.commit("compound/setType", newValue);
+      }
+    },
     initialMolfile: function() {
       return this.initialCompound?.attributes?.molfileV3000 ?? "";
     },
@@ -145,63 +163,54 @@ export default {
       return this.initialCompound?.attributes?.mrvfile ?? "<MDocument/>";
     },
     molecularWeight: function() {
-      return this.definedCompound?.attributes?.molecularWeight ?? "-";
+      return this.initialCompound?.attributes?.molecularWeight ?? "-";
     },
     molecularFormula: function() {
-      return this.definedCompound?.attributes?.molecularFormula ?? "-";
+      return this.initialCompound?.attributes?.molecularFormula ?? "-";
     },
     smiles: function() {
-      return this.definedCompound?.attributes?.smiles ?? "-";
+      return this.initialCompound?.attributes?.smiles ?? "-";
     },
     inchikey: function() {
-      return this.definedCompound?.attributes?.inchikey ?? "-";
+      return this.initialCompound?.attributes?.inchikey ?? "-";
     },
     cid: function() {
-      if (this.type === "definedCompound") {
-        return this.definedCompound?.id || "";
-      } else if (this.type === "none") {
-        return "";
-      } else {
-        return this.illDefinedCompound?.id || "";
-      }
+      return this.initialCompound?.id;
     },
     sid: function() {
       // the sid that the loaded compound is related to
       if (this.cid) {
-        return this.type === "definedCompound"
-          ? this.definedCompound?.relationships?.substance?.data?.id
-          : this.illDefinedCompound?.relationships.substance.data.id;
+        return this.initialCompound?.relationships?.substance?.data?.id || "";
       } else {
         return null;
       }
     },
     editorChanged: function() {
-      return (
-        (this.marvinChanged && this.type !== "definedCompound") ||
-        (this.ketcherChanged && this.type === "definedCompound")
-      );
+      if (this.initialCompound?.type === "illDefinedCompound") {
+        if (
+          this.initialCompound.id &&
+          this.type !==
+            this.initialCompound?.relationships?.queryStructureType.data.id
+        ) {
+          return true;
+        } else return this.marvinChanged;
+      } else return this.ketcherChanged;
     },
     showSubstanceLink: function() {
-      return (
-        this.sid !== null &&
-        this.substance.id !== "" &&
-        this.sid !== this.substance.id
-      );
+      return this.sid && this.sid !== this.substance?.id;
     },
     checkCompound: function() {
       let sub_id =
-        this.substance.relationships.associatedCompound?.data?.id || "";
+        this.substance.relationships?.associatedCompound?.data?.id || "";
       return sub_id === this.cid;
     }
   },
   methods: {
-    async fetchByMolfile(molfile) {
-      if (molfile) {
-        let fetchedCompound = await compoundApi.fetchByMolfile(molfile);
-        if (fetchedCompound) {
-          this.definedCompound = fetchedCompound;
-          this.ketcherChanged = false;
-        } else this.definedCompound = {};
+    resetCompound() {
+      if (this.type === "definedCompound") {
+        this.$refs["ketcher"].resetKetcher();
+      } else {
+        this.$refs["marvin"].resetMarvin();
       }
     },
     saveCompound(type) {
@@ -226,14 +235,19 @@ export default {
             id: this.cid,
             body: { ...requestBody, id: this.cid }
           })
+          .then(() => (this.ketcherChanged = false))
           .catch(err => this.handleError(err));
       } else {
         // If there is no id, save the new compound
         this.$store
           .dispatch("compound/definedcompound/post", requestBody)
-          .then(response =>
-            this.$emit("compoundUpdate", { data: response.data.data })
-          )
+          .then(response => {
+            this.$store.dispatch(
+              "compound/definedcompound/getFetch",
+              response.data.data.id
+            );
+            this.ketcherChanged = false;
+          })
           .catch(err => this.handleError(err));
       }
     },
@@ -261,19 +275,27 @@ export default {
             id: compoundId,
             body: { ...requestBody, id: compoundId }
           })
+          .then(response => {
+            this.$store.commit(
+              "compound/illdefinedcompound/storeFetch",
+              response.data.data
+            );
+            this.marvinChanged = false;
+          })
           .catch(err => this.handleError(err));
       } else {
         // If there is no id, save the new compound
         this.$store
           .dispatch("compound/illdefinedcompound/post", requestBody)
-          .then(response =>
+          .then(response => {
             // Load the newly created compound.  We could bypass this action by
             // storing the response but this verifies the compound is the same and
             // further searches will work
             this.$store.dispatch("compound/fetchCompound", {
               id: response.data.data.id
-            })
-          )
+            });
+            this.marvinChanged = false;
+          })
           .catch(err => this.handleError(err));
       }
     },

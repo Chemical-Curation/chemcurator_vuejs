@@ -259,21 +259,24 @@ export default {
      */
     saveRequest: function(row) {
       // Local functions to deal with successful saves and failures
-      function onSuccess(res) {
+      let onSuccess = res => {
         // Save the id of the potentially newly minted row.
         row.id = res.data.data.id;
         row.created = false;
         row.initialData = { ...row.data };
         row.errors = null;
-        return res;
-      }
 
-      function onFailure(err) {
+        this.addAlert(`${row.data.identifier} was saved`, "success");
+
+        return res;
+      };
+
+      let onFailure = err => {
         row.errors = err.response.data.errors;
         return {
           failed: true
         };
-      }
+      };
 
       let requestBody = this.buildRequestBody(row.data);
 
@@ -297,6 +300,7 @@ export default {
         SynonymApi.delete(row.data.id)
           .then(() => {
             this.gridOptions.rowData.splice(row.rowIndex, 1);
+            this.addAlert(`${row.data.data.identifier} deleted`, "warning");
           })
           .catch(err => {
             row.data.errors = err.response.data.errors;

@@ -1,5 +1,4 @@
 import _ from "lodash";
-import { mapActions } from "vuex";
 import BtnCellRenderer from "@/components/ag-grid/BtnCellRenderer";
 import RelationshipTypeCellRenderer from "@/components/ag-grid/RelationshipTypeCellRenderer";
 import RelationshipTypeCellEditor from "@/components/ag-grid/RelationshipTypeCellEditor";
@@ -88,8 +87,6 @@ export const agGridMixin = {
   },
 
   methods: {
-    ...mapActions("alert", ["alert"]),
-
     /**
      * Rebuilds rowData with a provided array of jsonapi compliant synonyms
      *
@@ -104,17 +101,19 @@ export const agGridMixin = {
       return rowData;
     },
 
+    countDownChanged: function(countdown) {
+      this.alert.timer = countdown;
+    },
+
     /**
-     * Adds an alert to the page and scrolls the user to the top of the page
-     * so they can see it.
+     * Adds an alert to the an alert box
+     * todo: If the top of the page is visible,
+     *       the state alert might be better than this approach
      */
-    addAlert(message, color) {
-      this.alert({
-        message: message,
-        color: color,
-        dismissCountDown: 15
-      });
-      window.scrollTo(0, 0);
+    addAlert(message, style) {
+      this.alert.message = message;
+      this.alert.style = style;
+      this.alert.timer = this.maxTimer;
     },
 
     /**

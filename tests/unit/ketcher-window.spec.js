@@ -59,6 +59,11 @@ describe("KetcherWindow.vue", () => {
     document.body.appendChild(iframe);
 
     wrapper = mount(KetcherWindow, {
+      propsData: {
+        compound: {
+          id: ""
+        }
+      },
       computed: {
         ketcherFrame: function() {
           return iframe;

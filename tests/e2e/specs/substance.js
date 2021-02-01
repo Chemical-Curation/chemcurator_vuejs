@@ -54,10 +54,6 @@ describe("The substance form", () => {
     cy.get("#source").select("Source 1");
     cy.get("#substanceType").select("Substance Type 1");
     cy.get("#save-substance-btn").click();
-    cy.get("[data-cy=alert-box]").should(
-      "contain",
-      `${casrn} is not unique in ['preferred_name', 'display_name', 'casrn']`
-    );
     cy.get("#feedback-preferredName").contains("not unique");
     cy.get("#feedback-displayName").contains("not unique");
     cy.get("#feedback-casrn").contains("not unique");
@@ -105,14 +101,81 @@ describe("The substance form", () => {
       .its("request.body.data.relationships.substanceType.data.id")
       .should("contain", "1");
   });
+  it("should save associatedCompound to substance", () => {
+    cy.route({
+      method: "PATCH",
+      url: "/substances/DTXSID202000099",
+      status: 200,
+      response: {
+        data: {
+          id: "DTXSID202000099"
+        }
+      }
+    }).as("post");
+
+    cy.visit("/substance?search=Solo%20substance");
+    cy.get("#save-substance-btn").should("be.disabled");
+    // Create Compound - Hydrogen Peroxide
+    cy.get("#compound-type-dropdown").select("Defined Compound");
+    cy.get("iframe[id=ketcher]")
+      .its("0.contentDocument.body")
+      .should("not.be.empty")
+      .then(cy.wrap)
+      .find("#canvas")
+      .children()
+      .find("text")
+      .should("not.exist");
+
+    // Find the oxygen button
+    cy.get("iframe[id=ketcher]")
+      .its("0.contentDocument.body")
+      .should("not.be.empty")
+      .then(cy.wrap)
+      .find("#atom")
+      .find("button")
+      .eq(6)
+      .click();
+
+    // Select a point. create a H2O there, click and drag to make H2O2
+    cy.get("iframe[id=ketcher]")
+      .its("0.contentDocument.body")
+      .should("not.be.empty")
+      .then(cy.wrap)
+      .find("#canvas")
+      // create first node
+      .click()
+      .find("text")
+      .first()
+      // select first node
+      .trigger("mousedown", { button: 0 })
+      // back up to canvas
+      .parent()
+      // drag to create compound
+      .trigger("mousemove", 500, 500, { force: true })
+      .trigger("mouseup", { force: true });
+
+    cy.get("#save-substance-btn")
+      .should("not.be.disabled")
+      .click();
+    cy.get("[data-cy=alert-box]").should(
+      "contain",
+      "Substance 'DTXSID202000099' updated successfully"
+    );
+  });
   it("should alert on unsaved Compounds", () => {
-    // quark
     cy.get("[data-cy=search-box]").type("Hydrogen Peroxide");
     cy.get("[data-cy=search-button]").click();
     cy.get("#compound-type-dropdown").select("Ill defined");
     cy.get("#feedback-cid").contains(
       "This Compound is not related to the Substance displayed."
     );
+  });
+  it("should reset field changes on the Substance Form", () => {
+    cy.get("[data-cy=search-box]").type("Hydrogen Peroxide");
+    cy.get("[data-cy=search-button]").click();
+    cy.get("#preferredName").type("Fake Name");
+    cy.get("#reset-substance-btn").click();
+    cy.get("#preferredName").should("have.value", "Hydrogen Peroxide");
   });
 });
 
@@ -131,15 +194,31 @@ describe("The substance page anonymous access", () => {
     cy.get("#compound-type-dropdown").should("not.contain", "Deprecated");
   });
 
-  it("should show depreciated qst if the compound is set to it", () => {
-    cy.get("[data-cy=search-box]").type("Deprecated Substance");
-    cy.get("[data-cy=search-button]").click();
+  it("should disassociate the compound if saved with qst none selected", () => {
+    cy.route({
+      method: "PATCH",
+      url: "/substances/DTXSID502000000",
+      status: 200,
+      response: {}
+    }).as("patch");
 
-    cy.get("#compound-type-dropdown").should("contain", "Deprecated");
-    cy.get("#compound-type-dropdown")
-      .find("[value=deprecated]")
-      .should("be.selected")
-      .should("have.attr", "disabled");
+    cy.adminLogin();
+    cy.visit("/substance/DTXSID502000000");
+
+    cy.get("button:contains('Save Compound')").should("be.disabled");
+    cy.get("#save-substance-btn").should("be.disabled");
+
+    cy.get("#compound-type-dropdown").select("None");
+
+    // Save
+    cy.get("#save-substance-btn")
+      .should("not.be.disabled")
+      .click();
+
+    cy.get("@patch").should("have.property", "status", 200);
+    cy.get("@patch")
+      .its("request.body.data.relationships.associatedCompound.data")
+      .should("be", null);
   });
 
   it("should toggle ketcher/marvinjs on dropdown", () => {
@@ -600,6 +679,106 @@ describe("The substance page authenticated access", () => {
       .should("match", /(<cml).*(><MDocument>).+(<\/MDocument><\/cml>)/);
   });
 
+  it("should patch querystructuretype on illdefined compounds", () => {
+    cy.route({
+      method: "PATCH",
+      url: "/illDefinedCompounds/DTXCID502000009",
+      status: 200,
+      response: {}
+    }).as("patch");
+
+    cy.visit("/substance/DTXSID602000001");
+
+    cy.get("button:contains('Save Compound')").should("be.disabled");
+
+    cy.get("#compound-type-dropdown").select("Markush-Query");
+
+    // Save
+    cy.get("button:contains('Save Compound')")
+      .should("not.be.disabled")
+      .click();
+
+    cy.get("@patch").should("have.property", "status", 200);
+    cy.get("@patch")
+      .its("request.body.data.relationships.queryStructureType.data.id")
+      .should("contain", "markush-query");
+  });
+  it("should reset changes to the Ketcher window", () => {
+    // Get Substance w/ Defined Compound
+    cy.get("[data-cy=search-box]").type("Hydrogen Peroxide");
+    cy.get("[data-cy=search-button]").click();
+
+    // Modify H2O2 so the DTXCID changes
+    cy.get("iframe[id=ketcher]")
+      .its("0.contentDocument.body")
+      .should("not.be.empty")
+      .then(cy.wrap)
+      .find("#canvas")
+      .children()
+      .find("text")
+      .should("not.exist");
+
+    // Find the oxygen button
+    cy.get("iframe[id=ketcher]")
+      .its("0.contentDocument.body")
+      .should("not.be.empty")
+      .then(cy.wrap)
+      .find("#atom")
+      .find("button")
+      .eq(6)
+      .click();
+
+    // Select a point. add Oxygen
+    cy.get("iframe[id=ketcher]")
+      .its("0.contentDocument.body")
+      .should("not.be.empty")
+      .then(cy.wrap)
+      .find("#canvas")
+      .click();
+
+    // Changes have been made, Reset should not be disabled
+    cy.get("#reset-compound-btn").should("not.be.disabled");
+
+    // The DTXCID Field should change and show it is not associated
+    cy.get("#feedback-cid").contains(
+      "This Compound is not related to the Substance displayed."
+    );
+
+    // Reset Compound Editor Window
+    cy.get("#reset-compound-btn").click();
+
+    // The DTXCID for Hydrogen Peroxide should populate
+    cy.get("#recordCompoundID").should("have.value", "DTXCID502000024");
+  });
+
+  it("should reset changes to the Marvin window", () => {
+    // Get Substance w/ Illdefined Compound to modify
+    cy.get("[data-cy=search-box]").type("Sample Substance 2");
+    cy.get("[data-cy=search-button]").click();
+
+    // Click CycloHexane Button
+    cy.get("iframe[id=marvin]")
+      .its("0.contentDocument.body")
+      .find("[title=CycloHexane]")
+      .click();
+
+    // Add CycloHexane to the canvas
+    cy.get("iframe[id=marvin]")
+      .its("0.contentDocument.body")
+      .find("canvas#canvas")
+      .click();
+
+    // Reset button enabled
+    cy.get("#reset-compound-btn").should("not.be.disabled");
+
+    // Reset Compound
+    cy.get("#reset-compound-btn").click();
+
+    // The buttons should be disabled
+    cy.get("#reset-compound-btn").should("be.disabled");
+    cy.get("button:contains('Save Compound')").should("be.disabled");
+  });
+
   it("confirm navigation away from editor changes", () => {
     cy.get("iframe[id=marvin]")
       .its("0.contentDocument.body")
@@ -781,6 +960,8 @@ describe("The substance page's Synonym Table", () => {
       .should("be.enabled")
       .click();
 
+    cy.get("#synonym-alert").should("be.visible");
+
     cy.get("#synonym-table")
       .find("div.ag-center-cols-clipper")
       .find("div.ag-row[role=row]")
@@ -797,7 +978,61 @@ describe("The substance page's Synonym Table", () => {
       method: "POST",
       url: "/synonyms",
       status: 201,
-      response: {} // currently unneeded
+      response: {
+        data: {
+          id: "9",
+          type: "synonym",
+          attributes: {
+            identifiers: "Synonym 9",
+            qcNotes: ""
+          },
+          relationships: {
+            source: {
+              links: {
+                self: "http://localhost:8000/synonyms/3/relationships/source",
+                related: "http://localhost:8000/synonyms/3/source"
+              },
+              data: {
+                type: "source",
+                id: "7"
+              }
+            },
+            substance: {
+              links: {
+                self:
+                  "http://localhost:8000/synonyms/3/relationships/substance",
+                related: "http://localhost:8000/synonyms/3/substance"
+              },
+              data: {
+                type: "substance",
+                id: "2"
+              }
+            },
+            synonymQuality: {
+              links: {
+                self:
+                  "http://localhost:8000/synonyms/3/relationships/synonymQuality",
+                related: "http://localhost:8000/synonyms/3/synonymQuality"
+              },
+              data: {
+                type: "synonymQuality",
+                id: "8"
+              }
+            },
+            synonymType: {
+              links: {
+                self:
+                  "http://localhost:8000/synonyms/3/relationships/synonymType",
+                related: "http://localhost:8000/synonyms/3/synonymType"
+              },
+              data: {
+                type: "synonymType",
+                id: "5"
+              }
+            }
+          }
+        }
+      }
     }).as("post");
 
     cy.get("[data-cy=search-box]").type("Sample Substance 2");
@@ -855,6 +1090,8 @@ describe("The substance page's Synonym Table", () => {
       .eq(5)
       .find("button")
       .click();
+
+    cy.get("#synonym-alert").should("be.visible");
 
     cy.get("@post")
       .its("request.body.data")
@@ -1118,6 +1355,94 @@ describe("The substance page's Relationships Table", () => {
       .should("contain", "DTXSID202000002");
   });
 
+  it("should allow editing (forward and reverse)", () => {
+    // Queue a simple success message.  Response is a template, not valid data.
+    cy.route({
+      method: "PATCH",
+      url: "/substanceRelationships/*",
+      status: 200,
+      response: {} // currently unneeded
+    }).as("patch");
+
+    cy.get("[data-cy=search-box]").type("Sample Substance 2");
+    cy.get("[data-cy=search-button]").click();
+
+    // Button is disabled
+    cy.get("#substance-relationship-table")
+      .find("div.ag-center-cols-clipper")
+      .find("div.ag-row[role=row]")
+      .first()
+      .children()
+      .eq(4)
+      .find("button")
+      .should("be.disabled");
+
+    // Find the first row's first cell and type (SID cell)
+    cy.get("#substance-relationship-table")
+      .find("div.ag-center-cols-clipper")
+      .find("div.ag-row[role=row]")
+      .first()
+      .children()
+      .eq(1)
+      .type("Hello World\n");
+
+    // Change to forward relationship type.  (Relationship Type cell)
+    cy.get("#substance-relationship-table")
+      .find("div.ag-center-cols-clipper")
+      .find("div.ag-row[role=row]")
+      .first()
+      .find("div[col-id='data.relationshipType']")
+      .dblclick();
+    cy.get("#substance-relationship-table")
+      .find("select")
+      .select("central many throw 3");
+
+    // Save the cell edit
+    cy.get("#substance-relationship-table")
+      .find("div.ag-center-cols-clipper")
+      .find("div.ag-row[role=row]")
+      .first()
+      .children()
+      .eq(4)
+      .find("button")
+      .should("be.enabled")
+      .click();
+
+    // Verify fake sid is in "toSubstance" relationship
+    cy.get("@patch")
+      .its("request.body.data.relationships.toSubstance.data.id")
+      .should("eq", "Hello World");
+
+    // Change to reverse relationship type.  (Relationship Type cell)
+    cy.get("#substance-relationship-table")
+      .find("div.ag-center-cols-clipper")
+      .find("div.ag-row[role=row]")
+      .first()
+      .find("div[col-id='data.relationshipType']")
+      .dblclick();
+    cy.get("#substance-relationship-table")
+      .find("select")
+      .select(
+        "Field paper tree where she. Plant project range research be especially half."
+      );
+
+    // Save the cell edit
+    cy.get("#substance-relationship-table")
+      .find("div.ag-center-cols-clipper")
+      .find("div.ag-row[role=row]")
+      .first()
+      .children()
+      .eq(4)
+      .find("button")
+      .should("be.enabled")
+      .click();
+
+    // Verify fake sid is in "fromSubstance" relationship
+    cy.get("@patch")
+      .its("request.body.data.relationships.fromSubstance.data.id")
+      .should("eq", "Hello World");
+  });
+
   it("should allow adding new substance relationships (forward & reverse)", () => {
     // Queue a simple success message (actual response is not currently used)
     cy.route({
@@ -1264,6 +1589,50 @@ describe("The substance page's Relationships Table", () => {
             }
           }
         }
+      });
+  });
+
+  it("should allow deleting", () => {
+    // Queue a simple success message.  Response is a template, not valid data.
+    cy.route({
+      method: "DELETE",
+      url: /substanceRelationships\/\d+/,
+      status: 204,
+      response: ""
+    });
+
+    cy.get("[data-cy=search-box]").type("Sample Substance 2");
+    cy.get("[data-cy=search-button]").click();
+
+    // This is the number of rows before delete
+    let rowCount;
+
+    cy.get("#substance-relationship-table")
+      .find("div.ag-center-cols-clipper")
+      .find("div.ag-row[role=row]")
+      .its("length")
+      .then($rowCount => {
+        rowCount = $rowCount;
+      });
+
+    // Find the first row's delete button, verify enabled and click
+    cy.get("#substance-relationship-table")
+      .find("div.ag-center-cols-clipper")
+      .find("div.ag-row[role=row]")
+      .first()
+      .children()
+      .eq(5)
+      .find("button")
+      .should("be.enabled")
+      .click();
+
+    cy.get("#substance-relationship-table")
+      .find("div.ag-center-cols-clipper")
+      .find("div.ag-row[role=row]")
+      .its("length")
+      .should($newRowCount => {
+        // Verify row count after delete is one less than the rows before change
+        expect($newRowCount).to.equal(rowCount - 1);
       });
   });
 

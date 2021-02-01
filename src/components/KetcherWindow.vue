@@ -16,18 +16,16 @@
 </template>
 
 <script>
-import { mapState } from "vuex";
-
 export default {
   name: "KetcherWindow",
   props: {
-    initialMolfile: String
+    initialMolfile: String,
+    urlParam: Boolean
   },
   data() {
     return {
       ketcherURL: process.env.VUE_APP_KETCHER_URL,
       blank:
-        "  0  0  0     0  0            999 V3000\n" +
         "M  V30 BEGIN CTAB\n" +
         "M  V30 COUNTS 0 0 0 0 0\n" +
         "M  V30 BEGIN ATOM\n" +
@@ -41,10 +39,14 @@ export default {
     };
   },
   methods: {
-    loadMolfile: function(molfile) {
+    resetKetcher: function() {
+      if (this.removeHeader(this.loadedMolfile) === this.blank) {
+        this.clearMolfile();
+      }
+      else this.loadMolfile(this.loadedMolfile);
+    },
+    loadMolfile: function(molfile, loaded) {
       if (molfile) {
-        this.loadedMolfile = "";
-
         this.ketcherFrame.contentWindow.postMessage(
           {
             type: "importMolfile",
@@ -53,6 +55,9 @@ export default {
           "*"
         );
       } else this.clearMolfile();
+      if (loaded) {
+        this.loadedMolfile = "";
+      }
     },
     exportMolfile: function() {
       this.ketcherFrame.contentWindow.postMessage(
@@ -65,33 +70,47 @@ export default {
         { type: "clearMolfile" },
         "*"
       );
+      this.$emit("molfileUpdate", {
+        changed: this.molfileChanged
+      });
     },
     removeHeader: function(str) {
+      // the header returned in the molfile changes on every refresh, but
+      // doesn't represent the compound data that the molfile contains. It can
+      // also differ then from what is drawn in comparison to what is stored.
       return str
         .split("\n")
-        .slice(3, -1)
+        .slice(4, -1)
         .join("\n");
     }
   },
   computed: {
-    ...mapState("compound/definedcompound", ["data"]),
     ketcherFrame: function() {
       return this.$refs.ketcher;
     },
     molfileChanged: function() {
-      return (
-        this.removeHeader(this.molfile) !==
-          this.removeHeader(this.loadedMolfile) &&
-        this.removeHeader(this.molfile) !== this.blank
-      );
+      if (this.urlParam) {
+        return (
+          this.removeHeader(this.loadedMolfile) !==
+            this.removeHeader(this.molfile) &&
+          this.removeHeader(this.molfile) !== this.blank
+        );
+      } else {
+        return this.blank !== this.removeHeader(this.molfile);
+      }
     }
   },
   watch: {
-    molfile: function() {
+    molfileChanged: function() {
       this.$emit("molfileUpdate", {
-        molfileV3000: this.molfile,
         changed: this.molfileChanged
       });
+    },
+    molfile: function() {
+      this.$store.dispatch(
+        "compound/definedcompound/fetchByMolfile",
+        this.molfile
+      );
     }
   },
   mounted() {
