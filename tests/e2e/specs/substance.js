@@ -163,13 +163,19 @@ describe("The substance form", () => {
     );
   });
   it("should alert on unsaved Compounds", () => {
-    // quark
     cy.get("[data-cy=search-box]").type("Hydrogen Peroxide");
     cy.get("[data-cy=search-button]").click();
     cy.get("#compound-type-dropdown").select("Ill defined");
     cy.get("#feedback-cid").contains(
       "This Compound is not related to the Substance displayed."
     );
+  });
+  it("should reset field changes on the Substance Form", () => {
+    cy.get("[data-cy=search-box]").type("Hydrogen Peroxide");
+    cy.get("[data-cy=search-button]").click();
+    cy.get("#preferredName").type("Fake Name");
+    cy.get("#reset-substance-btn").click();
+    cy.get("#preferredName").should("have.value", "Hydrogen Peroxide");
   });
 });
 
@@ -696,6 +702,81 @@ describe("The substance page authenticated access", () => {
     cy.get("@patch")
       .its("request.body.data.relationships.queryStructureType.data.id")
       .should("contain", "markush-query");
+  });
+  it("should reset changes to the Ketcher window", () => {
+    // Get Substance w/ Defined Compound
+    cy.get("[data-cy=search-box]").type("Hydrogen Peroxide");
+    cy.get("[data-cy=search-button]").click();
+
+    // Modify H2O2 so the DTXCID changes
+    cy.get("iframe[id=ketcher]")
+      .its("0.contentDocument.body")
+      .should("not.be.empty")
+      .then(cy.wrap)
+      .find("#canvas")
+      .children()
+      .find("text")
+      .should("not.exist");
+
+    // Find the oxygen button
+    cy.get("iframe[id=ketcher]")
+      .its("0.contentDocument.body")
+      .should("not.be.empty")
+      .then(cy.wrap)
+      .find("#atom")
+      .find("button")
+      .eq(6)
+      .click();
+
+    // Select a point. add Oxygen
+    cy.get("iframe[id=ketcher]")
+      .its("0.contentDocument.body")
+      .should("not.be.empty")
+      .then(cy.wrap)
+      .find("#canvas")
+      .click();
+
+    // Changes have been made, Reset should not be disabled
+    cy.get("#reset-compound-btn").should("not.be.disabled");
+
+    // The DTXCID Field should change and show it is not associated
+    cy.get("#feedback-cid").contains(
+      "This Compound is not related to the Substance displayed."
+    );
+
+    // Reset Compound Editor Window
+    cy.get("#reset-compound-btn").click();
+
+    // The DTXCID for Hydrogen Peroxide should populate
+    cy.get("#recordCompoundID").should("have.value", "DTXCID502000024");
+  });
+
+  it("should reset changes to the Marvin window", () => {
+    // Get Substance w/ Illdefined Compound to modify
+    cy.get("[data-cy=search-box]").type("Sample Substance 2");
+    cy.get("[data-cy=search-button]").click();
+
+    // Click CycloHexane Button
+    cy.get("iframe[id=marvin]")
+      .its("0.contentDocument.body")
+      .find("[title=CycloHexane]")
+      .click();
+
+    // Add CycloHexane to the canvas
+    cy.get("iframe[id=marvin]")
+      .its("0.contentDocument.body")
+      .find("canvas#canvas")
+      .click();
+
+    // Reset button enabled
+    cy.get("#reset-compound-btn").should("not.be.disabled");
+
+    // Reset Compound
+    cy.get("#reset-compound-btn").click();
+
+    // The buttons should be disabled
+    cy.get("#reset-compound-btn").should("be.disabled");
+    cy.get("button:contains('Save Compound')").should("be.disabled");
   });
 
   it("confirm navigation away from editor changes", () => {

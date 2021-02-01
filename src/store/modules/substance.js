@@ -137,9 +137,6 @@ const mutations = {
   loadDetail(state, payload) {
     state.detail = payload;
   },
-  clearDetail(state) {
-    state.detail = defaultDetail();
-  },
   clearState(state) {
     Object.assign(state, defaultState());
   }
