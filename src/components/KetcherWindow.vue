@@ -40,7 +40,10 @@ export default {
   },
   methods: {
     resetKetcher: function() {
-      this.loadMolfile(this.loadedMolfile);
+      if (this.removeHeader(this.loadedMolfile) === this.blank) {
+        this.clearMolfile();
+      }
+      else this.loadMolfile(this.loadedMolfile);
     },
     loadMolfile: function(molfile, loaded) {
       if (molfile) {
