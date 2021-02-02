@@ -1,7 +1,14 @@
 <template>
-  <div class="mb-5">
-    <div class="text-left">
+  <div>
+    <div class="d-flex justify-content-between text-left">
       <h3>Synonyms</h3>
+      <b-button
+        v-b-modal.bulk-add-synonyms-modal
+        variant="success"
+        :disabled="!substanceId || loading"
+        class="mb-2"
+        >Bulk Add Synonyms</b-button
+      >
     </div>
     <ag-grid-vue
       id="synonym-table"
@@ -24,14 +31,11 @@
       @dismiss-count-down="countDownChanged"
       >{{ alert.message }}</b-alert
     >
-    <div v-show="selectedError" class="mt-3 text-left">
-      <b-table
+    <div v-show="selectedError.length > 0" class="mt-3 text-left">
+      <error-table
+        :errors="selectedError"
         id="synonym-error-table"
-        :items="selectedError"
-        :fields="errorFields"
-        borderless
-        table-variant="danger"
-      ></b-table>
+      ></error-table>
     </div>
     <div class="d-flex flex-row justify-content-end my-3" v-if="editable">
       <b-button
@@ -44,6 +48,18 @@
         Add Synonym
       </b-button>
     </div>
+    <b-modal
+      id="bulk-add-synonyms-modal"
+      title="Bulk Add Synonyms"
+      size="lg"
+      hide-footer
+    >
+      <BulkAddSynonyms
+        :substance-id="substanceId"
+        @save="loadSynonyms(substanceId)"
+      >
+      </BulkAddSynonyms>
+    </b-modal>
   </div>
 </template>
 
@@ -52,10 +68,14 @@ import { mapActions, mapGetters, mapState } from "vuex";
 import { AgGridVue } from "ag-grid-vue";
 import SynonymApi from "@/api/synonym.js";
 import { agGridMixin } from "@/components/ag-grid/agGridMixin";
+import BulkAddSynonyms from "@/components/synonyms/BulkAddSynonyms";
+import ErrorTable from "@/components/ErrorTable";
 
 export default {
   name: "agSynonymTable",
   components: {
+    ErrorTable,
+    BulkAddSynonyms,
     AgGridVue
   },
   mixins: [agGridMixin],

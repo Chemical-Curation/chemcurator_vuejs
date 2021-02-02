@@ -42,8 +42,7 @@ export default {
     resetKetcher: function() {
       if (this.removeHeader(this.loadedMolfile) === this.blank) {
         this.clearMolfile();
-      }
-      else this.loadMolfile(this.loadedMolfile);
+      } else this.loadMolfile(this.loadedMolfile);
     },
     loadMolfile: function(molfile, loaded) {
       if (molfile) {
