@@ -1217,6 +1217,113 @@ describe("The substance page's Synonym Table", () => {
 
     cy.get("#synonym-error-table").should("contain.text", sampleErrorMessage);
   });
+
+  it("should bulk add synonyms", () => {
+    cy.route({
+      method: "POST",
+      url: "/synonyms",
+      status: 201,
+      response: {}
+    }).as("synonymPost");
+
+    cy.get("[data-cy=search-box]").type("Sample Substance 2");
+    cy.get("[data-cy=search-button]").click();
+
+    // Open Modal
+    cy.get("button:contains('Bulk Add Synonyms')").click();
+
+    cy.get("div[id='bulk-add-synonyms-modal']")
+      .find("select")
+      .eq(0)
+      .select("down indeed other 4");
+    cy.get("div[id='bulk-add-synonyms-modal']")
+      .find("select")
+      .eq(1)
+      .select("cost imagine 0");
+    cy.get("div[id='bulk-add-synonyms-modal']")
+      .find("select")
+      .eq(2)
+      .select("capital performance 4");
+
+    cy.get("div[id='bulk-add-synonyms-modal']")
+      .find("textarea")
+      .type("Test Synonym 1\nTest Synonym 2");
+
+    cy.get("div[id='bulk-add-synonyms-modal']")
+      .find("button:contains('Save')")
+      .click();
+
+    cy.get("div[id='bulk-add-synonyms-modal']")
+      .find("div[role='alert']:contains('All Identifiers Saved')")
+      .should("exist")
+      // Search for "synonymPost" alias requests.  There should be 2
+      .then(() => {
+        expect(
+          cy.state("requests").filter(call => call.alias === "synonymPost")
+        ).to.have.length(2);
+      });
+  });
+
+  it("should handle bulk add synonyms errors", () => {
+    cy.route({
+      method: "POST",
+      url: "/synonyms",
+      status: 400,
+      response: {
+        errors: [
+          {
+            code: "invalid",
+            detail: "Error Message",
+            status: "400",
+            source: { pointer: "/data/attributes/nonFieldErrors" }
+          }
+        ]
+      }
+    }).as("synonymPost");
+
+    cy.get("[data-cy=search-box]").type("Sample Substance 2");
+    cy.get("[data-cy=search-button]").click();
+
+    // Open Modal
+    cy.get("button:contains('Bulk Add Synonyms')").click();
+
+    cy.get("div[id='bulk-add-synonyms-modal']")
+      .find("select")
+      .eq(0)
+      .select("down indeed other 4");
+    cy.get("div[id='bulk-add-synonyms-modal']")
+      .find("select")
+      .eq(1)
+      .select("cost imagine 0");
+    cy.get("div[id='bulk-add-synonyms-modal']")
+      .find("select")
+      .eq(2)
+      .select("capital performance 4");
+
+    cy.get("div[id='bulk-add-synonyms-modal']")
+      .find("textarea")
+      .type("Test Synonym 1\nTest Synonym 2");
+
+    cy.get("div[id='bulk-add-synonyms-modal']")
+      .find("button:contains('Save')")
+      .click();
+    // Search for "post" alias requests
+
+    cy.get("div[id='bulk-add-synonyms-modal']")
+      .find(
+        "div[role='alert']:contains('The below identifiers were not saved. Review the errors and reattempt.')"
+      )
+      .should("exist")
+      .then(() => {
+        expect(
+          cy.state("requests").filter(call => call.alias === "synonymPost")
+        ).to.have.length(2);
+      });
+
+    cy.get("div[id='bulk-add-synonyms-modal']")
+      .find("table")
+      .should("be.visible");
+  });
 });
 
 describe("The substance page's Relationships Table", () => {
