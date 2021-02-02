@@ -23,6 +23,14 @@
       @row-selected="onRowSelected"
       rowSelection="single"
     />
+    <b-alert
+      class="mt-3"
+      id="synonym-alert"
+      :variant="alert.style"
+      :show="alert.timer"
+      @dismiss-count-down="countDownChanged"
+      >{{ alert.message }}</b-alert
+    >
     <div v-show="selectedError.length > 0" class="mt-3 text-left">
       <error-table
         :errors="selectedError"

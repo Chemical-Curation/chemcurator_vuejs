@@ -184,7 +184,7 @@ export default {
       return (
         this.attributes.identifiers !== "" &&
         Object.entries(this.relationships).filter(entry => {
-          return entry[1] === null;  // return true if the current relationship value is null
+          return entry[1] === null; // return true if the current relationship value is null
         }).length === 0
       );
     }

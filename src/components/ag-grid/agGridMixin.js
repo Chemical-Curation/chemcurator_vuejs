@@ -13,7 +13,14 @@ export const agGridMixin = {
       gridOptions: {},
       loading: false,
       selectedRow: null,
-      frameworkComponents: null
+      frameworkComponents: null,
+      // Display options for error table.
+      alert: {
+        style: "success",
+        message: "",
+        timer: 0
+      },
+      maxTimer: 10
     };
   },
 
