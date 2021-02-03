@@ -31,7 +31,8 @@ export default {
   },
   methods: {
     click: function(result) {
-      alert(result.id);
+      this.$router.push({ name: "substance_detail", params: { sid: result } });
+      // alert(result.id);
     }
   },
   components: {
