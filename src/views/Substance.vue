@@ -7,7 +7,7 @@
       <div>
         <SubstanceSearchPanel
           :headerText="this.$route.query.search"
-          @click="onClick($event)"
+          :searchResults="storedSearches"
         />
       </div>
     </div>
@@ -64,11 +64,16 @@ export default {
     ...mapGetters("auth", ["isAuthenticated"]),
     ...mapGetters("compound", { compound: "getCompound" }),
     ...mapGetters("qcLevel", { qcLevelOptions: "getOptions" }),
-    ...mapGetters("queryStructureType", { options: "getOptions" }),
+    ...mapGetters("queryStructureType", {
+      options: "getOptions",
+      qstList: "list"
+    }),
     ...mapGetters("source", { sourceOptions: "getOptions" }),
+    ...mapState("substance", {
+      substance: "detail",
+      storedSearches: "searchResults"
+    }),
     ...mapGetters("substanceType", { substanceTypeOptions: "getOptions" }),
-    ...mapState("substance", { substance: "detail" }),
-    ...mapState("queryStructureType", { qstList: "list" }),
 
     ifSearchParameter() {
       return !this.$route.query.search;
