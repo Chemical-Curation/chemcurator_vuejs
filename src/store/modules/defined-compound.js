@@ -4,9 +4,13 @@ import { HTTP } from "@/store/http-common";
 
 const defaultState = () => {
   return {
-    data: {},
+    data: {
+      id: "",
+      type: "definedCompound"
+    },
     included: {},
-    changed: false
+    changed: false,
+    loadable: false
   };
 };
 
@@ -35,6 +39,8 @@ const actions = {
         //       or if the json:api id is the same as the cid being passed in.
         if (obj) {
           dispatch("getFetch", obj.id);
+        } else {
+          commit("clearState");
         }
       })
       .catch(err => {
@@ -57,6 +63,9 @@ const mutations = {
   ...rootMutations,
   clearState(state) {
     Object.assign(state, defaultState());
+  },
+  setLoadable(state, val) {
+    state.loadable = val;
   }
 };
 

@@ -1,5 +1,4 @@
 import _ from "lodash";
-import { mapActions } from "vuex";
 import BtnCellRenderer from "@/components/ag-grid/BtnCellRenderer";
 import RelationshipTypeCellRenderer from "@/components/ag-grid/RelationshipTypeCellRenderer";
 import RelationshipTypeCellEditor from "@/components/ag-grid/RelationshipTypeCellEditor";
@@ -16,7 +15,12 @@ export const agGridMixin = {
       selectedRow: null,
       frameworkComponents: null,
       // Display options for error table.
-      errorFields: [{ label: "Errors", key: "modifiedDetail" }]
+      alert: {
+        style: "success",
+        message: "",
+        timer: 0
+      },
+      maxTimer: 10
     };
   },
 
@@ -73,12 +77,7 @@ export const agGridMixin = {
     },
 
     selectedError: function() {
-      if (this.selectedRow?.errors)
-        return this.selectedRow.errors.map(error => {
-          error.modifiedDetail = this.buildErrorString(error);
-          return error;
-        });
-      return null;
+      return this.selectedRow?.errors ?? [];
     },
 
     /**
@@ -95,8 +94,6 @@ export const agGridMixin = {
   },
 
   methods: {
-    ...mapActions("alert", ["alert"]),
-
     /**
      * Rebuilds rowData with a provided array of jsonapi compliant synonyms
      *
@@ -111,17 +108,19 @@ export const agGridMixin = {
       return rowData;
     },
 
+    countDownChanged: function(countdown) {
+      this.alert.timer = countdown;
+    },
+
     /**
-     * Adds an alert to the page and scrolls the user to the top of the page
-     * so they can see it.
+     * Adds an alert to the an alert box
+     * todo: If the top of the page is visible,
+     *       the state alert might be better than this approach
      */
-    addAlert(message, color) {
-      this.alert({
-        message: message,
-        color: color,
-        dismissCountDown: 15
-      });
-      window.scrollTo(0, 0);
+    addAlert(message, style) {
+      this.alert.message = message;
+      this.alert.style = style;
+      this.alert.timer = this.maxTimer;
     },
 
     /**
@@ -131,40 +130,6 @@ export const agGridMixin = {
       if (event.node.isSelected()) {
         this.selectedRow = event.data;
       }
-    },
-
-    /**
-     * Turns a row specific error into readable text
-     *
-     * Prepends a title case of the pointer's attribute to the error string if the error is
-     * field specific.  Pointer values of "nonFieldErrors" will be ignored.
-     *
-     * @param error {Object}: JsonAPI error object containing error detail string and a source.pointer
-     *     Example JsonAPI error
-     *     {
-     *       detail: "This field is required"
-     *       status: "400"
-     *       source: { pointer: "data/attributes/synonymQuality" }
-     *       code: "required"
-     *     }
-     * @returns {string}: Modified error string.
-     *     From above example "Synonym Quality: This field is required"
-     */
-    buildErrorString: function(error) {
-      let readableDetails = error.detail;
-
-      if (error?.source?.pointer) {
-        let pointerField = error.source.pointer
-          .split("/")
-          .slice(-1)
-          .shift();
-        if (pointerField !== "nonFieldErrors") {
-          let result = pointerField.replace(/([A-Z])/g, " $1");
-          let finalResult = result.charAt(0).toUpperCase() + result.slice(1);
-          readableDetails = finalResult + ": " + readableDetails;
-        }
-      }
-      return readableDetails;
     },
 
     /**

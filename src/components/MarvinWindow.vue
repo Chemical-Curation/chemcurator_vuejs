@@ -31,6 +31,15 @@ export default {
     };
   },
   methods: {
+    resetMarvin: function() {
+      this.marvinFrame.contentWindow.postMessage(
+        {
+          type: "importMrvfile",
+          mrvfile: this.loadedMrvfile
+        },
+        "*"
+      );
+    },
     loadMrvfile: function(mrvfile) {
       this.loadedMrvfile = "";
       this.marvinFrame.contentWindow.postMessage(
