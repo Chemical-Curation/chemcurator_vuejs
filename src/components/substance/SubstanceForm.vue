@@ -126,6 +126,26 @@ export default {
         return false;
       }
     },
+    checkRelationship: function() {
+      // Prevents saving a Substance that has an unsaved (no DTXCID) Compound
+      if (this.$store.state.compound.type !== "none") {
+        if (
+          this.$store.state.compound.type == "definedCompound" &&
+          this.$store.state.compound.definedcompound.data.id == ""
+        ) {
+          return false;
+        } else if (
+          this.$store.state.compound.type == "illdefinedCompound" &&
+          this.$store.state.compound.illdefinedcompound.data.id == ""
+        ) {
+          return false;
+        } else {
+          return true;
+        }
+      } else {
+        return true;
+      }
+    },
     btnDisabled: function() {
       if (this.compoundChanged) {
         return false;
@@ -269,24 +289,32 @@ export default {
       return payload;
     },
     saveSubstance() {
-      let { id } = this.form;
-      let payload = this.buildPayload();
-      if (id) {
-        payload["id"] = id;
-        // if there is an id, patch the currently loaded substance.
-        this.$store
-          .dispatch("substance/patch", {
-            id: id,
-            body: { ...payload }
-          })
-          .then(response => this.handleSuccess(response))
-          .catch(err => this.handleFail(err));
+      if (this.checkRelationship) {
+        let { id } = this.form;
+        let payload = this.buildPayload();
+        if (id) {
+          payload["id"] = id;
+          // if there is an id, patch the currently loaded substance.
+          this.$store
+            .dispatch("substance/patch", {
+              id: id,
+              body: { ...payload }
+            })
+            .then(response => this.handleSuccess(response))
+            .catch(err => this.handleFail(err));
+        } else {
+          // If there is no id, save the new substance.
+          this.$store
+            .dispatch("substance/post", payload)
+            .then(response => this.handleSuccess(response))
+            .catch(err => this.handleFail(err));
+        }
       } else {
-        // If there is no id, save the new substance.
-        this.$store
-          .dispatch("substance/post", payload)
-          .then(response => this.handleSuccess(response))
-          .catch(err => this.handleFail(err));
+        this.$store.dispatch("alert/alert", {
+          message: `Gotta do the thing`,
+          color: "warning",
+          dismissCountDown: 5
+        });
       }
     },
     handleSuccess(response) {
