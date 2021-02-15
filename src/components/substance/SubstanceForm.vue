@@ -59,6 +59,9 @@
       variant="secondary"
       >Reset Substance</b-button
     >
+    <b-form-invalid-feedback id="feedback-cid" :state="hasValidCompound">
+      This Compound displayed is not saved.
+    </b-form-invalid-feedback>
   </b-form>
 </template>
 
@@ -87,6 +90,7 @@ export default {
         source: 0,
         substanceType: 0
       },
+      hasValidCompound: true,
       validationState: this.clearValidation(),
       textareas: ["description", "privateQcNote", "publicQcNote"],
       dropdowns: ["qcLevel", "source", "substanceType"],
@@ -290,6 +294,7 @@ export default {
     },
     saveSubstance() {
       if (this.checkRelationship) {
+        this.hasValidCompound = true;
         let { id } = this.form;
         let payload = this.buildPayload();
         if (id) {
@@ -310,11 +315,7 @@ export default {
             .catch(err => this.handleFail(err));
         }
       } else {
-        this.$store.dispatch("alert/alert", {
-          message: `Gotta do the thing`,
-          color: "warning",
-          dismissCountDown: 5
-        });
+        this.hasValidCompound = false;
       }
     },
     handleSuccess(response) {
