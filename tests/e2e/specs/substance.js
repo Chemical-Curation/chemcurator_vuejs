@@ -173,6 +173,15 @@ describe("The substance form", () => {
   });
 });
 
+describe("Substance Search Results", () => {
+  it("It should display search text as header", () => {
+    cy.get("[data-cy=search-box]").type("plow");
+    cy.get("[data-cy=search-button]").click();
+    cy.get("#header-text").should("contain", "plow");
+  });
+  it("Substance page should load alternate search result", () => {});
+});
+
 describe("The substance page anonymous access", () => {
   beforeEach(() => {
     cy.server();

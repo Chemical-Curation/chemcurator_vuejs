@@ -73,6 +73,9 @@ let actions = {
       }
     });
   },
+  storedSearch: async (context, substance) => {
+    context.commit("selectSubstance", substance);
+  },
   substanceSearch: async (context, { searchString }) => {
     // let resource = await context.dispatch("getResourceURI");
     let resource = "search";
@@ -147,6 +150,9 @@ const mutations = {
   },
   clearState(state) {
     Object.assign(state, defaultState());
+  },
+  selectSubstance(state, substance) {
+    state.detail = substance;
   }
 };
 

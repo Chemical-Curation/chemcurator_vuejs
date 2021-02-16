@@ -7,7 +7,7 @@
       <div>
         <SubstanceSearchPanel
           :headerText="this.$route.query.search"
-          @click="onClick($event)"
+          @click="searchSelection($event)"
         />
       </div>
     </div>
@@ -103,6 +103,11 @@ export default {
             this.$store.commit("compound/illdefinedcompound/clearState");
           }
         });
+    },
+    searchSelection: function(result) {
+      // this.$router.push({ name: "substance_detail", params: { sid: result } });
+      this.$store.dispatch("substance/storedSearch", result);
+      console.log(result);
     }
   },
   components: {
