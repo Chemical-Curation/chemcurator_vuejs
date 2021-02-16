@@ -1,6 +1,10 @@
 <template>
   <div>
-    <b-button v-b-toggle.substance-search-panel class="btn btn-primary btn-sm">
+    <b-button
+      v-b-toggle.substance-search-panel
+      class="btn btn-primary btn-sm"
+      data-cy="search-results-button"
+    >
       Toggle Search Results
     </b-button>
     <b-sidebar id="substance-search-panel" right shadow>
@@ -9,6 +13,7 @@
       </div>
       <div class="substance-search-panel-results text-center">
         <search-node
+          data-cy="search-node"
           v-for="(result, index) in storedSearches"
           class="btn btn-outline-success mb-2 mx-1 btn-block"
           :key="index"

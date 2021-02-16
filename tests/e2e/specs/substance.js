@@ -177,9 +177,13 @@ describe("Substance Search Results", () => {
   it("It should display search text as header", () => {
     cy.get("[data-cy=search-box]").type("plow");
     cy.get("[data-cy=search-button]").click();
+    cy.get("[data-cy=search-results-button]").click();
     cy.get("#header-text").should("contain", "plow");
+    cy.get("[data-cy=search-node]")
+      .contains("DTXSID602000001")
+      .click();
+    cy.get("#id").should("have.value", "DTXSID602000001");
   });
-  it("Substance page should load alternate search result", () => {});
 });
 
 describe("The substance page anonymous access", () => {
