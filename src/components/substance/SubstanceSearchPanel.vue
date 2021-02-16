@@ -29,6 +29,12 @@ export default {
     headerText: String,
     searchResults: Array
   },
+  methods: {
+    click: function(result) {
+      this.$router.push({ name: "substance_detail", params: { sid: result } });
+      // alert(result.id);
+    }
+  },
   components: {
     SearchNode
   },
