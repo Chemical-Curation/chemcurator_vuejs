@@ -10,6 +10,7 @@
       <div class="substance-search-panel-results text-center">
         <search-node
           v-for="(result, index) in storedSearches"
+          class="btn btn-outline-success mb-2 mx-1 btn-block"
           :key="index"
           :result="result"
           @click="$emit('click', result)"
