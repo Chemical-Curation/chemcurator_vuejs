@@ -59,8 +59,12 @@
       variant="secondary"
       >Reset Substance</b-button
     >
-    <b-form-invalid-feedback id="feedback-cid" :state="hasValidCompound">
-      This Compound displayed is not saved.
+    <b-form-invalid-feedback
+      id="feedback-substanceSave"
+      :state="hasValidCompound"
+    >
+      The Compound displayed is not saved. Save changes to the Compound before
+      saving the Substance or set Structure Type to 'None'.
     </b-form-invalid-feedback>
   </b-form>
 </template>

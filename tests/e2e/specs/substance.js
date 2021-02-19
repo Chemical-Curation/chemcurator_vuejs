@@ -170,6 +170,20 @@ describe("The substance form", () => {
       "This Compound is not related to the Substance displayed."
     );
   });
+  it("should prevent saving Substance when no DTXCID", () => {
+    let casrn = valid_casrns[Math.floor(Math.random() * valid_casrns.length)];
+    cy.get("#preferredName").type("I am a fake preferredName");
+    cy.get("#displayName").type("I am a fake displayName");
+    cy.get("#casrn").type(casrn);
+    cy.get("#qcLevel").select("QC Level 1");
+    cy.get("#source").select("Source 1");
+    cy.get("#substanceType").select("Substance Type 1");
+    cy.get("#compound-type-dropdown").select("Ill defined");
+    cy.get("#save-substance-btn").click();
+    cy.get("#feedback-substanceSave").contains(
+      "The Compound displayed is not saved. Save changes to the Compound before saving the Substance or set Structure Type to 'None'."
+    );
+  });
   it("should reset field changes on the Substance Form", () => {
     cy.get("[data-cy=search-box]").type("Hydrogen Peroxide");
     cy.get("[data-cy=search-button]").click();
