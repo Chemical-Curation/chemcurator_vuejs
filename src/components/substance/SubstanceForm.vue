@@ -59,6 +59,13 @@
       variant="secondary"
       >Reset Substance</b-button
     >
+    <b-form-invalid-feedback
+      id="feedback-substanceSave"
+      :state="hasValidCompound"
+    >
+      The Compound displayed is not saved. Save changes to the Compound before
+      saving the Substance or set Structure Type to 'None'.
+    </b-form-invalid-feedback>
   </b-form>
 </template>
 
@@ -87,6 +94,7 @@ export default {
         source: 0,
         substanceType: 0
       },
+      hasValidCompound: true,
       validationState: this.clearValidation(),
       textareas: ["description", "privateQcNote", "publicQcNote"],
       dropdowns: ["qcLevel", "source", "substanceType"],
@@ -124,6 +132,26 @@ export default {
         return true;
       } else {
         return false;
+      }
+    },
+    checkRelationship: function() {
+      // Prevents saving a Substance that has an unsaved (no DTXCID) Compound
+      if (this.$store.state.compound.type !== "none") {
+        if (
+          this.$store.state.compound.type == "definedCompound" &&
+          this.$store.state.compound.definedcompound.data.id == ""
+        ) {
+          return false;
+        } else if (
+          this.$store.state.compound.type == "illdefinedCompound" &&
+          this.$store.state.compound.illdefinedcompound.data.id == ""
+        ) {
+          return false;
+        } else {
+          return true;
+        }
+      } else {
+        return true;
       }
     },
     btnDisabled: function() {
@@ -269,24 +297,29 @@ export default {
       return payload;
     },
     saveSubstance() {
-      let { id } = this.form;
-      let payload = this.buildPayload();
-      if (id) {
-        payload["id"] = id;
-        // if there is an id, patch the currently loaded substance.
-        this.$store
-          .dispatch("substance/patch", {
-            id: id,
-            body: { ...payload }
-          })
-          .then(response => this.handleSuccess(response))
-          .catch(err => this.handleFail(err));
+      if (this.checkRelationship) {
+        this.hasValidCompound = true;
+        let { id } = this.form;
+        let payload = this.buildPayload();
+        if (id) {
+          payload["id"] = id;
+          // if there is an id, patch the currently loaded substance.
+          this.$store
+            .dispatch("substance/patch", {
+              id: id,
+              body: { ...payload }
+            })
+            .then(response => this.handleSuccess(response))
+            .catch(err => this.handleFail(err));
+        } else {
+          // If there is no id, save the new substance.
+          this.$store
+            .dispatch("substance/post", payload)
+            .then(response => this.handleSuccess(response))
+            .catch(err => this.handleFail(err));
+        }
       } else {
-        // If there is no id, save the new substance.
-        this.$store
-          .dispatch("substance/post", payload)
-          .then(response => this.handleSuccess(response))
-          .catch(err => this.handleFail(err));
+        this.hasValidCompound = false;
       }
     },
     handleSuccess(response) {
